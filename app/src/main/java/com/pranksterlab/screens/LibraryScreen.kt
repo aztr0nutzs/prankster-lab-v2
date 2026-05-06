@@ -2,6 +2,7 @@ package com.pranksterlab.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -47,6 +49,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -66,17 +70,23 @@ import kotlinx.coroutines.launch
 private const val FILTER_ALL = "ALL"
 private const val FILTER_FAVORITES = "FAVORITES"
 private const val FILTER_CUSTOM = "CUSTOM"
+private const val FILTER_GENERATED = "GENERATED"
 
 @Composable
-fun LibraryScreen(soundRepository: SoundRepository, audioPlayerController: AudioPlayerController) {
+fun LibraryScreen(
+    soundRepository: SoundRepository,
+    audioPlayerController: AudioPlayerController,
+    onOpenSequence: () -> Unit = {},
+    onOpenTimer: () -> Unit = {}
+) {
     var bundledSounds by remember { mutableStateOf(emptyList<PrankSound>()) }
     var customSounds by remember { mutableStateOf(emptyList<PrankSound>()) }
     var selectedCategory by remember { mutableStateOf(FILTER_ALL) }
     var selectedPack by remember { mutableStateOf<String?>(null) }
     var searchQuery by remember { mutableStateOf("") }
     var isSearchActive by remember { mutableStateOf(false) }
+    var showDiagnostics by remember { mutableStateOf(false) }
     val activePackFilter by soundRepository.activePackFilter.collectAsState()
-    val showDiagnostics = false
 
     val favoriteIds by soundRepository.getFavoritesFlow().collectAsState(initial = emptySet())
     val scope = rememberCoroutineScope()
@@ -92,7 +102,7 @@ fun LibraryScreen(soundRepository: SoundRepository, audioPlayerController: Audio
 
     val allSounds = bundledSounds + customSounds
     val validSounds = allSounds.filter { sound ->
-        sound.isCustom || soundRepository.isCatalogSoundPlayable(sound)
+        soundRepository.isSoundPlayable(sound)
     }
     val invalidSounds = allSounds - validSounds.toSet()
 
@@ -106,6 +116,7 @@ fun LibraryScreen(soundRepository: SoundRepository, audioPlayerController: Audio
             add("$category ($count)")
         }
         if (validSounds.any { it.isCustom }) add("$FILTER_CUSTOM (${validSounds.count { it.isCustom }})")
+        if (validSounds.any { it.isGeneratedSound() }) add("$FILTER_GENERATED (${validSounds.count { it.isGeneratedSound() }})")
     }
 
     val filteredSounds = validSounds.filter { sound ->
@@ -114,6 +125,7 @@ fun LibraryScreen(soundRepository: SoundRepository, audioPlayerController: Audio
             FILTER_ALL -> true
             FILTER_FAVORITES -> favoriteIds.contains(sound.id)
             FILTER_CUSTOM -> sound.isCustom
+            FILTER_GENERATED -> sound.isGeneratedSound()
             else -> sound.category == chipKey
         }
         val matchesPack = selectedPack == null || sound.packId == selectedPack
@@ -130,7 +142,12 @@ fun LibraryScreen(soundRepository: SoundRepository, audioPlayerController: Audio
         ScanlineOverlay()
 
         Column(modifier = Modifier.fillMaxSize()) {
-            Header(onSearchClick = { isSearchActive = !isSearchActive })
+            Header(
+                onSearchClick = { isSearchActive = !isSearchActive },
+                showDiagnostics = showDiagnostics,
+                invalidCount = invalidSounds.size,
+                onDiagnosticsClick = { showDiagnostics = !showDiagnostics }
+            )
 
             if (selectedPack != null) {
                 Row(
@@ -203,12 +220,29 @@ fun LibraryScreen(soundRepository: SoundRepository, audioPlayerController: Audio
                         sound = sound,
                         audioPlayerController = audioPlayerController,
                         isFavorite = favoriteIds.contains(sound.id),
-                        onToggleFavorite = { scope.launch { soundRepository.toggleFavorite(sound.id) } }
+                        onToggleFavorite = { scope.launch { soundRepository.toggleFavorite(sound.id) } },
+                        onAddToSequence = {
+                            soundRepository.queueSoundForSequence(sound.id)
+                            onOpenSequence()
+                        },
+                        onTimerShortcut = {
+                            soundRepository.queueSoundForTimer(sound.id)
+                            onOpenTimer()
+                        }
                     )
                 }
                 if (showDiagnostics && invalidSounds.isNotEmpty()) {
                     item {
-                        Text("INVALID ASSETS: ${invalidSounds.size}", color = Color(0xFFFCA5A5), modifier = Modifier.padding(8.dp))
+                        HUDCard(modifier = Modifier.fillMaxWidth(), accentColor = OrangeAccent) {
+                            Column(modifier = Modifier.padding(14.dp)) {
+                                Text("INVALID / BLOCKED ASSETS: ${invalidSounds.size}", color = OrangeAccent)
+                                Text(
+                                    invalidSounds.take(5).joinToString("\n") { "${it.name}  /  ${it.assetPath}" },
+                                    color = Color.Gray,
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -217,12 +251,23 @@ fun LibraryScreen(soundRepository: SoundRepository, audioPlayerController: Audio
 }
 
 @Composable
-fun Header(onSearchClick: () -> Unit) {
+fun Header(
+    onSearchClick: () -> Unit,
+    showDiagnostics: Boolean,
+    invalidCount: Int,
+    onDiagnosticsClick: () -> Unit
+) {
     Column(modifier = Modifier.fillMaxWidth().padding(top = 24.dp, bottom = 8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
         Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.size(32.dp))
             Text("PRANKSTER", style = MaterialTheme.typography.headlineSmall.copy(fontStyle = androidx.compose.ui.text.font.FontStyle.Italic, fontWeight = FontWeight.Black, letterSpacing = (-1).sp), color = Color.White)
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                Text(
+                    text = if (showDiagnostics) "DIAG $invalidCount" else "DIAG",
+                    color = if (showDiagnostics) OrangeAccent else Color.Gray,
+                    style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                    modifier = Modifier.clickable { onDiagnosticsClick() }
+                )
                 IconButton(onClick = onSearchClick, modifier = Modifier.size(24.dp)) { Icon(Icons.Default.Search, null, tint = LimeAccent.copy(alpha = 0.8f)) }
             }
         }
@@ -232,9 +277,17 @@ fun Header(onSearchClick: () -> Unit) {
 }
 
 @Composable
-fun HUDSoundCard(sound: PrankSound, audioPlayerController: AudioPlayerController, isFavorite: Boolean, onToggleFavorite: () -> Unit) {
+fun HUDSoundCard(
+    sound: PrankSound,
+    audioPlayerController: AudioPlayerController,
+    isFavorite: Boolean,
+    onToggleFavorite: () -> Unit,
+    onAddToSequence: () -> Unit,
+    onTimerShortcut: () -> Unit
+) {
     val playbackState by audioPlayerController.playbackState.collectAsState()
     val isPlaying = playbackState.isPlaying && playbackState.currentSoundId == sound.id
+    var loopEnabled by remember(sound.id) { mutableStateOf(sound.loopable) }
     val accentColor = when (sound.category) {
         "FUNNY", "CARTOON" -> FuchsiaAccent
         "VOICE" -> CyanAccent
@@ -248,32 +301,75 @@ fun HUDSoundCard(sound: PrankSound, audioPlayerController: AudioPlayerController
                 Column(modifier = Modifier.weight(1f)) {
                     Text(sound.name.uppercase(), color = LimeAccent, style = MaterialTheme.typography.headlineSmall.copy(letterSpacing = 1.sp))
                     Text("${sound.category} • ${sound.packId ?: "UNPACKED"}", color = Color.Gray)
-                    Text(sound.tags.joinToString("  •  "), color = Color.Gray, style = MaterialTheme.typography.bodySmall)
+                    Text(sound.tags.joinToString("  •  ").ifBlank { "NO TAGS" }, color = Color.Gray, style = MaterialTheme.typography.bodySmall)
                 }
                 IconButton(onClick = onToggleFavorite) { Icon(if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder, "Favorite", tint = if (isFavorite) FuchsiaAccent else Color.Gray) }
             }
+            NeonWaveform(
+                seed = sound.id,
+                color = accentColor,
+                modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp).height(34.dp)
+            )
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Default.AccessTime, null, tint = Color.Gray, modifier = Modifier.size(14.dp))
                 Text(if (sound.durationMs > 0) "${sound.durationMs}ms" else "DURATION N/A", color = Color.Gray, style = MaterialTheme.typography.bodySmall)
                 if (sound.loopable) {
-                    Icon(Icons.Default.Loop, "Loopable", tint = CyanAccent, modifier = Modifier.size(16.dp))
+                    Icon(
+                        Icons.Default.Loop,
+                        "Loop toggle",
+                        tint = if (loopEnabled) CyanAccent else Color.Gray,
+                        modifier = Modifier.size(18.dp).clickable { loopEnabled = !loopEnabled }
+                    )
+                    Text(if (loopEnabled) "LOOP ON" else "LOOP OFF", color = if (loopEnabled) CyanAccent else Color.Gray, style = MaterialTheme.typography.bodySmall)
                 }
             }
             Row(modifier = Modifier.fillMaxWidth().padding(top = 10.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(onClick = {
-                    if (isPlaying) audioPlayerController.stop() else audioPlayerController.playPrankSound(sound, sound.loopable)
+                    if (isPlaying) audioPlayerController.stop() else audioPlayerController.playPrankSound(sound, sound.loopable && loopEnabled)
                 }, colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent), border = androidx.compose.foundation.BorderStroke(1.dp, accentColor)) {
                     Icon(if (isPlaying) Icons.Default.Stop else Icons.Default.PlayArrow, "Play stop", tint = accentColor)
                     Spacer(modifier = Modifier.size(6.dp))
                     Text(if (isPlaying) "STOP" else "PLAY", color = accentColor)
                 }
-                Button(onClick = {}, colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent), border = androidx.compose.foundation.BorderStroke(1.dp, CyanAccent.copy(alpha = 0.4f))) {
+                Button(onClick = onAddToSequence, colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent), border = androidx.compose.foundation.BorderStroke(1.dp, CyanAccent.copy(alpha = 0.4f))) {
                     Icon(Icons.Default.Add, "Add to sequence", tint = CyanAccent)
                 }
-                Button(onClick = {}, colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent), border = androidx.compose.foundation.BorderStroke(1.dp, OrangeAccent.copy(alpha = 0.4f))) {
+                Button(onClick = onTimerShortcut, colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent), border = androidx.compose.foundation.BorderStroke(1.dp, OrangeAccent.copy(alpha = 0.4f))) {
                     Icon(Icons.Default.Timer, "Timer shortcut", tint = OrangeAccent)
                 }
             }
         }
     }
+}
+
+@Composable
+fun NeonWaveform(seed: String, color: Color, modifier: Modifier = Modifier) {
+    val bars = remember(seed) {
+        val base = seed.fold(0) { acc, char -> acc + char.code }.coerceAtLeast(1)
+        List(28) { index ->
+            val value = ((base + index * 37) % 100) / 100f
+            0.25f + value * 0.75f
+        }
+    }
+    Canvas(
+        modifier = modifier
+            .background(Brush.horizontalGradient(listOf(Color.Transparent, color.copy(alpha = 0.08f), Color.Transparent)))
+    ) {
+        val gap = size.width / (bars.size * 1.6f)
+        val barWidth = gap.coerceAtLeast(2f)
+        bars.forEachIndexed { index, heightFactor ->
+            val x = index * (barWidth + gap)
+            val barHeight = size.height * heightFactor
+            drawLine(
+                color = color.copy(alpha = 0.35f + heightFactor * 0.45f),
+                start = Offset(x, (size.height - barHeight) / 2f),
+                end = Offset(x, (size.height + barHeight) / 2f),
+                strokeWidth = barWidth
+            )
+        }
+    }
+}
+
+private fun PrankSound.isGeneratedSound(): Boolean {
+    return generatedMetadata != null || createdByUser && tags.any { it.equals("generated", true) }
 }

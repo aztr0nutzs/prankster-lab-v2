@@ -1,6 +1,7 @@
 package com.pranksterlab.core.repository
 
 import android.content.Context
+import android.media.MediaMetadataRetriever
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -16,6 +17,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import java.io.File
 import java.io.InputStreamReader
 
 import androidx.datastore.preferences.core.stringSetPreferencesKey
@@ -23,13 +25,22 @@ import kotlinx.coroutines.flow.first
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "custom_sounds")
 
+private val SUPPORTED_AUDIO_EXTENSIONS = setOf(
+    "mp3", "ogg", "oga", "wav", "m4a", "aac", "mp4", "3gp", "flac", "opus", "amr"
+)
+
 class SoundRepository(private val context: Context) {
     private val gson = Gson()
+    private val playabilityCache = mutableMapOf<String, Boolean>()
     private val CUSTOM_SOUNDS_KEY = stringPreferencesKey("custom_sounds_json")
     private val FAVORITES_KEY = stringSetPreferencesKey("favorite_sound_ids")
     private val SEQUENCE_PRESETS_KEY = stringPreferencesKey("sequence_presets_json")
     private val _activePackFilter = MutableStateFlow<String?>(null)
     val activePackFilter: StateFlow<String?> = _activePackFilter
+    private val _pendingSequenceSoundId = MutableStateFlow<String?>(null)
+    val pendingSequenceSoundId: StateFlow<String?> = _pendingSequenceSoundId
+    private val _pendingTimerSoundId = MutableStateFlow<String?>(null)
+    val pendingTimerSoundId: StateFlow<String?> = _pendingTimerSoundId
     private val MASTER_VOLUME_KEY = floatPreferencesKey("master_volume")
     private val SAFE_RANDOM_MODE_KEY = booleanPreferencesKey("safe_random_mode_default")
     private val HAPTICS_ENABLED_KEY = booleanPreferencesKey("haptics_enabled")
@@ -52,14 +63,58 @@ class SoundRepository(private val context: Context) {
     }
 
     fun isCatalogSoundPlayable(sound: PrankSound): Boolean {
+        if (sound.isCustom || sound.localUri != null) return isSoundPlayable(sound)
         if (sound.assetPath.isBlank()) return false
+        if (!hasSupportedExtension(sound.assetPath)) return false
+        playabilityCache[sound.assetPath]?.let { return it }
         return try {
-            context.assets.open(sound.assetPath).use { stream ->
-                stream.available() >= 0
-            }
-            true
+            context.assets.open(sound.assetPath).use { /* existence check */ }
+            canDecodeAsset(sound.assetPath).also { playabilityCache[sound.assetPath] = it }
+        } catch (_: Exception) {
+            playabilityCache[sound.assetPath] = false
+            false
+        }
+    }
+
+    fun isSoundPlayable(sound: PrankSound): Boolean {
+        val path = sound.localUri ?: sound.assetPath
+        if (path.isBlank() || !hasSupportedExtension(path)) return false
+        if (!sound.isCustom && sound.localUri == null) return isCatalogSoundPlayable(sound)
+
+        if (path.startsWith("content://") || path.startsWith("file://")) {
+            return true
+        }
+
+        return try {
+            val file = File(path)
+            file.exists() && file.length() > 0L
         } catch (_: Exception) {
             false
+        }
+    }
+
+    private fun hasSupportedExtension(path: String): Boolean {
+        return path.substringAfterLast('.', "").lowercase() in SUPPORTED_AUDIO_EXTENSIONS
+    }
+
+    private fun canDecodeAsset(assetPath: String): Boolean {
+        val retriever = MediaMetadataRetriever()
+        return try {
+            context.assets.openFd(assetPath).use { descriptor ->
+                retriever.setDataSource(
+                    descriptor.fileDescriptor,
+                    descriptor.startOffset,
+                    descriptor.length
+                )
+            }
+            val duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+            val hasAudio = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_HAS_AUDIO)
+            val durationMs = duration?.toLongOrNull() ?: 0L
+            durationMs > 0L && (hasAudio == null || hasAudio == "yes")
+        } catch (_: Exception) {
+            false
+        } finally {
+            try { retriever.release() } catch (_: Exception) {}
         }
     }
 
@@ -80,6 +135,26 @@ class SoundRepository(private val context: Context) {
 
     fun setActivePackFilter(packId: String?) {
         _activePackFilter.value = packId
+    }
+
+    fun queueSoundForSequence(soundId: String) {
+        _pendingSequenceSoundId.value = soundId
+    }
+
+    fun consumePendingSequenceSoundId(): String? {
+        val pending = _pendingSequenceSoundId.value
+        _pendingSequenceSoundId.value = null
+        return pending
+    }
+
+    fun queueSoundForTimer(soundId: String) {
+        _pendingTimerSoundId.value = soundId
+    }
+
+    fun consumePendingTimerSoundId(): String? {
+        val pending = _pendingTimerSoundId.value
+        _pendingTimerSoundId.value = null
+        return pending
     }
 
     /**

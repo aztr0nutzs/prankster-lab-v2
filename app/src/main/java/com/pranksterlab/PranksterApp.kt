@@ -69,7 +69,14 @@ fun PranksterApp() {
             modifier = Modifier.padding(paddingValues)
         ) {
             composable("home") { HomeScreen(audioPlayerController, soundRepository, onNavigate = { navController.navigate(it) }) }
-            composable("library") { LibraryScreen(soundRepository, audioPlayerController) }
+            composable("library") {
+                LibraryScreen(
+                    soundRepository = soundRepository,
+                    audioPlayerController = audioPlayerController,
+                    onOpenSequence = { navController.navigate("sequence") },
+                    onOpenTimer = { navController.navigate("timer") }
+                )
+            }
             composable("timer") { TimerPrankScreen(soundRepository, audioPlayerController) }
             composable("forge") { SoundForgeScreen(soundForgeViewModel, audioPlayerController) }
             composable("lab") { SoundPacksScreen(soundRepository, audioPlayerController, onOpenLibrary = { navController.navigate("library") }) }

@@ -46,8 +46,14 @@ fun TimerPrankScreen(soundRepository: SoundRepository, audioPlayerController: Au
     LaunchedEffect(Unit) {
         val bundled = soundRepository.getBundledSounds()
         soundRepository.getCustomSoundsFlow().collect { custom ->
-            soundsList = bundled + custom
+            soundsList = (bundled + custom).filter { soundRepository.isSoundPlayable(it) }
         }
+    }
+
+    LaunchedEffect(soundsList) {
+        if (soundsList.isEmpty()) return@LaunchedEffect
+        val pendingSoundId = soundRepository.consumePendingTimerSoundId() ?: return@LaunchedEffect
+        selectedSound = soundsList.firstOrNull { it.id == pendingSoundId }
     }
 
     LaunchedEffect(timerState, remainingSeconds) {

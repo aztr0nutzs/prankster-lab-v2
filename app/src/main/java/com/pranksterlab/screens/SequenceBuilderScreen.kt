@@ -116,6 +116,17 @@ fun SequenceBuilderScreen(soundRepository: SoundRepository, audioPlayerControlle
     val soundById = remember(catalog) { catalog.associateBy { it.id } }
     val isPlaying = sequenceJob != null
 
+    LaunchedEffect(playableCatalog) {
+        if (catalog.isEmpty()) return@LaunchedEffect
+        val pendingSoundId = soundRepository.consumePendingSequenceSoundId() ?: return@LaunchedEffect
+        playableCatalog.firstOrNull { it.id == pendingSoundId }?.let { sound ->
+            sequence = sequence + sound.toSequenceStep()
+            warning = "Added '${sound.name}' from Library."
+        } ?: run {
+            warning = "Library handoff sound is no longer playable."
+        }
+    }
+
     Box(modifier = Modifier.fillMaxSize().background(BackgroundDark)) {
         ScanlineOverlay()
         LazyColumn(
