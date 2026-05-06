@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -sSL -o gradle/wrapper/gradle-wrapper.jar https://services.gradle.org/distributions/gradle-8.11.1-wrapper.jar)",
+      "Bash(curl -sSL -o gradle/wrapper/gradle-wrapper.jar https://raw.githubusercontent.com/gradle/gradle/v8.11.1/gradle/wrapper/gradle-wrapper.jar)",
+      "Bash(./gradlew assembleDebug)"
+    ]
+  }
+}
