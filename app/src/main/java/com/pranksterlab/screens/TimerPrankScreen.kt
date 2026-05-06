@@ -57,9 +57,10 @@ fun TimerPrankScreen(soundRepository: SoundRepository, audioPlayerController: Au
             if (remainingSeconds == 0) {
                 timerState = TimerState.PLAYING
                 selectedSound?.let {
-                    val isActuallyLocal = it.isCustom || it.localUri != null
-                    val pathToPlay = it.localUri ?: it.assetPath
-                    audioPlayerController.playSound(pathToPlay, isLocalUri = isActuallyLocal, soundId = it.id, soundTitle = it.name, isLooping = it.loopable)
+                    val started = audioPlayerController.playPrankSound(it, isLooping = it.loopable)
+                    if (!started) {
+                        timerState = TimerState.IDLE
+                    }
                 }
             }
         }

@@ -93,10 +93,13 @@ fun HomeScreen(
 
         if (sound != null) {
             playbackError = null
-            val isActuallyLocal = sound.isCustom || sound.localUri != null
-            val pathToPlay = sound.localUri ?: sound.assetPath
-            audioPlayerController.playSound(pathToPlay, isLocalUri = isActuallyLocal, soundId = sound.id, soundTitle = sound.name)
-            lastSoundName = sound.name
+            val started = audioPlayerController.playPrankSound(sound)
+            if (started) {
+                lastSoundName = sound.name
+            } else {
+                playbackError = "INVALID_ASSET"
+                addLog("CORE ERROR: ${sound.name} REJECTED")
+            }
         } else {
             playbackError = "EMPTY_CAT"
             addLog("CORE ERROR: NO SAMPLES IN $category")
@@ -179,10 +182,8 @@ fun QuickDeploySection(
         val possible = soundsList.filter { it.category.equals(category, ignoreCase = true) }
         val sound = possible.randomOrNull()
         if (sound != null) {
-            val isActuallyLocal = sound.isCustom || sound.localUri != null
-            val pathToPlay = sound.localUri ?: sound.assetPath
-            audioPlayerController.playSound(pathToPlay, isLocalUri = isActuallyLocal, soundId = sound.id, soundTitle = sound.name)
-            onLog("QUICK DEPLOY: ${sound.name}")
+            val started = audioPlayerController.playPrankSound(sound)
+            onLog(if (started) "QUICK DEPLOY: ${sound.name}" else "REJECTED: ${sound.name}")
         }
     }
 

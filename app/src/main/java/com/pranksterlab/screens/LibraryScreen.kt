@@ -245,22 +245,20 @@ fun HUDSoundCard(
     }
 
     val playbackState by audioPlayerController.playbackState.collectAsState()
+    val invalidIds by audioPlayerController.invalidSoundIds.collectAsState()
     val isPlaying = playbackState.isPlaying && playbackState.currentSoundId == sound.id
+    val isInvalid = sound.id in invalidIds
+    val isErroredHere = playbackState.lastErrorSoundId == sound.id && playbackState.lastError != null
 
     HUDCard(
-        modifier = Modifier.fillMaxWidth().clickable {
+        modifier = Modifier.fillMaxWidth().clickable(enabled = !isInvalid) {
             if (isPlaying) {
                 audioPlayerController.stop()
             } else {
-                audioPlayerController.playSound(
-                    sound.localUri ?: sound.assetPath,
-                    isLocalUri = sound.isCustom || sound.localUri != null,
-                    soundId = sound.id,
-                    soundTitle = sound.name
-                )
+                audioPlayerController.playPrankSound(sound, isLooping = sound.loopable)
             }
         },
-        accentColor = accentColor
+        accentColor = if (isInvalid) Color.Red else accentColor
     ) {
         Row(
             modifier = Modifier.padding(24.dp).fillMaxWidth(),
@@ -312,6 +310,21 @@ fun HUDSoundCard(
                 }
             }
             
+            if (isInvalid || isErroredHere) {
+                Box(
+                    modifier = Modifier
+                        .background(Color.Red.copy(alpha = 0.15f), RoundedCornerShape(4.dp))
+                        .border(1.dp, Color.Red.copy(alpha = 0.6f), RoundedCornerShape(4.dp))
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                ) {
+                    Text(
+                        text = if (isInvalid) "UNAVAILABLE" else "ERROR",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Color.Red
+                    )
+                }
+                Spacer(modifier = Modifier.width(8.dp))
+            }
             IconButton(onClick = onToggleFavorite) {
                 Icon(
                     imageVector = if (isFavorite) Icons.Default.Star else Icons.Default.StarBorder,
