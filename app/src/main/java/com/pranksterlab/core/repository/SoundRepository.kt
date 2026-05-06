@@ -12,11 +12,8 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.pranksterlab.core.model.PrankSound
 import com.pranksterlab.core.model.SoundSequencePreset
-<<<<<<< HEAD
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-=======
->>>>>>> ab3d2a17ec638be0dec68ea9b4a39e2db4c4c7a8
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.io.InputStreamReader
@@ -31,7 +28,6 @@ class SoundRepository(private val context: Context) {
     private val CUSTOM_SOUNDS_KEY = stringPreferencesKey("custom_sounds_json")
     private val FAVORITES_KEY = stringSetPreferencesKey("favorite_sound_ids")
     private val SEQUENCE_PRESETS_KEY = stringPreferencesKey("sequence_presets_json")
-<<<<<<< HEAD
     private val _activePackFilter = MutableStateFlow<String?>(null)
     val activePackFilter: StateFlow<String?> = _activePackFilter
     private val MASTER_VOLUME_KEY = floatPreferencesKey("master_volume")
@@ -39,8 +35,6 @@ class SoundRepository(private val context: Context) {
     private val HAPTICS_ENABLED_KEY = booleanPreferencesKey("haptics_enabled")
     private val ANIMATION_INTENSITY_KEY = stringPreferencesKey("animation_intensity")
     private val SAFETY_ACK_KEY = booleanPreferencesKey("safety_ack")
-=======
->>>>>>> ab3d2a17ec638be0dec68ea9b4a39e2db4c4c7a8
 
     /**
      * Loads the bundled sound catalog from assets.
@@ -214,7 +208,6 @@ class SoundRepository(private val context: Context) {
             preferences[SEQUENCE_PRESETS_KEY] = gson.toJson(currentList)
         }
     }
-<<<<<<< HEAD
 
     fun getMasterVolumeFlow(): Flow<Float> = context.dataStore.data.map { it[MASTER_VOLUME_KEY] ?: 1.0f }
     suspend fun setMasterVolume(value: Float) {
@@ -292,8 +285,6 @@ class SoundRepository(private val context: Context) {
             0
         }
     }
-=======
->>>>>>> ab3d2a17ec638be0dec68ea9b4a39e2db4c4c7a8
 }
 
 data class PackSummary(
