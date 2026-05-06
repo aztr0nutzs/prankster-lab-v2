@@ -14,7 +14,8 @@
       "Bash(python tools/_compare_ogg.py)",
       "Bash(python tools/_check_ogg_corruption.py)",
       "Bash(python tools/rebuild_audio.py)",
-      "Bash(python tools/validate_sound_catalog.py)"
+      "Bash(python tools/validate_sound_catalog.py)",
+      "Bash(./gradlew :app:compileDebugKotlin)"
     ]
   }
 }

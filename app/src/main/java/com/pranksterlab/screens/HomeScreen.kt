@@ -30,6 +30,11 @@ import com.pranksterlab.components.HeadlineText
 import com.pranksterlab.components.LabelCaps
 import com.pranksterlab.components.ScanlineOverlay
 import com.pranksterlab.components.reactor.ReactorCorePanel
+import com.pranksterlab.components.reactor.StatusReadout
+import com.pranksterlab.components.reactor.QuickDeployPanel
+import com.pranksterlab.components.reactor.TraceLogPanel
+import com.pranksterlab.components.reactor.TraceEntry
+import com.pranksterlab.components.reactor.KillAudioPanel
 import com.pranksterlab.core.audio.AudioPlayerController
 import com.pranksterlab.core.repository.SoundRepository
 import com.pranksterlab.core.model.PrankSound
@@ -124,23 +129,61 @@ fun HomeScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
         item { WaveformHeader() }
-        item { 
+        item {
             val hasCustom = soundsList.any { it.isCustom }
+            val safeCount = soundsList.count { it.isSafeForRandomMode }
             ReactorCorePanel(
                 currentSoundName = lastSoundName,
                 currentCategory = selectedCategory,
                 isPlaying = playbackState.isPlaying,
                 hasCustomSounds = hasCustom,
                 playbackError = playbackError,
+                loadedSoundCount = soundsList.size,
+                safeSoundCount = safeCount,
                 onTrigger = { cat, intensity -> triggerReactor(cat, intensity) },
                 onStop = { audioPlayerController.stopAll() },
                 onCategoryChange = { selectedCategory = it }
             )
         }
-        item { QuickDeploySection(audioPlayerController, soundsList) { addLog(it) } }
-        item { TraceLogSection(traceLog) }
+        item {
+            com.pranksterlab.components.reactor.StatusReadout(
+                loadedCount = soundsList.size,
+                safeCount = soundsList.count { it.isSafeForRandomMode },
+                currentSound = playbackState.currentSoundTitle ?: lastSoundName,
+                currentCategory = selectedCategory,
+                isPlaying = playbackState.isPlaying,
+                safeMode = true
+            )
+        }
+        item {
+            com.pranksterlab.components.reactor.QuickDeployPanel(
+                onDeploy = { cat ->
+                    val possible = soundsList.filter { it.category.equals(cat, ignoreCase = true) }
+                    val sound = possible.randomOrNull()
+                    if (sound != null) {
+                        val started = audioPlayerController.playPrankSound(sound)
+                        addLog(if (started) "QUICK DEPLOY: ${sound.name}" else "REJECTED: ${sound.name}")
+                    } else {
+                        addLog("EMPTY: $cat")
+                    }
+                }
+            )
+        }
+        item {
+            com.pranksterlab.components.reactor.TraceLogPanel(
+                entries = traceLog.map { com.pranksterlab.components.reactor.TraceEntry(it.title, it.time) }
+            )
+        }
         item { ModeGridSection(soundsList, onNavigate) }
-        item { KillSwitchSection(audioPlayerController) { addLog("KILLSWITCH ACTIVATED") } }
+        item {
+            com.pranksterlab.components.reactor.KillAudioPanel(
+                isPlaying = playbackState.isPlaying,
+                onKill = {
+                    audioPlayerController.stopAll()
+                    addLog("KILLSWITCH ACTIVATED")
+                }
+            )
+        }
         }
     }
 }
