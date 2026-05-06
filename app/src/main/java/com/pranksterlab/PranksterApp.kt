@@ -72,9 +72,9 @@ fun PranksterApp() {
             composable("library") { LibraryScreen(soundRepository, audioPlayerController) }
             composable("timer") { TimerPrankScreen(soundRepository, audioPlayerController) }
             composable("forge") { SoundForgeScreen(soundForgeViewModel, audioPlayerController) }
-            composable("lab") { SoundPacksScreen() }
+            composable("lab") { SoundPacksScreen(soundRepository, audioPlayerController, onOpenLibrary = { navController.navigate("library") }) }
             composable("system") { SettingsScreen() }
-            composable("sequence") { SequenceBuilderScreen() }
+            composable("sequence") { SequenceBuilderScreen(soundRepository, audioPlayerController) }
             composable("randomizer") { RandomizerScreen(soundRepository, audioPlayerController) }
             composable("messages") { PrankMessagesScreen() }
         }
