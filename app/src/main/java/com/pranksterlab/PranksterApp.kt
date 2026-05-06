@@ -75,7 +75,7 @@ fun PranksterApp() {
             composable("lab") { SoundPacksScreen() }
             composable("system") { SettingsScreen() }
             composable("sequence") { SequenceBuilderScreen() }
-            composable("randomizer") { RandomizerScreen() }
+            composable("randomizer") { RandomizerScreen(soundRepository, audioPlayerController) }
             composable("messages") { PrankMessagesScreen() }
         }
     }

@@ -60,6 +60,19 @@ class AudioPlayerController(private val context: Context) {
         )
     }
 
+    fun canPlayPrankSound(sound: PrankSound): Boolean {
+        if (sound.id in invalidSounds) return false
+        val isLocal = sound.isCustom || sound.localUri != null
+        val path = sound.localUri ?: sound.assetPath
+        val validation = validateSource(path, isLocal)
+        if (validation != null) {
+            Log.w(TAG, "Preflight rejected soundId=${sound.id} path='$path' reason=$validation")
+            markInvalid(sound.id)
+            return false
+        }
+        return true
+    }
+
     /**
      * Plays a sound. Performs validation up front and refuses to play if the asset
      * is missing, blank, has an unsupported extension, or cannot be decoded.
