@@ -33,13 +33,22 @@ fun SoundForgeScreen(viewModel: SoundForgeViewModel, audioPlayer: AudioPlayerCon
     val playbackState by audioPlayer.playbackState.collectAsState()
     val isPlayingPreview = playbackState.isPlaying && playbackState.currentSoundId == "preview"
     val result by viewModel.generatedResult
+    val savedConfirmation by viewModel.savedConfirmation
+    val saveError by viewModel.saveError
 
     var showSaveDialog by remember { mutableStateOf(false) }
     var saveName by remember { mutableStateOf("") }
     var saveCategory by remember { mutableStateOf("CUSTOM") }
     
     val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
+    LaunchedEffect(savedConfirmation, saveError) {
+        savedConfirmation?.let {
+            snackbarHostState.showSnackbar(message = it, duration = SnackbarDuration.Short)
+        }
+        saveError?.let {
+            snackbarHostState.showSnackbar(message = it, duration = SnackbarDuration.Short)
+        }
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         SoundForgeWorkbench(
@@ -103,17 +112,6 @@ fun SoundForgeScreen(viewModel: SoundForgeViewModel, audioPlayer: AudioPlayerCon
                     viewModel.saveGeneratedSound(saveName, saveCategory)
                     showSaveDialog = false
                     saveName = ""
-                    scope.launch {
-                        val snackbarResult = snackbarHostState.showSnackbar(
-                            message = "Sound saved to library",
-                            actionLabel = "VIEW",
-                            duration = SnackbarDuration.Short
-                        )
-                        if (snackbarResult == SnackbarResult.ActionPerformed) {
-                            // Ideally navigate to library, but we'd need navController here.
-                            // For now, it's just feedback.
-                        }
-                    }
                 }) {
                     Text("SAVE", color = FuchsiaAccent)
                 }
