@@ -5,10 +5,15 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.pranksterlab.core.model.PrankSound
+import com.pranksterlab.core.model.SoundSequencePreset
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.io.InputStreamReader
@@ -22,6 +27,14 @@ class SoundRepository(private val context: Context) {
     private val gson = Gson()
     private val CUSTOM_SOUNDS_KEY = stringPreferencesKey("custom_sounds_json")
     private val FAVORITES_KEY = stringSetPreferencesKey("favorite_sound_ids")
+    private val SEQUENCE_PRESETS_KEY = stringPreferencesKey("sequence_presets_json")
+    private val _activePackFilter = MutableStateFlow<String?>(null)
+    val activePackFilter: StateFlow<String?> = _activePackFilter
+    private val MASTER_VOLUME_KEY = floatPreferencesKey("master_volume")
+    private val SAFE_RANDOM_MODE_KEY = booleanPreferencesKey("safe_random_mode_default")
+    private val HAPTICS_ENABLED_KEY = booleanPreferencesKey("haptics_enabled")
+    private val ANIMATION_INTENSITY_KEY = stringPreferencesKey("animation_intensity")
+    private val SAFETY_ACK_KEY = booleanPreferencesKey("safety_ack")
 
     /**
      * Loads the bundled sound catalog from assets.
@@ -36,6 +49,37 @@ class SoundRepository(private val context: Context) {
             e.printStackTrace()
             emptyList()
         }
+    }
+
+    fun isCatalogSoundPlayable(sound: PrankSound): Boolean {
+        if (sound.assetPath.isBlank()) return false
+        return try {
+            context.assets.open(sound.assetPath).use { stream ->
+                stream.available() >= 0
+            }
+            true
+        } catch (_: Exception) {
+            false
+        }
+    }
+
+    fun buildPackSummaries(sounds: List<PrankSound>): List<PackSummary> {
+        return sounds
+            .filter { !it.packId.isNullOrBlank() }
+            .groupBy { it.packId!!.trim() }
+            .map { (packId, packSounds) ->
+                val categoryFocus = packSounds.groupingBy { it.category }.eachCount().maxByOrNull { it.value }?.key ?: "MISC"
+                PackSummary(
+                    packId = packId,
+                    soundCount = packSounds.size,
+                    categoryFocus = categoryFocus
+                )
+            }
+            .sortedBy { it.packId }
+    }
+
+    fun setActivePackFilter(packId: String?) {
+        _activePackFilter.value = packId
     }
 
     /**
@@ -119,4 +163,141 @@ class SoundRepository(private val context: Context) {
             preferences[CUSTOM_SOUNDS_KEY] = gson.toJson(currentList)
         }
     }
+
+    fun getSequencePresetsFlow(): Flow<List<SoundSequencePreset>> {
+        return context.dataStore.data.map { preferences ->
+            val jsonString = preferences[SEQUENCE_PRESETS_KEY] ?: "[]"
+            val listType = object : TypeToken<List<SoundSequencePreset>>() {}.type
+            try {
+                gson.fromJson<List<SoundSequencePreset>>(jsonString, listType) ?: emptyList()
+            } catch (_: Exception) {
+                emptyList()
+            }
+        }
+    }
+
+    suspend fun saveSequencePreset(preset: SoundSequencePreset) {
+        context.dataStore.edit { preferences ->
+            val currentJson = preferences[SEQUENCE_PRESETS_KEY] ?: "[]"
+            val listType = object : TypeToken<List<SoundSequencePreset>>() {}.type
+            val currentList: MutableList<SoundSequencePreset> = try {
+                gson.fromJson(currentJson, listType) ?: mutableListOf()
+            } catch (_: Exception) {
+                mutableListOf()
+            }
+            val existingIndex = currentList.indexOfFirst { it.id == preset.id }
+            if (existingIndex >= 0) {
+                currentList[existingIndex] = preset
+            } else {
+                currentList.add(preset)
+            }
+            preferences[SEQUENCE_PRESETS_KEY] = gson.toJson(currentList)
+        }
+    }
+
+    suspend fun deleteSequencePreset(presetId: String) {
+        context.dataStore.edit { preferences ->
+            val currentJson = preferences[SEQUENCE_PRESETS_KEY] ?: "[]"
+            val listType = object : TypeToken<List<SoundSequencePreset>>() {}.type
+            val currentList: MutableList<SoundSequencePreset> = try {
+                gson.fromJson(currentJson, listType) ?: mutableListOf()
+            } catch (_: Exception) {
+                mutableListOf()
+            }
+            currentList.removeAll { it.id == presetId }
+            preferences[SEQUENCE_PRESETS_KEY] = gson.toJson(currentList)
+        }
+    }
+
+    fun getMasterVolumeFlow(): Flow<Float> = context.dataStore.data.map { it[MASTER_VOLUME_KEY] ?: 1.0f }
+    suspend fun setMasterVolume(value: Float) {
+        context.dataStore.edit { it[MASTER_VOLUME_KEY] = value.coerceIn(0f, 1f) }
+    }
+
+    fun getSafeRandomModeDefaultFlow(): Flow<Boolean> = context.dataStore.data.map { it[SAFE_RANDOM_MODE_KEY] ?: true }
+    suspend fun setSafeRandomModeDefault(enabled: Boolean) {
+        context.dataStore.edit { it[SAFE_RANDOM_MODE_KEY] = enabled }
+    }
+
+    fun getHapticsEnabledFlow(): Flow<Boolean> = context.dataStore.data.map { it[HAPTICS_ENABLED_KEY] ?: true }
+    suspend fun setHapticsEnabled(enabled: Boolean) {
+        context.dataStore.edit { it[HAPTICS_ENABLED_KEY] = enabled }
+    }
+
+    fun getAnimationIntensityFlow(): Flow<String> = context.dataStore.data.map { it[ANIMATION_INTENSITY_KEY] ?: "FULL" }
+    suspend fun setAnimationIntensity(value: String) {
+        context.dataStore.edit { it[ANIMATION_INTENSITY_KEY] = value }
+    }
+
+    fun getSafetyAckFlow(): Flow<Boolean> = context.dataStore.data.map { it[SAFETY_ACK_KEY] ?: false }
+    suspend fun setSafetyAck(ack: Boolean) {
+        context.dataStore.edit { it[SAFETY_ACK_KEY] = ack }
+    }
+
+    suspend fun clearFavorites() {
+        context.dataStore.edit { it[FAVORITES_KEY] = emptySet() }
+    }
+
+    suspend fun clearRecentSounds() {
+        context.dataStore.edit { it.remove(stringPreferencesKey("recent_sounds_json")) }
+    }
+
+    suspend fun deleteGeneratedSounds(): Int {
+        val sounds = getCustomSoundsFlow().first()
+        val toRemove = sounds.filter { it.tags.any { tag -> tag.equals("generated", true) } || it.createdByUser && it.generatedMetadata != null }
+        if (toRemove.isEmpty()) return 0
+        context.dataStore.edit { preferences ->
+            val remaining = sounds.filterNot { s -> toRemove.any { it.id == s.id } }
+            preferences[CUSTOM_SOUNDS_KEY] = gson.toJson(remaining)
+        }
+        return toRemove.size
+    }
+
+    fun getAudioDiagnostics(): AudioDiagnostics {
+        val catalog = getBundledSounds()
+        val totalCatalog = catalog.size
+        val playableCatalog = catalog.count { isCatalogSoundPlayable(it) }
+        val missingAssets = catalog.count { !isCatalogSoundPlayable(it) }
+        val uncataloged = countUncatalogedAssets(catalog.map { it.assetPath }.toSet())
+        return AudioDiagnostics(
+            totalCatalogSounds = totalCatalog,
+            playableCatalogSounds = playableCatalog,
+            invalidCatalogSounds = totalCatalog - playableCatalog,
+            missingAssets = missingAssets,
+            uncatalogedAssets = uncataloged,
+            lastValidationResult = "Catalog scan: $playableCatalog/$totalCatalog playable"
+        )
+    }
+
+    private fun countUncatalogedAssets(catalogPaths: Set<String>): Int {
+        val discovered = mutableListOf<String>()
+        fun scan(path: String) {
+            context.assets.list(path)?.forEach { child ->
+                val full = if (path.isBlank()) child else "$path/$child"
+                val nested = context.assets.list(full)
+                if (nested != null && nested.isNotEmpty()) scan(full) else if (full.startsWith("sounds/")) discovered.add(full)
+            }
+        }
+        return try {
+            scan("sounds")
+            discovered.count { it !in catalogPaths }
+        } catch (_: Exception) {
+            0
+        }
+    }
 }
+
+data class PackSummary(
+    val packId: String,
+    val soundCount: Int,
+    val categoryFocus: String
+)
+
+data class AudioDiagnostics(
+    val totalCatalogSounds: Int,
+    val playableCatalogSounds: Int,
+    val invalidCatalogSounds: Int,
+    val missingAssets: Int,
+    val uncatalogedAssets: Int,
+    val lastValidationResult: String
+)
