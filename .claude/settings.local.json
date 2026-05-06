@@ -3,7 +3,12 @@
     "allow": [
       "Bash(curl -sSL -o gradle/wrapper/gradle-wrapper.jar https://services.gradle.org/distributions/gradle-8.11.1-wrapper.jar)",
       "Bash(curl -sSL -o gradle/wrapper/gradle-wrapper.jar https://raw.githubusercontent.com/gradle/gradle/v8.11.1/gradle/wrapper/gradle-wrapper.jar)",
-      "Bash(./gradlew assembleDebug)"
+      "Bash(./gradlew assembleDebug)",
+      "Bash(find . -maxdepth 3 -iname \"prankster_sounds_minimal*\")",
+      "Bash(ls *.zip)",
+      "Bash(ls ~/Downloads/prankster_sounds_minimal*)",
+      "Bash(ls ~/Desktop/prankster_sounds_minimal*)",
+      "Read(//c/Users/Aztr0nutZs/Downloads/**)"
     ]
   }
 }

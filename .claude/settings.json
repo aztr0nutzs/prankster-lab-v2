@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/Aztr0nutZs/Desktop/**)",
+      "Bash(unzip -l prankster_sounds_minimal.zip)",
+      "Bash(unzip -l \"c:/Users/Aztr0nutZs/Desktop/prankster_sounds/prankster_sounds_minimal.zip\")",
+      "Bash(awk '{print $4}')",
+      "Bash(python -c \"import json; d=json.load\\(open\\('app/src/main/assets/sound_catalog.json',encoding='utf-8'\\)\\); print\\('entries:',len\\(d\\)\\); print\\('cats:', sorted\\(set\\(x['category'] for x in d\\)\\)\\)\")",
+      "Bash(python)",
+      "Bash(python tools/_audit.py)",
+      "Bash(mkdir -p \"c:/Users/Aztr0nutZs/Desktop/prankster-lab/tools/_minimal\")",
+      "Bash(unzip -oq \"c:/Users/Aztr0nutZs/Desktop/prankster_sounds/prankster_sounds_minimal.zip\")",
+      "Bash(python tools/_validate_minimal.py)",
+      "Bash(python tools/_compare_ogg.py)",
+      "Bash(python tools/_check_ogg_corruption.py)",
+      "Bash(python tools/rebuild_audio.py)",
+      "Bash(python tools/validate_sound_catalog.py)"
+    ]
+  }
+}
