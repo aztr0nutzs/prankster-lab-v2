@@ -328,6 +328,23 @@ class SoundRepository(private val context: Context) {
         return toRemove.size
     }
 
+    suspend fun resetSoundForgePresets(): Int {
+        var removed = 0
+        context.dataStore.edit { preferences ->
+            listOf(
+                stringPreferencesKey("sound_forge_presets_json"),
+                stringPreferencesKey("soundforge_presets_json"),
+                stringPreferencesKey("forge_presets_json")
+            ).forEach { key ->
+                if (preferences.contains(key)) {
+                    preferences.remove(key)
+                    removed++
+                }
+            }
+        }
+        return removed
+    }
+
     fun getAudioDiagnostics(): AudioDiagnostics {
         val catalog = getBundledSounds()
         val totalCatalog = catalog.size
