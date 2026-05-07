@@ -4,8 +4,8 @@
     "name": "Computernoise 000",
     "category": "AMBIENCE",
     "packId": "ambience_pack",
-    "assetPath": "sounds/ambience/computerNoise_000.ogg",
-    "durationMs": 0,
+    "assetPath": "sounds/ambience/computerNoise_000.wav",
+    "durationMs": 1200,
     "tags": [
       "ambience",
       "tech_scifi"
@@ -23,8 +23,8 @@
     "name": "Computernoise 001",
     "category": "AMBIENCE",
     "packId": "ambience_pack",
-    "assetPath": "sounds/ambience/computerNoise_001.ogg",
-    "durationMs": 0,
+    "assetPath": "sounds/ambience/computerNoise_001.wav",
+    "durationMs": 1200,
     "tags": [
       "ambience",
       "tech_scifi"
@@ -42,8 +42,8 @@
     "name": "Computernoise 002",
     "category": "AMBIENCE",
     "packId": "ambience_pack",
-    "assetPath": "sounds/ambience/computerNoise_002.ogg",
-    "durationMs": 0,
+    "assetPath": "sounds/ambience/computerNoise_002.wav",
+    "durationMs": 1200,
     "tags": [
       "ambience",
       "tech_scifi"
@@ -61,8 +61,8 @@
     "name": "Computernoise 003",
     "category": "AMBIENCE",
     "packId": "ambience_pack",
-    "assetPath": "sounds/ambience/computerNoise_003.ogg",
-    "durationMs": 0,
+    "assetPath": "sounds/ambience/computerNoise_003.wav",
+    "durationMs": 1200,
     "tags": [
       "ambience",
       "tech_scifi"
@@ -194,8 +194,8 @@
     "name": "Enginecircular 000",
     "category": "AMBIENCE",
     "packId": "ambience_pack",
-    "assetPath": "sounds/ambience/engineCircular_000.ogg",
-    "durationMs": 0,
+    "assetPath": "sounds/ambience/engineCircular_000.wav",
+    "durationMs": 1200,
     "tags": [
       "ambience",
       "tech_scifi"
@@ -213,8 +213,8 @@
     "name": "Enginecircular 001",
     "category": "AMBIENCE",
     "packId": "ambience_pack",
-    "assetPath": "sounds/ambience/engineCircular_001.ogg",
-    "durationMs": 0,
+    "assetPath": "sounds/ambience/engineCircular_001.wav",
+    "durationMs": 1200,
     "tags": [
       "ambience",
       "tech_scifi"
@@ -232,8 +232,8 @@
     "name": "Enginecircular 002",
     "category": "AMBIENCE",
     "packId": "ambience_pack",
-    "assetPath": "sounds/ambience/engineCircular_002.ogg",
-    "durationMs": 0,
+    "assetPath": "sounds/ambience/engineCircular_002.wav",
+    "durationMs": 1200,
     "tags": [
       "ambience",
       "tech_scifi"
@@ -251,8 +251,8 @@
     "name": "Enginecircular 003",
     "category": "AMBIENCE",
     "packId": "ambience_pack",
-    "assetPath": "sounds/ambience/engineCircular_003.ogg",
-    "durationMs": 0,
+    "assetPath": "sounds/ambience/engineCircular_003.wav",
+    "durationMs": 1200,
     "tags": [
       "ambience",
       "tech_scifi"
@@ -270,8 +270,8 @@
     "name": "Enginecircular 004",
     "category": "AMBIENCE",
     "packId": "ambience_pack",
-    "assetPath": "sounds/ambience/engineCircular_004.ogg",
-    "durationMs": 0,
+    "assetPath": "sounds/ambience/engineCircular_004.wav",
+    "durationMs": 1200,
     "tags": [
       "ambience",
       "tech_scifi"
@@ -365,8 +365,8 @@
     "name": "Explosioncrunch 004",
     "category": "AMBIENCE",
     "packId": "ambience_pack",
-    "assetPath": "sounds/ambience/explosionCrunch_004.ogg",
-    "durationMs": 0,
+    "assetPath": "sounds/ambience/explosionCrunch_004.wav",
+    "durationMs": 1200,
     "tags": [
       "ambience",
       "tech_scifi"
@@ -916,8 +916,8 @@
     "name": "Slime 001",
     "category": "AMBIENCE",
     "packId": "ambience_pack",
-    "assetPath": "sounds/ambience/slime_001.ogg",
-    "durationMs": 0,
+    "assetPath": "sounds/ambience/slime_001.wav",
+    "durationMs": 1200,
     "tags": [
       "ambience",
       "tech_scifi"
@@ -935,8 +935,8 @@
     "name": "Spaceengine 000",
     "category": "AMBIENCE",
     "packId": "ambience_pack",
-    "assetPath": "sounds/ambience/spaceEngine_000.ogg",
-    "durationMs": 0,
+    "assetPath": "sounds/ambience/spaceEngine_000.wav",
+    "durationMs": 1200,
     "tags": [
       "ambience",
       "tech_scifi"
@@ -954,8 +954,8 @@
     "name": "Spaceengine 001",
     "category": "AMBIENCE",
     "packId": "ambience_pack",
-    "assetPath": "sounds/ambience/spaceEngine_001.ogg",
-    "durationMs": 0,
+    "assetPath": "sounds/ambience/spaceEngine_001.wav",
+    "durationMs": 1200,
     "tags": [
       "ambience",
       "tech_scifi"
@@ -973,8 +973,8 @@
     "name": "Spaceengine 002",
     "category": "AMBIENCE",
     "packId": "ambience_pack",
-    "assetPath": "sounds/ambience/spaceEngine_002.ogg",
-    "durationMs": 0,
+    "assetPath": "sounds/ambience/spaceEngine_002.wav",
+    "durationMs": 1200,
     "tags": [
       "ambience",
       "tech_scifi"
@@ -992,8 +992,8 @@
     "name": "Spaceengine 003",
     "category": "AMBIENCE",
     "packId": "ambience_pack",
-    "assetPath": "sounds/ambience/spaceEngine_003.ogg",
-    "durationMs": 0,
+    "assetPath": "sounds/ambience/spaceEngine_003.wav",
+    "durationMs": 1200,
     "tags": [
       "ambience",
       "tech_scifi"
@@ -1011,8 +1011,8 @@
     "name": "Spaceenginelarge 000",
     "category": "AMBIENCE",
     "packId": "ambience_pack",
-    "assetPath": "sounds/ambience/spaceEngineLarge_000.ogg",
-    "durationMs": 0,
+    "assetPath": "sounds/ambience/spaceEngineLarge_000.wav",
+    "durationMs": 1200,
     "tags": [
       "ambience",
       "tech_scifi"
@@ -1030,8 +1030,8 @@
     "name": "Spaceenginelarge 001",
     "category": "AMBIENCE",
     "packId": "ambience_pack",
-    "assetPath": "sounds/ambience/spaceEngineLarge_001.ogg",
-    "durationMs": 0,
+    "assetPath": "sounds/ambience/spaceEngineLarge_001.wav",
+    "durationMs": 1200,
     "tags": [
       "ambience",
       "tech_scifi"
@@ -1049,8 +1049,8 @@
     "name": "Spaceenginelarge 002",
     "category": "AMBIENCE",
     "packId": "ambience_pack",
-    "assetPath": "sounds/ambience/spaceEngineLarge_002.ogg",
-    "durationMs": 0,
+    "assetPath": "sounds/ambience/spaceEngineLarge_002.wav",
+    "durationMs": 1200,
     "tags": [
       "ambience",
       "tech_scifi"
@@ -1068,8 +1068,8 @@
     "name": "Spaceenginelarge 003",
     "category": "AMBIENCE",
     "packId": "ambience_pack",
-    "assetPath": "sounds/ambience/spaceEngineLarge_003.ogg",
-    "durationMs": 0,
+    "assetPath": "sounds/ambience/spaceEngineLarge_003.wav",
+    "durationMs": 1200,
     "tags": [
       "ambience",
       "tech_scifi"
@@ -1087,8 +1087,8 @@
     "name": "Spaceenginelarge 004",
     "category": "AMBIENCE",
     "packId": "ambience_pack",
-    "assetPath": "sounds/ambience/spaceEngineLarge_004.ogg",
-    "durationMs": 0,
+    "assetPath": "sounds/ambience/spaceEngineLarge_004.wav",
+    "durationMs": 1200,
     "tags": [
       "ambience",
       "tech_scifi"
@@ -1106,8 +1106,8 @@
     "name": "Spaceenginelow 000",
     "category": "AMBIENCE",
     "packId": "ambience_pack",
-    "assetPath": "sounds/ambience/spaceEngineLow_000.ogg",
-    "durationMs": 0,
+    "assetPath": "sounds/ambience/spaceEngineLow_000.wav",
+    "durationMs": 1200,
     "tags": [
       "ambience",
       "tech_scifi"
@@ -1125,8 +1125,8 @@
     "name": "Spaceenginelow 001",
     "category": "AMBIENCE",
     "packId": "ambience_pack",
-    "assetPath": "sounds/ambience/spaceEngineLow_001.ogg",
-    "durationMs": 0,
+    "assetPath": "sounds/ambience/spaceEngineLow_001.wav",
+    "durationMs": 1200,
     "tags": [
       "ambience",
       "tech_scifi"
@@ -1144,8 +1144,8 @@
     "name": "Spaceenginelow 002",
     "category": "AMBIENCE",
     "packId": "ambience_pack",
-    "assetPath": "sounds/ambience/spaceEngineLow_002.ogg",
-    "durationMs": 0,
+    "assetPath": "sounds/ambience/spaceEngineLow_002.wav",
+    "durationMs": 1200,
     "tags": [
       "ambience",
       "tech_scifi"
@@ -1163,8 +1163,8 @@
     "name": "Spaceenginelow 003",
     "category": "AMBIENCE",
     "packId": "ambience_pack",
-    "assetPath": "sounds/ambience/spaceEngineLow_003.ogg",
-    "durationMs": 0,
+    "assetPath": "sounds/ambience/spaceEngineLow_003.wav",
+    "durationMs": 1200,
     "tags": [
       "ambience",
       "tech_scifi"
@@ -1182,8 +1182,8 @@
     "name": "Spaceenginelow 004",
     "category": "AMBIENCE",
     "packId": "ambience_pack",
-    "assetPath": "sounds/ambience/spaceEngineLow_004.ogg",
-    "durationMs": 0,
+    "assetPath": "sounds/ambience/spaceEngineLow_004.wav",
+    "durationMs": 1200,
     "tags": [
       "ambience",
       "tech_scifi"
@@ -1201,8 +1201,8 @@
     "name": "Spaceenginesmall 000",
     "category": "AMBIENCE",
     "packId": "ambience_pack",
-    "assetPath": "sounds/ambience/spaceEngineSmall_000.ogg",
-    "durationMs": 0,
+    "assetPath": "sounds/ambience/spaceEngineSmall_000.wav",
+    "durationMs": 1200,
     "tags": [
       "ambience",
       "tech_scifi"
@@ -1220,8 +1220,8 @@
     "name": "Spaceenginesmall 001",
     "category": "AMBIENCE",
     "packId": "ambience_pack",
-    "assetPath": "sounds/ambience/spaceEngineSmall_001.ogg",
-    "durationMs": 0,
+    "assetPath": "sounds/ambience/spaceEngineSmall_001.wav",
+    "durationMs": 1200,
     "tags": [
       "ambience",
       "tech_scifi"
@@ -1239,8 +1239,8 @@
     "name": "Spaceenginesmall 002",
     "category": "AMBIENCE",
     "packId": "ambience_pack",
-    "assetPath": "sounds/ambience/spaceEngineSmall_002.ogg",
-    "durationMs": 0,
+    "assetPath": "sounds/ambience/spaceEngineSmall_002.wav",
+    "durationMs": 1200,
     "tags": [
       "ambience",
       "tech_scifi"
@@ -1258,8 +1258,8 @@
     "name": "Spaceenginesmall 003",
     "category": "AMBIENCE",
     "packId": "ambience_pack",
-    "assetPath": "sounds/ambience/spaceEngineSmall_003.ogg",
-    "durationMs": 0,
+    "assetPath": "sounds/ambience/spaceEngineSmall_003.wav",
+    "durationMs": 1200,
     "tags": [
       "ambience",
       "tech_scifi"
@@ -1277,8 +1277,8 @@
     "name": "Spaceenginesmall 004",
     "category": "AMBIENCE",
     "packId": "ambience_pack",
-    "assetPath": "sounds/ambience/spaceEngineSmall_004.ogg",
-    "durationMs": 0,
+    "assetPath": "sounds/ambience/spaceEngineSmall_004.wav",
+    "durationMs": 1200,
     "tags": [
       "ambience",
       "tech_scifi"
@@ -1296,8 +1296,8 @@
     "name": "Thrusterfire 000",
     "category": "AMBIENCE",
     "packId": "ambience_pack",
-    "assetPath": "sounds/ambience/thrusterFire_000.ogg",
-    "durationMs": 0,
+    "assetPath": "sounds/ambience/thrusterFire_000.wav",
+    "durationMs": 1200,
     "tags": [
       "ambience",
       "tech_scifi"
@@ -1315,8 +1315,8 @@
     "name": "Thrusterfire 001",
     "category": "AMBIENCE",
     "packId": "ambience_pack",
-    "assetPath": "sounds/ambience/thrusterFire_001.ogg",
-    "durationMs": 0,
+    "assetPath": "sounds/ambience/thrusterFire_001.wav",
+    "durationMs": 1200,
     "tags": [
       "ambience",
       "tech_scifi"
@@ -1334,8 +1334,8 @@
     "name": "Thrusterfire 002",
     "category": "AMBIENCE",
     "packId": "ambience_pack",
-    "assetPath": "sounds/ambience/thrusterFire_002.ogg",
-    "durationMs": 0,
+    "assetPath": "sounds/ambience/thrusterFire_002.wav",
+    "durationMs": 1200,
     "tags": [
       "ambience",
       "tech_scifi"
@@ -1353,8 +1353,8 @@
     "name": "Thrusterfire 003",
     "category": "AMBIENCE",
     "packId": "ambience_pack",
-    "assetPath": "sounds/ambience/thrusterFire_003.ogg",
-    "durationMs": 0,
+    "assetPath": "sounds/ambience/thrusterFire_003.wav",
+    "durationMs": 1200,
     "tags": [
       "ambience",
       "tech_scifi"
@@ -1372,8 +1372,8 @@
     "name": "Thrusterfire 004",
     "category": "AMBIENCE",
     "packId": "ambience_pack",
-    "assetPath": "sounds/ambience/thrusterFire_004.ogg",
-    "durationMs": 0,
+    "assetPath": "sounds/ambience/thrusterFire_004.wav",
+    "durationMs": 1200,
     "tags": [
       "ambience",
       "tech_scifi"
@@ -5134,7 +5134,7 @@
     "name": "It's A Tie",
     "category": "VOICE",
     "packId": "voice_pack",
-    "assetPath": "sounds/voices_fighter/it's_a_tie.ogg",
+    "assetPath": "sounds/voices_fighter/its_a_tie.ogg",
     "durationMs": 0,
     "tags": [
       "voice",
