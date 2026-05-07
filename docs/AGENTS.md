@@ -12,23 +12,23 @@ Primary Stack:
 - Gradle Kotlin DSL
 
 Primary Android Package:
-com.pranksterlab
+`com.pranksterlab`
 
 Primary Android Source Root:
-app/src/main/java/com/pranksterlab/
+`app/src/main/java/com/pranksterlab/`
 
 Primary Android Asset Root:
-app/src/main/assets/
+`app/src/main/assets/`
 
 Primary Sound Asset Root:
-app/src/main/assets/sounds/
+`app/src/main/assets/sounds/`
 
 ## CORE DIRECTIVE
 
-This project must become a premium-quality Android prank laboratory application with:
+This project must remain a premium-quality Android prank laboratory application with:
 - immersive cyberpunk UI
 - stable Android architecture
-- massive categorized sound library
+- categorized sound library
 - advanced reactor-core interactions
 - procedural sound generation
 - offline playback
@@ -38,7 +38,7 @@ This project must become a premium-quality Android prank laboratory application 
 
 ## STRICT UI PRESERVATION AMENDMENT
 
-No AI agent may:
+No agent may:
 - replace custom UI with generic Material layouts
 - flatten layered surfaces
 - remove waveform systems
@@ -50,7 +50,7 @@ No AI agent may:
 - reduce visual hierarchy
 - remove neon styling
 
-All future work MUST preserve:
+All future work must preserve:
 - dark cyberpunk aesthetic
 - neon edge lighting
 - layered surfaces
@@ -64,9 +64,14 @@ All future work MUST preserve:
 
 ## BUILD INTEGRITY RULE
 
-No feature work before:
-./gradlew assembleDebug
-passes successfully.
+Before claiming success, run:
+
+```powershell
+.\gradlew.bat clean assembleDebug --stacktrace --console=plain
+```
+
+Current status as of 2026-05-07:
+PASS
 
 ## AUDIO RULES
 
@@ -77,33 +82,36 @@ Required:
 - playback validation
 - corrupt file handling
 - duration validation
+- no missing assets
+- no uncataloged packaged audio
+- no duplicate catalog IDs or paths
 
 Forbidden:
 - fake playback
 - hardcoded fake sound lists
 - silent playback failures
+- placeholder audio files
+- TTS-substitute corrupted binary files
+
+Current automated audio status as of 2026-05-07:
+PASS
 
 ## CURRENT KNOWN BLOCKERS
 
-1. Corrupt Gradle wrapper
-2. Build not verified
-3. Corrupt Android audio assets
-4. Weak validation tooling
-5. Incomplete Randomizer
-6. Mock Sequence Builder
-7. Bare Settings screen
-8. Partial Reactor Core
-9. Partial Sound Forge
+1. Manual device/emulator QA not executed because `adb` is unavailable in the current environment.
+2. npm audit reports high-severity vulnerabilities through `google-tts-api` -> `axios`.
+3. Build warnings remain for manifest package declaration, Java 8 target under JDK 21, deprecated icons, and unused parameters.
+4. Reduced animation preference is persisted but not globally enforced across every animated component.
 
 ## SUCCESS CONDITIONS
 
 Production readiness requires:
-- successful assembleDebug
-- all catalog sounds playable
+- successful clean `assembleDebug`
+- all catalog sounds validated
 - no corrupt assets
-- Randomizer complete
-- Sequence Builder complete
-- Sound Forge stable
-- Reactor Core advanced and interactive
-- stable playback
-- visually cohesive premium UI
+- no missing assets
+- no duplicate IDs or paths
+- manual app flow QA on device/emulator
+- stable playback across Home, Library, Timer, Randomizer, Sequence Builder, Sound Forge, and Settings
+- dependency audit triaged
+- visually cohesive premium UI preserved
