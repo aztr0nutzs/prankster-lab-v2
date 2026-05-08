@@ -29,8 +29,8 @@ import com.pranksterlab.components.GlassPanel
 import com.pranksterlab.components.HeadlineText
 import com.pranksterlab.components.LabelCaps
 import com.pranksterlab.components.PrankstarHeader
-import com.pranksterlab.components.PrankstarHeaderVariant
 import com.pranksterlab.components.ScanlineOverlay
+import com.pranksterlab.R
 import com.pranksterlab.components.reactor.ReactorCorePanel
 import com.pranksterlab.components.reactor.StatusReadout
 import com.pranksterlab.components.reactor.QuickDeployPanel
@@ -130,7 +130,14 @@ fun HomeScreen(
             modifier = Modifier.fillMaxSize().padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-        item { PrankstarHeader(variant = PrankstarHeaderVariant.SN1, height = 96.dp) }
+        item {
+            PrankstarHeader(
+                title = "Prankster Reactor",
+                subtitle = "Command Console / Live Deploy",
+                imageRes = R.drawable.prankstar_sn1,
+                statusLabel = if (playbackState.isPlaying) "LIVE" else "ARMED"
+            )
+        }
         item { WaveformHeader() }
         item {
             val hasCustom = soundsList.any { it.isCustom }

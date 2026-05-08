@@ -21,9 +21,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.pranksterlab.R
 import com.pranksterlab.components.GlassPanel
 import com.pranksterlab.components.HeadlineText
 import com.pranksterlab.components.LabelCaps
+import com.pranksterlab.components.PrankstarHeader
 import com.pranksterlab.theme.*
 import kotlin.random.Random
 
@@ -71,6 +73,13 @@ fun PrankMessagesScreen() {
 
     LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         item {
+            PrankstarHeader(
+                title = "Prank Messages",
+                subtitle = "Transparent Prank Text Console",
+                imageRes = R.drawable.prankstar_sn3,
+                statusLabel = selectedCategory
+            )
+            Spacer(modifier = Modifier.height(16.dp))
             HeadlineText("PRANK MESSAGES", color = CyanAccent)
             Text("Harmless prank texts, sent transparently", color = Color.Gray, style = MaterialTheme.typography.bodySmall)
             Spacer(modifier = Modifier.height(24.dp))
