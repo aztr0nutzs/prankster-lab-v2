@@ -37,9 +37,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.pranksterlab.R
 import com.pranksterlab.components.HUDCard
 import com.pranksterlab.components.HeadlineText
 import com.pranksterlab.components.LabelCaps
+import com.pranksterlab.components.PrankstarHeader
 import com.pranksterlab.components.ScanlineOverlay
 import com.pranksterlab.core.audio.AudioPlayerController
 import com.pranksterlab.core.model.PrankSound
@@ -68,7 +70,15 @@ fun SoundPacksScreen(soundRepository: SoundRepository, audioPlayerController: Au
     Box(modifier = Modifier.fillMaxSize().background(BackgroundDark)) {
         ScanlineOverlay()
 
-        Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            PrankstarHeader(
+                title = "Sound Packs",
+                subtitle = "Featured Data Pack Catalogue",
+                imageRes = R.drawable.prankstar_sn2,
+                statusLabel = "${packSummaries.size} PACKS",
+                modifier = Modifier.padding(top = 8.dp)
+            )
+            Column(modifier = Modifier.fillMaxWidth().weight(1f).padding(16.dp)) {
             HeadlineText("FEATURED DATA PACKS", color = CyanAccent)
             Text(
                 "REAL CATALOG PACKS  /  ${validSounds.size} VALID SIGNALS",
@@ -108,6 +118,7 @@ fun SoundPacksScreen(soundRepository: SoundRepository, audioPlayerController: Au
                         }
                     )
                 }
+            }
             }
         }
     }

@@ -64,10 +64,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.pranksterlab.R
 import com.pranksterlab.components.HUDCard
 import com.pranksterlab.components.LabelCaps
 import com.pranksterlab.components.PrankstarHeader
-import com.pranksterlab.components.PrankstarHeaderVariant
 import com.pranksterlab.components.ScanlineOverlay
 import com.pranksterlab.core.audio.AudioPlayerController
 import com.pranksterlab.core.repository.SoundRepository
@@ -126,7 +126,10 @@ fun RandomizerScreen(
         ) {
             item {
                 PrankstarHeader(
-                    variant = PrankstarHeaderVariant.SN3,
+                    title = "Randomizer",
+                    subtitle = "Chaos Algorithm Engine",
+                    imageRes = R.drawable.prankstar_sn3,
+                    statusLabel = if (state.isRunning) "RUNNING" else "ARMED",
                     modifier = Modifier.padding(top = 8.dp)
                 )
             }

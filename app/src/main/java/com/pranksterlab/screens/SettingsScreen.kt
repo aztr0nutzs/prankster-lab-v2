@@ -45,9 +45,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.pranksterlab.BuildConfig
+import com.pranksterlab.R
 import com.pranksterlab.components.HUDCard
 import com.pranksterlab.components.HeadlineText
 import com.pranksterlab.components.LabelCaps
+import com.pranksterlab.components.PrankstarHeader
 import com.pranksterlab.components.ScanlineOverlay
 import com.pranksterlab.core.audio.AudioPlayerController
 import com.pranksterlab.core.repository.AudioDiagnostics
@@ -88,6 +90,14 @@ fun SettingsScreen(soundRepository: SoundRepository, audioPlayerController: Audi
         ScanlineOverlay()
 
         LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            item {
+                PrankstarHeader(
+                    title = "System Setup",
+                    subtitle = "Diagnostics / Safety / App Control",
+                    imageRes = R.drawable.prankstar_sn2,
+                    statusLabel = if ((diagnostics?.invalidCatalogSounds ?: 0) > 0) "ALERT" else "STABLE"
+                )
+            }
             item {
                 HeadlineText("SYSTEM SETUP", color = CyanAccent)
                 Text("DIAGNOSTICS / SAFETY / APP CONTROL", color = Color.Gray, style = MaterialTheme.typography.labelSmall)

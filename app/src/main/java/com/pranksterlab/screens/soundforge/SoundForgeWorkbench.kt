@@ -71,7 +71,9 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.pranksterlab.R
 import com.pranksterlab.components.LabelCaps
+import com.pranksterlab.components.PrankstarHeader
 import com.pranksterlab.core.model.GeneratedSoundResult
 import com.pranksterlab.core.model.SoundForgeGeneratorType
 import com.pranksterlab.theme.BackgroundDark
@@ -125,6 +127,19 @@ fun SoundForgeWorkbench(
             ),
         contentPadding = PaddingValues(bottom = 24.dp)
     ) {
+        item {
+            PrankstarHeader(
+                title = "Sound Forge",
+                subtitle = "Procedural Synthesis Lab",
+                imageRes = R.drawable.prankstar_sn3,
+                statusLabel = when {
+                    isGenerating -> "RENDER"
+                    isPlaying -> "PREVIEW"
+                    else -> "ARMED"
+                },
+                modifier = Modifier.padding(bottom = 4.dp)
+            )
+        }
         item {
             WorkbenchHeader(
                 selectedType = selectedType,
