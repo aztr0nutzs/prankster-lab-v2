@@ -14,6 +14,7 @@ import com.pranksterlab.components.BottomNavBar
 import com.pranksterlab.components.TopBar
 import com.pranksterlab.screens.*
 import com.pranksterlab.screens.soundforge.SoundForgeScreen
+import com.pranksterlab.screens.voice.VoiceJokeGeneratorScreen
 import com.pranksterlab.screens.soundforge.SoundForgeViewModel
 import com.pranksterlab.core.audio.generator.SoundGeneratorEngine
 import com.pranksterlab.core.repository.CustomSoundManager
@@ -73,7 +74,7 @@ fun PranksterApp() {
                 LibraryScreen(
                     soundRepository = soundRepository,
                     audioPlayerController = audioPlayerController,
-                    onOpenSequence = { navController.navigate("sequence") },
+                    onOpenSequence = { navController.navigate("voice_lab") },
                     onOpenTimer = { navController.navigate("timer") }
                 )
             }
@@ -81,7 +82,7 @@ fun PranksterApp() {
             composable("forge") { SoundForgeScreen(soundForgeViewModel, audioPlayerController) }
             composable("lab") { SoundPacksScreen(soundRepository, audioPlayerController, onOpenLibrary = { navController.navigate("library") }) }
             composable("system") { SettingsScreen(soundRepository, audioPlayerController) }
-            composable("sequence") { SequenceBuilderScreen(soundRepository, audioPlayerController) }
+            composable("voice_lab") { VoiceJokeGeneratorScreen(soundRepository) }
             composable("randomizer") { RandomizerScreen(soundRepository, audioPlayerController) }
             composable("messages") { PrankMessagesScreen() }
         }

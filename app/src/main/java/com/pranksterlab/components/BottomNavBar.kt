@@ -65,6 +65,13 @@ fun BottomNavBar(currentRoute: String, onNavigate: (String) -> Unit) {
             activeColor = LimeAccent
         )
         NavItem(
+            icon = Icons.Default.RecordVoiceOver,
+            label = "VOICE",
+            isSelected = currentRoute == "voice_lab",
+            onClick = { onNavigate("voice_lab") },
+            activeColor = LimeAccent
+        )
+        NavItem(
             icon = Icons.Default.Settings,
             label = "SYSTEM",
             isSelected = currentRoute == "system",

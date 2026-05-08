@@ -1,0 +1,103 @@
+package com.pranksterlab.screens.voice
+
+import android.media.MediaPlayer
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
+import com.pranksterlab.R
+import com.pranksterlab.components.PrankstarHeader
+import com.pranksterlab.components.ScanlineOverlay
+import com.pranksterlab.core.repository.SoundRepository
+import com.pranksterlab.core.voice.*
+import com.pranksterlab.theme.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.io.File
+
+@Composable
+fun VoiceJokeGeneratorScreen(soundRepository: SoundRepository) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val tts = remember { AndroidTextToSpeechEngine(context) }
+    val generatedRepo = remember { GeneratedVoiceRepository(soundRepository) }
+    var preset by remember { mutableStateOf(VoicePresetLibrary.presets.first()) }
+    var text by remember { mutableStateOf("") }
+    var outputName by remember { mutableStateOf("") }
+    var pitch by remember { mutableStateOf(preset.pitch) }
+    var speed by remember { mutableStateOf(preset.speechRate) }
+    var volume by remember { mutableStateOf(preset.volume) }
+    var effect by remember { mutableStateOf(0.2f) }
+    var echo by remember { mutableStateOf(false) }
+    var status by remember { mutableStateOf("READY") }
+    var generatedFile by remember { mutableStateOf<File?>(null) }
+
+    DisposableEffect(Unit) { onDispose { tts.release() } }
+
+    Box(Modifier.fillMaxSize().background(BackgroundDark)) {
+        ScanlineOverlay()
+        LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp), contentPadding = PaddingValues(bottom = 120.dp)) {
+            item { PrankstarHeader("Voice Lab", "Joke / Comment Generator", R.drawable.prankstar_sn3, statusLabel = status) }
+            item { Text("Synthetic Presets", color = LimeAccent) }
+            items(VoicePresetLibrary.presets.groupBy { it.category }.entries.toList()) { (cat, list) ->
+                Text(cat.name.replace('_',' '), color = CyanAccent)
+                list.forEach { p ->
+                    Card(Modifier.fillMaxWidth().padding(vertical = 4.dp).clickable { preset = p; pitch = p.pitch; speed = p.speechRate; volume = p.volume }.border(1.dp, if (preset.id==p.id) FuchsiaAccent else Color.DarkGray, RoundedCornerShape(12.dp)), colors = CardDefaults.cardColors(containerColor = GlassBackground)) {
+                        Column(Modifier.padding(12.dp)) { Text(p.displayName, color = Color.White); Text("${p.description} • ${p.toneStyle}/${p.effectStyle}", color = Color.LightGray, style = MaterialTheme.typography.bodySmall) }
+                    }
+                }
+            }
+            item {
+                OutlinedTextField(text, { if (it.length<=300) text = it }, modifier = Modifier.fillMaxWidth().height(140.dp), placeholder={Text("Try: \"Warning, this fridge is now sentient\"")}, label={Text("Joke / Comment")})
+            }
+            item { Text("${text.length}/300", color = if (text.isBlank()) OrangeAccent else LimeAccent) }
+            item {
+                Column(Modifier.fillMaxWidth().background(GlassBackground, RoundedCornerShape(14.dp)).padding(12.dp)) {
+                    Text("Voice Settings", color = CyanAccent)
+                    Slider(pitch,{pitch=it},valueRange=0.5f..1.8f); Text("Pitch ${"%.2f".format(pitch)}", color = Color.White)
+                    Slider(speed,{speed=it},valueRange=0.5f..1.6f); Text("Speed ${"%.2f".format(speed)}", color = Color.White)
+                    Slider(volume,{volume=it},valueRange=0.2f..1.2f); Text("Volume ${"%.2f".format(volume)}", color = Color.White)
+                    Slider(effect,{effect=it}); Text("Effect ${"%.2f".format(effect)}", color = Color.White)
+                    Row { Checkbox(echo,{echo=it}); Text("Echo/Reverb (simulated toggle)", color = Color.White) }
+                }
+            }
+            item { OutlinedTextField(outputName, { outputName = it }, modifier = Modifier.fillMaxWidth(), label = { Text("Output Name") }, placeholder={Text("Midnight prank check-in")}) }
+            item {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Button(onClick = {
+                        if (text.isBlank() || text.contains("police", true) || text.contains("emergency", true)) { status = "ERROR"; return@Button }
+                        scope.launch(Dispatchers.IO) {
+                            status = "GENERATING"
+                            val file = File(context.filesDir, "voice_${System.currentTimeMillis()}.wav")
+                            tts.synthesizeToFile(VoiceGeneratorSettings(preset, text, pitch, speed, volume, preset.toneStyle, effect, echo, outputName), file)
+                            generatedFile = file
+                            status = "SAVED"
+                        }
+                    }, enabled = text.isNotBlank()) { Text("Generate") }
+                    Button(onClick = {
+                        generatedFile?.let {
+                            MediaPlayer().apply { setDataSource(it.absolutePath); prepare(); start() }
+                        }
+                    }, enabled = generatedFile != null) { Text("Preview") }
+                    Button(onClick = { tts.stopPreview() }) { Text("Stop") }
+                }
+            }
+            item {
+                Button(onClick = {
+                    val file = generatedFile ?: return@Button
+                    scope.launch { generatedRepo.saveGeneratedVoice(file, VoiceGeneratorSettings(preset,text,pitch,speed,volume,preset.toneStyle,effect,echo,outputName), null) }
+                }, enabled = generatedFile != null) { Text("Save to Library (WAV)") }
+            }
+            item { Text("Safety: Keep pranks harmless. No real-person or official-alert impersonation.", color = OrangeAccent) }
+        }
+    }
+}
