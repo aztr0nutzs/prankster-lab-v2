@@ -127,7 +127,8 @@ fun HomeScreen(
     Box(modifier = Modifier.fillMaxSize().background(BackgroundDark)) {
         ScanlineOverlay()
         LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(16.dp),
+            modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
+            contentPadding = androidx.compose.foundation.layout.PaddingValues(top = 16.dp, bottom = 80.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
         item {

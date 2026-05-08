@@ -98,10 +98,6 @@ fun SettingsScreen(soundRepository: SoundRepository, audioPlayerController: Audi
                     statusLabel = if ((diagnostics?.invalidCatalogSounds ?: 0) > 0) "ALERT" else "STABLE"
                 )
             }
-            item {
-                HeadlineText("SYSTEM SETUP", color = CyanAccent)
-                Text("DIAGNOSTICS / SAFETY / APP CONTROL", color = Color.Gray, style = MaterialTheme.typography.labelSmall)
-            }
 
             item {
                 HUDCard(modifier = Modifier.fillMaxWidth(), accentColor = CyanAccent) {
