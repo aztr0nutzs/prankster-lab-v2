@@ -152,7 +152,8 @@ fun HomeScreen(
                 safeSoundCount = safeCount,
                 onTrigger = { cat, intensity -> triggerReactor(cat, intensity) },
                 onStop = { audioPlayerController.stopAll() },
-                onCategoryChange = { selectedCategory = it }
+                onCategoryChange = { selectedCategory = it },
+                coreImageRes = R.drawable.prankstar_core
             )
         }
         item {
