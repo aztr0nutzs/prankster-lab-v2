@@ -66,6 +66,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pranksterlab.components.HUDCard
 import com.pranksterlab.components.LabelCaps
+import com.pranksterlab.components.PrankstarHeader
+import com.pranksterlab.components.PrankstarHeaderVariant
 import com.pranksterlab.components.ScanlineOverlay
 import com.pranksterlab.core.audio.AudioPlayerController
 import com.pranksterlab.core.repository.SoundRepository
@@ -122,6 +124,13 @@ fun RandomizerScreen(
             contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 112.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            item {
+                PrankstarHeader(
+                    variant = PrankstarHeaderVariant.SN3,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+            }
+
             item {
                 RandomizerHeader(
                     isRunning = state.isRunning,

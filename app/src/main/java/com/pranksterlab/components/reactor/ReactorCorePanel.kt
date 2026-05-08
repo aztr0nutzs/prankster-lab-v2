@@ -2,6 +2,7 @@ package com.pranksterlab.components.reactor
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -22,7 +23,9 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -452,6 +455,31 @@ fun ReactorCorePanel(
                     ),
                 contentAlignment = Alignment.Center
             ) {
+                // Decorative core artwork backdrop. Sits behind the HUD crosshair
+                // and primary controls so animations / interactions remain unchanged.
+                Image(
+                    painter = painterResource(id = com.pranksterlab.R.drawable.prankstar_core),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(8.dp)
+                        .clip(CircleShape)
+                        .graphicsLayer {
+                            val s = if (state == ReactorState.PLAYING || state == ReactorState.CHARGING) corePulse else 1f
+                            scaleX = s
+                            scaleY = s
+                            alpha = when (state) {
+                                ReactorState.PLAYING -> 0.55f
+                                ReactorState.CHARGING -> 0.45f
+                                ReactorState.ERROR -> 0.30f * errorFlash + 0.20f
+                                ReactorState.COOLDOWN -> 0.30f
+                                ReactorState.ARMED -> 0.40f
+                                ReactorState.IDLE -> 0.30f
+                            }
+                        },
+                    contentScale = ContentScale.Crop
+                )
+
                 // Crosshair lines for HUD feel
                 Canvas(modifier = Modifier.fillMaxSize().padding(20.dp)) {
                     val a = accentColor.copy(alpha = 0.28f)
