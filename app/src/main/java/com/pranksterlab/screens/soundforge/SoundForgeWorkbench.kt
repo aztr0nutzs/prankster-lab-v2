@@ -137,7 +137,7 @@ fun SoundForgeWorkbench(
                     isPlaying -> "PREVIEW"
                     else -> "ARMED"
                 },
-                modifier = Modifier.padding(bottom = 4.dp)
+                modifier = Modifier.padding(horizontal = 16.dp, bottom = 4.dp)
             )
         }
         item {

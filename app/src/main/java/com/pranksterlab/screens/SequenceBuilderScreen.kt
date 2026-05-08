@@ -343,22 +343,10 @@ private suspend fun runSequence(
 
 @Composable
 private fun SequenceHeader(stepCount: Int, presetCount: Int, blockedCount: Int) {
-    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        Text(
-            "SEQUENCE BUILDER",
-            style = MaterialTheme.typography.displayLarge.copy(fontSize = 34.sp, letterSpacing = 2.sp),
-            color = CyanAccent
-        )
-        Text(
-            "MULTI-SOUND PRANK PLAYLIST HUD",
-            color = Color.Gray,
-            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold)
-        )
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-            StatusChip("STEPS", stepCount.toString(), LimeAccent, Modifier.weight(1f))
-            StatusChip("PRESETS", presetCount.toString(), CyanAccent, Modifier.weight(1f))
-            StatusChip("BLOCKED", blockedCount.toString(), OrangeAccent, Modifier.weight(1f))
-        }
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+        StatusChip("STEPS", stepCount.toString(), LimeAccent, Modifier.weight(1f))
+        StatusChip("PRESETS", presetCount.toString(), CyanAccent, Modifier.weight(1f))
+        StatusChip("BLOCKED", blockedCount.toString(), OrangeAccent, Modifier.weight(1f))
     }
 }
 

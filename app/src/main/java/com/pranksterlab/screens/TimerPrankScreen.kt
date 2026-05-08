@@ -23,6 +23,7 @@ import com.pranksterlab.components.GlassPanel
 import com.pranksterlab.components.HeadlineText
 import com.pranksterlab.components.LabelCaps
 import com.pranksterlab.components.PrankstarHeader
+import com.pranksterlab.components.ScanlineOverlay
 import com.pranksterlab.core.audio.AudioPlayerController
 import com.pranksterlab.core.model.PrankSound
 import com.pranksterlab.core.repository.SoundRepository
@@ -80,7 +81,9 @@ fun TimerPrankScreen(soundRepository: SoundRepository, audioPlayerController: Au
         }
     }
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier.fillMaxSize().background(BackgroundDark)) {
+        ScanlineOverlay()
+        Column(modifier = Modifier.fillMaxSize()) {
         PrankstarHeader(
             title = "Timer Prank",
             subtitle = "Delayed Detonation Console",
@@ -89,7 +92,8 @@ fun TimerPrankScreen(soundRepository: SoundRepository, audioPlayerController: Au
                 TimerState.COUNTDOWN -> "ARMED"
                 TimerState.PLAYING -> "LIVE"
                 TimerState.IDLE -> "READY"
-            }
+            },
+            modifier = Modifier.padding(horizontal = 16.dp)
         )
         Column(modifier = Modifier.fillMaxWidth().weight(1f).padding(16.dp)) {
         HeadlineText("TIMER PRANK", color = CyanAccent)
@@ -229,6 +233,7 @@ fun TimerPrankScreen(soundRepository: SoundRepository, audioPlayerController: Au
             }
         }
         }
+    }
     }
 
     if (showSoundPicker) {

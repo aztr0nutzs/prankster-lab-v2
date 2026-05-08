@@ -149,7 +149,7 @@ fun LibraryScreen(
                 subtitle = "Library / Catalog Browser",
                 imageRes = R.drawable.prankstar_sn2,
                 statusLabel = "${validSounds.size} ASSETS",
-                modifier = Modifier.padding(top = 8.dp)
+                modifier = Modifier.padding(horizontal = 16.dp, top = 8.dp)
             )
             Header(
                 onSearchClick = { isSearchActive = !isSearchActive },
@@ -266,22 +266,23 @@ fun Header(
     invalidCount: Int,
     onDiagnosticsClick: () -> Unit
 ) {
-    Column(modifier = Modifier.fillMaxWidth().padding(top = 24.dp, bottom = 8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-        Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier.size(32.dp))
-            Text("PRANKSTER", style = MaterialTheme.typography.headlineSmall.copy(fontStyle = androidx.compose.ui.text.font.FontStyle.Italic, fontWeight = FontWeight.Black, letterSpacing = (-1).sp), color = Color.White)
-            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                Text(
-                    text = if (showDiagnostics) "DIAG $invalidCount" else "DIAG",
-                    color = if (showDiagnostics) OrangeAccent else Color.Gray,
-                    style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
-                    modifier = Modifier.clickable { onDiagnosticsClick() }
-                )
-                IconButton(onClick = onSearchClick, modifier = Modifier.size(24.dp)) { Icon(Icons.Default.Search, null, tint = LimeAccent.copy(alpha = 0.8f)) }
-            }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        horizontalArrangement = Arrangement.End,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = if (showDiagnostics) "DIAG $invalidCount" else "DIAG",
+            color = if (showDiagnostics) OrangeAccent else Color.Gray,
+            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+            modifier = Modifier.clickable { onDiagnosticsClick() }
+        )
+        Spacer(modifier = Modifier.width(16.dp))
+        IconButton(onClick = onSearchClick, modifier = Modifier.size(24.dp)) {
+            Icon(Icons.Default.Search, null, tint = LimeAccent.copy(alpha = 0.8f))
         }
-        Spacer(modifier = Modifier.size(18.dp))
-        Text("AUDIO ARSENAL", style = MaterialTheme.typography.displayLarge.copy(fontSize = 32.sp, letterSpacing = 4.sp, lineHeight = 32.sp, fontStyle = androidx.compose.ui.text.font.FontStyle.Italic), color = LimeAccent)
     }
 }
 
