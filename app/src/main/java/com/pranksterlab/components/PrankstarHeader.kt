@@ -1,5 +1,6 @@
 package com.pranksterlab.components
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -37,18 +38,7 @@ import com.pranksterlab.theme.CyanAccent
 import com.pranksterlab.theme.FuchsiaAccent
 import com.pranksterlab.theme.LimeAccent
 
-/**
- * Convenience mapping from the bundled Prankstar art panels to a screen-specific accent.
- * Screens choose their image directly via [PrankstarHeader]'s `imageRes` parameter; this
- * helper exists so callers can stay consistent with the dark neon palette already in use.
- */
-enum class PrankstarHeaderVariant(val drawableId: Int, val accent: Color) {
-    SN1(R.drawable.prankstar_sn1, CyanAccent),
-    SN2(R.drawable.prankstar_sn2, FuchsiaAccent),
-    SN3(R.drawable.prankstar_sn3, LimeAccent),
-}
-
-private fun accentForImage(imageRes: Int): Color = when (imageRes) {
+private fun accentForImage(@DrawableRes imageRes: Int): Color = when (imageRes) {
     R.drawable.prankstar_sn1 -> CyanAccent
     R.drawable.prankstar_sn2 -> FuchsiaAccent
     R.drawable.prankstar_sn3 -> LimeAccent
@@ -68,7 +58,7 @@ private fun accentForImage(imageRes: Int): Color = when (imageRes) {
 fun PrankstarHeader(
     title: String,
     subtitle: String,
-    imageRes: Int,
+    @DrawableRes imageRes: Int,
     modifier: Modifier = Modifier,
     statusLabel: String? = null,
     trailingContent: (@Composable RowScope.() -> Unit)? = null,
@@ -219,7 +209,7 @@ private fun ScanlineTrim() {
                 color = Color.Black.copy(alpha = 0.10f),
                 start = Offset(0f, y),
                 end = Offset(size.width, y),
-                strokeWidth = 1f,
+                strokeWidth = 1.dp.toPx(),
             )
             y += spacing
         }

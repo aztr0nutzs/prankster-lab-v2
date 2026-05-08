@@ -79,46 +79,46 @@ fun SoundPacksScreen(soundRepository: SoundRepository, audioPlayerController: Au
                 modifier = Modifier.padding(top = 8.dp)
             )
             Column(modifier = Modifier.fillMaxWidth().weight(1f).padding(16.dp)) {
-            HeadlineText("FEATURED DATA PACKS", color = CyanAccent)
-            Text(
-                "REAL CATALOG PACKS  /  ${validSounds.size} VALID SIGNALS",
-                color = Color.Gray,
-                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
-            )
-            Spacer(modifier = Modifier.height(16.dp))
+                HeadlineText("FEATURED DATA PACKS", color = CyanAccent)
+                Text(
+                    "REAL CATALOG PACKS  /  ${validSounds.size} VALID SIGNALS",
+                    color = Color.Gray,
+                    style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+                )
+                Spacer(modifier = Modifier.height(16.dp))
 
-            if (packSummaries.isEmpty()) {
-                HUDCard(modifier = Modifier.fillMaxWidth(), accentColor = CyanAccent) {
-                    Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
-                        Text("NO VALID PACKS", color = CyanAccent)
-                        Text("Catalog packs appear once valid playable assets are detected.", color = Color.Gray)
+                if (packSummaries.isEmpty()) {
+                    HUDCard(modifier = Modifier.fillMaxWidth(), accentColor = CyanAccent) {
+                        Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+                            Text("NO VALID PACKS", color = CyanAccent)
+                            Text("Catalog packs appear once valid playable assets are detected.", color = Color.Gray)
+                        }
                     }
                 }
-            }
 
-            LazyVerticalGrid(
-                columns = GridCells.Adaptive(168.dp),
-                modifier = Modifier.fillMaxSize(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                contentPadding = PaddingValues(bottom = 100.dp)
-            ) {
-                items(packSummaries, key = { it.packId }) { pack ->
-                    val packSounds = validSounds.filter { it.packId == pack.packId }
-                    PackCard(
-                        pack = pack,
-                        sampleSound = packSounds.firstOrNull(),
-                        onPreview = {
-                            val sample = packSounds.randomOrNull() ?: return@PackCard
-                            audioPlayerController.playPrankSound(sample, false)
-                        },
-                        onOpen = {
-                            soundRepository.setActivePackFilter(pack.packId)
-                            onOpenLibrary()
-                        }
-                    )
+                LazyVerticalGrid(
+                    columns = GridCells.Adaptive(168.dp),
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    contentPadding = PaddingValues(bottom = 100.dp)
+                ) {
+                    items(packSummaries, key = { it.packId }) { pack ->
+                        val packSounds = validSounds.filter { it.packId == pack.packId }
+                        PackCard(
+                            pack = pack,
+                            sampleSound = packSounds.firstOrNull(),
+                            onPreview = {
+                                val sample = packSounds.randomOrNull() ?: return@PackCard
+                                audioPlayerController.playPrankSound(sample, false)
+                            },
+                            onOpen = {
+                                soundRepository.setActivePackFilter(pack.packId)
+                                onOpenLibrary()
+                            }
+                        )
+                    }
                 }
-            }
             }
         }
     }

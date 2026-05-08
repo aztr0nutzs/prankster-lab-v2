@@ -92,142 +92,142 @@ fun TimerPrankScreen(soundRepository: SoundRepository, audioPlayerController: Au
             }
         )
         Column(modifier = Modifier.fillMaxWidth().weight(1f).padding(16.dp)) {
-        HeadlineText("TIMER PRANK", color = CyanAccent)
-        Spacer(modifier = Modifier.height(8.dp))
-        LabelCaps("Set a delay, hide your device, and watch.", color = OnBackground.copy(alpha=0.6f))
-        
-        Spacer(modifier = Modifier.height(32.dp))
+            HeadlineText("TIMER PRANK", color = CyanAccent)
+            Spacer(modifier = Modifier.height(8.dp))
+            LabelCaps("Set a delay, hide your device, and watch.", color = OnBackground.copy(alpha=0.6f))
 
-        // Timer Display
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp)
-                .clip(RoundedCornerShape(24.dp))
-                .background(GlassBackground)
-                .border(2.dp, if (timerState == TimerState.COUNTDOWN) FuchsiaAccent else CyanAccent.copy(alpha=0.2f), RoundedCornerShape(24.dp)),
-            contentAlignment = Alignment.Center
-        ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                if (timerState == TimerState.COUNTDOWN) {
-                    Text(
-                        text = String.format("%02d:%02d", remainingSeconds / 60, remainingSeconds % 60),
-                        style = MaterialTheme.typography.displayLarge.copy(fontSize = 72.sp),
-                        color = FuchsiaAccent
-                    )
-                    LabelCaps("DETONATION IMMINENT", color = FuchsiaAccent)
-                } else if (timerState == TimerState.PLAYING) {
-                    Icon(Icons.Default.VolumeUp, null, tint = CyanAccent, modifier = Modifier.size(64.dp))
-                    LabelCaps("EXECUTING PRANK", color = CyanAccent)
-                } else {
-                    Text(
-                        text = String.format("%02d:%02d", delaySeconds / 60, delaySeconds % 60),
-                        style = MaterialTheme.typography.displayLarge.copy(fontSize = 72.sp),
-                        color = CyanAccent.copy(alpha = 0.5f)
-                    )
-                    LabelCaps("TIMER ARMED", color = CyanAccent.copy(alpha = 0.5f))
-                }
-            }
-        }
+            Spacer(modifier = Modifier.height(32.dp))
 
-        Spacer(modifier = Modifier.height(32.dp))
-
-        // Delay Selection
-        HeadlineText("DELAY PRESETS", color = OnBackground)
-        Spacer(modifier = Modifier.height(16.dp))
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            listOf(5, 15, 30, 60, 300).forEach { sec ->
-                PresetButton(
-                    label = if (sec < 60) "${sec}S" else "${sec/60}M",
-                    isSelected = delaySeconds == sec && timerState == TimerState.IDLE,
-                    enabled = timerState == TimerState.IDLE,
-                    onClick = { delaySeconds = sec }
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        // Sound Selection
-        HeadlineText("SOUND PAYLOAD", color = OnBackground)
-        Spacer(modifier = Modifier.height(16.dp))
-        GlassPanel(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable(enabled = timerState == TimerState.IDLE) { showSoundPicker = true }
-                .padding(16.dp)
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.MusicNote, null, tint = CyanAccent)
-                Spacer(modifier = Modifier.width(16.dp))
-                Column {
-                    Text(
-                        text = selectedSound?.name ?: "Select Sound...",
-                        color = if (selectedSound != null) Color.White else Color.Gray,
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                    if (selectedSound != null) {
-                        LabelCaps(text = selectedSound!!.category, color = FuchsiaAccent)
+            // Timer Display
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+                    .clip(RoundedCornerShape(24.dp))
+                    .background(GlassBackground)
+                    .border(2.dp, if (timerState == TimerState.COUNTDOWN) FuchsiaAccent else CyanAccent.copy(alpha=0.2f), RoundedCornerShape(24.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    if (timerState == TimerState.COUNTDOWN) {
+                        Text(
+                            text = String.format("%02d:%02d", remainingSeconds / 60, remainingSeconds % 60),
+                            style = MaterialTheme.typography.displayLarge.copy(fontSize = 72.sp),
+                            color = FuchsiaAccent
+                        )
+                        LabelCaps("DETONATION IMMINENT", color = FuchsiaAccent)
+                    } else if (timerState == TimerState.PLAYING) {
+                        Icon(Icons.Default.VolumeUp, null, tint = CyanAccent, modifier = Modifier.size(64.dp))
+                        LabelCaps("EXECUTING PRANK", color = CyanAccent)
+                    } else {
+                        Text(
+                            text = String.format("%02d:%02d", delaySeconds / 60, delaySeconds % 60),
+                            style = MaterialTheme.typography.displayLarge.copy(fontSize = 72.sp),
+                            color = CyanAccent.copy(alpha = 0.5f)
+                        )
+                        LabelCaps("TIMER ARMED", color = CyanAccent.copy(alpha = 0.5f))
                     }
                 }
-                Spacer(modifier = Modifier.weight(1f))
-                Icon(Icons.Default.ChevronRight, null, tint = OnBackground.copy(alpha=0.5f))
             }
-        }
 
-        Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.height(32.dp))
 
-        // Safety Copy
-        Text(
-            text = "Use responsibly. Avoid public spaces or emergencies.",
-            color = OnBackground.copy(alpha = 0.4f),
-            style = MaterialTheme.typography.bodySmall,
-            modifier = Modifier.align(Alignment.CenterHorizontally).padding(bottom = 16.dp)
-        )
-
-        // Action Buttons
-        Row(modifier = Modifier.fillMaxWidth().height(56.dp), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-            if (timerState == TimerState.COUNTDOWN) {
-                Button(
-                    onClick = { timerState = TimerState.IDLE },
-                    modifier = Modifier.weight(1f).fillMaxHeight(),
-                    colors = ButtonDefaults.buttonColors(containerColor = ErrorRed, contentColor = Color.Black),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Icon(Icons.Default.Cancel, null)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("CANCEL")
-                }
-            } else {
-                Button(
-                    onClick = {
-                        remainingSeconds = delaySeconds
-                        timerState = TimerState.COUNTDOWN
-                    },
-                    enabled = selectedSound != null && timerState == TimerState.IDLE,
-                    modifier = Modifier.weight(1f).fillMaxHeight(),
-                    colors = ButtonDefaults.buttonColors(containerColor = CyanAccent, contentColor = Color.Black),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Icon(Icons.Default.HourglassEmpty, null)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("START TIMER")
+            // Delay Selection
+            HeadlineText("DELAY PRESETS", color = OnBackground)
+            Spacer(modifier = Modifier.height(16.dp))
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                listOf(5, 15, 30, 60, 300).forEach { sec ->
+                    PresetButton(
+                        label = if (sec < 60) "${sec}S" else "${sec/60}M",
+                        isSelected = delaySeconds == sec && timerState == TimerState.IDLE,
+                        enabled = timerState == TimerState.IDLE,
+                        onClick = { delaySeconds = sec }
+                    )
                 }
             }
-            
-            if (timerState == TimerState.PLAYING) {
-                Button(
-                    onClick = { audioPlayerController.stopAll() },
-                    modifier = Modifier.weight(1f).fillMaxHeight(),
-                    colors = ButtonDefaults.buttonColors(containerColor = ErrorRed, contentColor = Color.Black),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Icon(Icons.Default.Dangerous, null)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("KILL SWITCH")
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // Sound Selection
+            HeadlineText("SOUND PAYLOAD", color = OnBackground)
+            Spacer(modifier = Modifier.height(16.dp))
+            GlassPanel(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(enabled = timerState == TimerState.IDLE) { showSoundPicker = true }
+                    .padding(16.dp)
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.MusicNote, null, tint = CyanAccent)
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Column {
+                        Text(
+                            text = selectedSound?.name ?: "Select Sound...",
+                            color = if (selectedSound != null) Color.White else Color.Gray,
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        if (selectedSound != null) {
+                            LabelCaps(text = selectedSound!!.category, color = FuchsiaAccent)
+                        }
+                    }
+                    Spacer(modifier = Modifier.weight(1f))
+                    Icon(Icons.Default.ChevronRight, null, tint = OnBackground.copy(alpha=0.5f))
                 }
             }
-        }
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            // Safety Copy
+            Text(
+                text = "Use responsibly. Avoid public spaces or emergencies.",
+                color = OnBackground.copy(alpha = 0.4f),
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.align(Alignment.CenterHorizontally).padding(bottom = 16.dp)
+            )
+
+            // Action Buttons
+            Row(modifier = Modifier.fillMaxWidth().height(56.dp), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                if (timerState == TimerState.COUNTDOWN) {
+                    Button(
+                        onClick = { timerState = TimerState.IDLE },
+                        modifier = Modifier.weight(1f).fillMaxHeight(),
+                        colors = ButtonDefaults.buttonColors(containerColor = ErrorRed, contentColor = Color.Black),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Icon(Icons.Default.Cancel, null)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("CANCEL")
+                    }
+                } else {
+                    Button(
+                        onClick = {
+                            remainingSeconds = delaySeconds
+                            timerState = TimerState.COUNTDOWN
+                        },
+                        enabled = selectedSound != null && timerState == TimerState.IDLE,
+                        modifier = Modifier.weight(1f).fillMaxHeight(),
+                        colors = ButtonDefaults.buttonColors(containerColor = CyanAccent, contentColor = Color.Black),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Icon(Icons.Default.HourglassEmpty, null)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("START TIMER")
+                    }
+                }
+
+                if (timerState == TimerState.PLAYING) {
+                    Button(
+                        onClick = { audioPlayerController.stopAll() },
+                        modifier = Modifier.weight(1f).fillMaxHeight(),
+                        colors = ButtonDefaults.buttonColors(containerColor = ErrorRed, contentColor = Color.Black),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Icon(Icons.Default.Dangerous, null)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("KILL SWITCH")
+                    }
+                }
+            }
         }
     }
 
