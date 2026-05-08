@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="./prankster_sn3.png" alt="Prankster Lab v2 banner" width="100%" />
+  <img src="./prankstar_sn3.png" alt="Prankster Lab v2 banner" width="100%" />
 </div>
 
 <div align="center">
@@ -24,6 +24,10 @@
 ## Overview
 
 **Prankster Lab v2** is a premium prank soundboard and audio utility built for fast, fun, and highly organized sound triggering. The project blends a polished user interface with a growing audio catalog, advanced sound-management workflows, and a strong foundation for reactive, prank-oriented interactions.
+
+<div align="center">
+  <img src="./prankstar_sn1.png" alt="Prankster Lab visual showcase 1" width="92%" />
+</div>
 
 It is designed to feel less like a basic button board and more like a **stylized audio playground**: a place where users can browse categories, trigger sounds instantly, explore curated packs, and eventually build sequences, randomizers, and generated audio experiences.
 
@@ -74,6 +78,10 @@ Prankster Lab v2 is built around a few major pillars:
 - Voice synthesis / procedural audio
 - Sound forge style editing features
 - Offline playback support
+
+<div align="center">
+  <img src="./prankstar_sn2.png" alt="Prankster Lab visual showcase 2" width="92%" />
+</div>
 
 ---
 
