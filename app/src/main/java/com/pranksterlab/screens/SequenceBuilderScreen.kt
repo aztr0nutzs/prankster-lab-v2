@@ -57,6 +57,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pranksterlab.components.HUDCard
 import com.pranksterlab.components.LabelCaps
+import com.pranksterlab.components.PrankstarHeader
+import com.pranksterlab.components.PrankstarHeaderVariant
 import com.pranksterlab.components.ScanlineOverlay
 import com.pranksterlab.core.audio.AudioPlayerController
 import com.pranksterlab.core.model.PrankSound
@@ -134,6 +136,8 @@ fun SequenceBuilderScreen(soundRepository: SoundRepository, audioPlayerControlle
             verticalArrangement = Arrangement.spacedBy(14.dp),
             contentPadding = PaddingValues(top = 18.dp, bottom = 110.dp)
         ) {
+            item { PrankstarHeader(variant = PrankstarHeaderVariant.SN2) }
+
             item {
                 SequenceHeader(
                     stepCount = sequence.size,

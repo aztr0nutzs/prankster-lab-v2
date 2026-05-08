@@ -28,6 +28,8 @@ import androidx.compose.ui.unit.sp
 import com.pranksterlab.components.GlassPanel
 import com.pranksterlab.components.HeadlineText
 import com.pranksterlab.components.LabelCaps
+import com.pranksterlab.components.PrankstarHeader
+import com.pranksterlab.components.PrankstarHeaderVariant
 import com.pranksterlab.components.ScanlineOverlay
 import com.pranksterlab.components.reactor.ReactorCorePanel
 import com.pranksterlab.components.reactor.StatusReadout
@@ -128,6 +130,7 @@ fun HomeScreen(
             modifier = Modifier.fillMaxSize().padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+        item { PrankstarHeader(variant = PrankstarHeaderVariant.SN1, height = 96.dp) }
         item { WaveformHeader() }
         item {
             val hasCustom = soundsList.any { it.isCustom }

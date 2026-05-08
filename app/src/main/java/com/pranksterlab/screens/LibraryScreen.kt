@@ -56,6 +56,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pranksterlab.components.HUDCard
+import com.pranksterlab.components.PrankstarHeader
+import com.pranksterlab.components.PrankstarHeaderVariant
 import com.pranksterlab.components.ScanlineOverlay
 import com.pranksterlab.core.audio.AudioPlayerController
 import com.pranksterlab.core.model.PrankSound
@@ -142,6 +144,10 @@ fun LibraryScreen(
         ScanlineOverlay()
 
         Column(modifier = Modifier.fillMaxSize()) {
+            PrankstarHeader(
+                variant = PrankstarHeaderVariant.SN2,
+                modifier = Modifier.padding(top = 8.dp)
+            )
             Header(
                 onSearchClick = { isSearchActive = !isSearchActive },
                 showDiagnostics = showDiagnostics,
