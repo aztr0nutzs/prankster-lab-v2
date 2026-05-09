@@ -27,6 +27,15 @@ class AndroidTextToSpeechEngine(context: Context) : VoiceSynthesisEngine {
         engine.synthesizeToFile(settings.text, params, outputFile, utteranceId)
     }
 
+
+    override fun preview(settings: VoiceGeneratorSettings) {
+        val engine = tts ?: return
+        engine.setPitch(settings.pitch)
+        engine.setSpeechRate(settings.speechRate)
+        val params = Bundle().apply { putFloat(TextToSpeech.Engine.KEY_PARAM_VOLUME, settings.volume) }
+        engine.speak(settings.text, TextToSpeech.QUEUE_FLUSH, params, "preview_${System.currentTimeMillis()}")
+    }
+
     override fun stopPreview() { tts?.stop() }
     override fun release() { tts?.shutdown(); tts = null }
 }
