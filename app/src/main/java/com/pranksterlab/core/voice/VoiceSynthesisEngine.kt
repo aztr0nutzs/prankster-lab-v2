@@ -6,6 +6,7 @@ data class VoiceSynthesisResult(val outputFile: File, val formatLabel: String, v
 
 interface VoiceSynthesisEngine {
     suspend fun synthesizeToFile(settings: VoiceGeneratorSettings, outputFile: File): VoiceSynthesisResult
+    fun preview(settings: VoiceGeneratorSettings)
     fun stopPreview()
     fun release()
 }
