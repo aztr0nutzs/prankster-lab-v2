@@ -52,6 +52,10 @@ private fun accentForImage(imageRes: Int): Color = when (imageRes) {
     R.drawable.prankstar_sn1 -> CyanAccent
     R.drawable.prankstar_sn2 -> FuchsiaAccent
     R.drawable.prankstar_sn3 -> LimeAccent
+    R.drawable.header_sound_gen -> CyanAccent
+    R.drawable.header_sound_stash -> FuchsiaAccent
+    R.drawable.header_joke_gen -> LimeAccent
+    R.drawable.header_settings -> FuchsiaAccent
     else -> CyanAccent
 }
 

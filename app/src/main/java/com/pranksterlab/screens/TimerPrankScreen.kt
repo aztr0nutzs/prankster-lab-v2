@@ -87,7 +87,7 @@ fun TimerPrankScreen(soundRepository: SoundRepository, audioPlayerController: Au
         PrankstarHeader(
             title = "Timer Prank",
             subtitle = "Delayed Detonation Console",
-            imageRes = R.drawable.prankstar_sn3,
+            imageRes = R.drawable.header_sound_gen,
             statusLabel = when (timerState) {
                 TimerState.COUNTDOWN -> "ARMED"
                 TimerState.PLAYING -> "LIVE"

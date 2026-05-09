@@ -98,7 +98,7 @@ fun VoiceJokeGeneratorScreen(soundRepository: SoundRepository) {
             verticalArrangement = Arrangement.spacedBy(12.dp),
             contentPadding = PaddingValues(bottom = 120.dp)
         ) {
-            item { PrankstarHeader("Voice Lab", "Joke / Comment Generator", R.drawable.prankstar_sn3, statusLabel = status) }
+            item { PrankstarHeader("Voice Lab", "Joke / Comment Generator", R.drawable.header_joke_gen, statusLabel = status) }
             item { Text("Synthetic Presets", color = LimeAccent) }
             item { Text("Warning: All voices are synthetic styling presets, not real-person clones.", color = OrangeAccent) }
 
