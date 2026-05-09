@@ -128,7 +128,7 @@ fun RandomizerScreen(
                 PrankstarHeader(
                     title = "Randomizer",
                     subtitle = "Chaos Algorithm Engine",
-                    imageRes = R.drawable.prankstar_sn3,
+                    imageRes = R.drawable.header_sound_gen,
                     statusLabel = if (state.isRunning) "RUNNING" else "ARMED",
                     modifier = Modifier.padding(top = 8.dp)
                 )

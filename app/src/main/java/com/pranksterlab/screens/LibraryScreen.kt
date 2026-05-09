@@ -147,7 +147,7 @@ fun LibraryScreen(
             PrankstarHeader(
                 title = "Audio Arsenal",
                 subtitle = "Library / Catalog Browser",
-                imageRes = R.drawable.prankstar_sn2,
+                imageRes = R.drawable.header_sound_stash,
                 statusLabel = "${validSounds.size} ASSETS",
                 modifier = Modifier.padding(horizontal = 16.dp, top = 8.dp)
             )

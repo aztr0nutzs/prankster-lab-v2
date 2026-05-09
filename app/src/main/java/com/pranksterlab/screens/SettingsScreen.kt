@@ -99,7 +99,7 @@ fun SettingsScreen(soundRepository: SoundRepository, audioPlayerController: Audi
                 PrankstarHeader(
                     title = "System Setup",
                     subtitle = "Diagnostics / Safety / App Control",
-                    imageRes = R.drawable.prankstar_sn2,
+                    imageRes = R.drawable.header_settings,
                     statusLabel = if ((diagnostics?.invalidCatalogSounds ?: 0) > 0) "ALERT" else "STABLE"
                 )
             }
