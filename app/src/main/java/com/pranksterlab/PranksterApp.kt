@@ -10,7 +10,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.pranksterlab.components.BottomNavBar
+import com.pranksterlab.components.PrankstarBottomDock
 import com.pranksterlab.components.TopBar
 import com.pranksterlab.screens.*
 import com.pranksterlab.screens.soundforge.SoundForgeScreen
@@ -43,6 +43,14 @@ fun PranksterApp() {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route ?: "home"
+    val dockRoute = when (currentRoute) {
+        "home", "randomizer", "timer" -> "home"
+        "library", "lab" -> "library"
+        "forge" -> "forge"
+        "voice_lab", "messages" -> "voice_lab"
+        "system" -> "system"
+        else -> "home"
+    }
 
     Scaffold(
         topBar = { 
@@ -52,8 +60,8 @@ fun PranksterApp() {
         },
         containerColor = Color.Black,
         bottomBar = {
-            BottomNavBar(
-                currentRoute = currentRoute,
+            PrankstarBottomDock(
+                currentRoute = dockRoute,
                 onNavigate = { route ->
                     navController.navigate(route) {
                         popUpTo(navController.graph.startDestinationId) { saveState = true }
