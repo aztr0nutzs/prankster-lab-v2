@@ -311,6 +311,14 @@ fun HUDSoundCard(
                 Column(modifier = Modifier.weight(1f)) {
                     Text(sound.name.uppercase(), color = LimeAccent, style = MaterialTheme.typography.headlineSmall.copy(letterSpacing = 1.sp))
                     Text("${sound.category} • ${sound.packId ?: "UNPACKED"}", color = Color.Gray)
+                    if (sound.isGeneratedSound()) {
+                        sound.generatedMetadata?.voicePresetName?.let { preset ->
+                            Text("VOICE: $preset", color = CyanAccent, style = MaterialTheme.typography.bodySmall)
+                        }
+                        sound.generatedMetadata?.sourceText?.takeIf { it.isNotBlank() }?.let { source ->
+                            Text("TEXT: ${source.take(64)}", color = Color.Gray, style = MaterialTheme.typography.bodySmall)
+                        }
+                    }
                     Text(sound.tags.joinToString("  •  ").ifBlank { "NO TAGS" }, color = Color.Gray, style = MaterialTheme.typography.bodySmall)
                 }
                 IconButton(onClick = onToggleFavorite) { Icon(if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder, "Favorite", tint = if (isFavorite) FuchsiaAccent else Color.Gray) }

@@ -35,6 +35,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -78,12 +79,16 @@ fun SettingsScreen(soundRepository: SoundRepository, audioPlayerController: Audi
     var confirmAction by remember { mutableStateOf<String?>(null) }
     var actionResult by remember { mutableStateOf<String?>(null) }
     var showDeveloperDiagnostics by remember { mutableStateOf(false) }
+    var generatedCount by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(savedVolume) {
         audioPlayerController.setMasterVolume(savedVolume)
     }
     LaunchedEffect(Unit) {
         diagnostics = soundRepository.getAudioDiagnostics()
+        soundRepository.getCustomSoundsFlow().collect { sounds ->
+            generatedCount = sounds.count { it.category.equals("VOICE_GENERATED", true) || it.packId.equals("voice_lab", true) || it.tags.any { tag -> tag.equals("generated", true) } }
+        }
     }
 
     androidx.compose.foundation.layout.Box(modifier = Modifier.fillMaxSize().background(BackgroundDark)) {
@@ -158,6 +163,7 @@ fun SettingsScreen(soundRepository: SoundRepository, audioPlayerController: Audi
                         DiagnosticReadout("PLAYABLE", diagnostics?.playableCatalogSounds ?: 0, LimeAccent, Modifier.weight(1f))
                         DiagnosticReadout("INVALID", diagnostics?.invalidCatalogSounds ?: 0, OrangeAccent, Modifier.weight(1f))
                     }
+                    DiagnosticLine("Generated clips", "$generatedCount", CyanAccent)
                     if (showDeveloperDiagnostics) {
                         DiagnosticLine("Missing assets", "${diagnostics?.missingAssets ?: 0}")
                         DiagnosticLine("Uncataloged assets", "${diagnostics?.uncatalogedAssets ?: 0}")
@@ -179,6 +185,7 @@ fun SettingsScreen(soundRepository: SoundRepository, audioPlayerController: Audi
                     ActionButton("Clear recent sounds") { confirmAction = "clear_recent" }
                     ActionButton("Clear favorites") { confirmAction = "clear_favorites" }
                     ActionButton("Delete generated sounds") { confirmAction = "delete_generated" }
+                    ActionButton("Clear missing generated metadata") { confirmAction = "clear_missing_generated_meta" }
                     ActionButton("Reset Sound Forge presets") { confirmAction = "reset_forge" }
                     ActionButton("Open validation report") {
                         val report = findValidationReport(context.filesDir, context.cacheDir, context.getExternalFilesDir(null))
@@ -260,6 +267,10 @@ fun SettingsScreen(soundRepository: SoundRepository, audioPlayerController: Audi
                                 } else {
                                     "No persisted Sound Forge presets found to reset."
                                 }
+                            }
+                            "clear_missing_generated_meta" -> {
+                                val cleared = soundRepository.clearMissingGeneratedMetadata()
+                                actionResult = "Cleared generated metadata for $cleared missing file entries."
                             }
                         }
                         diagnostics = soundRepository.getAudioDiagnostics()

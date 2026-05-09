@@ -181,9 +181,11 @@ fun RandomizerScreen(
             item {
                 SafeModeCard(
                     safeMode = state.safeMode,
+                    includeGeneratedVoiceClips = state.includeGeneratedVoiceClips,
                     isRunning = state.isRunning,
                     safeCount = state.sounds.count { it.isSafeForRandomMode },
-                    onSafeMode = viewModel::setSafeMode
+                    onSafeMode = viewModel::setSafeMode,
+                    onIncludeGenerated = viewModel::setIncludeGeneratedVoiceClips
                 )
             }
 
@@ -437,36 +439,50 @@ private fun CurrentSoundPanel(
 @Composable
 private fun SafeModeCard(
     safeMode: Boolean,
+    includeGeneratedVoiceClips: Boolean,
     isRunning: Boolean,
     safeCount: Int,
-    onSafeMode: (Boolean) -> Unit
+    onSafeMode: (Boolean) -> Unit,
+    onIncludeGenerated: (Boolean) -> Unit
 ) {
     NeonSection(title = "Safe Mode Card", accent = LimeAccent) {
-        Row(
-            modifier = Modifier.padding(14.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Icon(Icons.Default.Security, contentDescription = null, tint = LimeAccent, modifier = Modifier.size(30.dp))
-            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text("PRANK-SAFE RANDOM MODE", color = Color.White, style = MaterialTheme.typography.labelLarge)
-                Text(
-                    text = "Excludes unsafe catalog entries, known invalid assets, corrupt files, and long known-duration sounds. $safeCount catalog sounds are marked safe.",
-                    color = OutlineLight,
-                    style = MaterialTheme.typography.bodySmall
+        Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                Icon(Icons.Default.Security, contentDescription = null, tint = LimeAccent, modifier = Modifier.size(30.dp))
+                Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text("PRANK-SAFE RANDOM MODE", color = Color.White, style = MaterialTheme.typography.labelLarge)
+                    Text(
+                        text = "Excludes unsafe catalog entries, known invalid assets, corrupt files, and long known-duration sounds. $safeCount catalog sounds are marked safe.",
+                        color = OutlineLight,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+                Switch(
+                    checked = safeMode,
+                    enabled = !isRunning,
+                    onCheckedChange = onSafeMode,
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = LimeAccent,
+                        checkedTrackColor = LimeAccent.copy(alpha = 0.25f),
+                        uncheckedThumbColor = OutlineLight,
+                        uncheckedTrackColor = SurfaceBright
+                    )
                 )
             }
-            Switch(
-                checked = safeMode,
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
+                Text("Include Generated Voice Clips", color = Color.White, style = MaterialTheme.typography.bodyMedium)
+                Switch(
+                checked = includeGeneratedVoiceClips,
                 enabled = !isRunning,
-                onCheckedChange = onSafeMode,
+                onCheckedChange = onIncludeGenerated,
                 colors = SwitchDefaults.colors(
-                    checkedThumbColor = LimeAccent,
-                    checkedTrackColor = LimeAccent.copy(alpha = 0.25f),
+                    checkedThumbColor = CyanAccent,
+                    checkedTrackColor = CyanAccent.copy(alpha = 0.25f),
                     uncheckedThumbColor = OutlineLight,
                     uncheckedTrackColor = SurfaceBright
                 )
             )
+            }
         }
     }
 }
