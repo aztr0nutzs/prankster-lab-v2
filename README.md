@@ -4,7 +4,7 @@
 
 <div align="center">
 
-# Prankster Lab v2
+# Prankst⭐️r Lab v2
 
 <p>
   <strong>Premium prank soundboard • Audio lab • Reactive sound experience</strong>
