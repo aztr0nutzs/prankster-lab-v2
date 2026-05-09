@@ -46,11 +46,11 @@ data class DockTab(
 )
 
 private val dockTabs = listOf(
-    DockTab("home", "CORE", "Core", Icons.Default.Bolt),
-    DockTab("library", "LIBRARY", "Library", Icons.Default.LibraryMusic),
-    DockTab("forge", "FORGE", "Forge", Icons.Default.Extension),
-    DockTab("voice_lab", "JOKES", "Jokes", Icons.Default.RecordVoiceOver),
-    DockTab("system", "SYSTEM", "System", Icons.Default.Settings),
+    DockTab("home", "CORE", "Navigate to Core", Icons.Default.Bolt),
+    DockTab("library", "LIBRARY", "Navigate to Library", Icons.Default.LibraryMusic),
+    DockTab("forge", "FORGE", "Navigate to Forge", Icons.Default.Extension),
+    DockTab("voice_lab", "JOKES", "Navigate to Jokes", Icons.Default.RecordVoiceOver),
+    DockTab("system", "SYSTEM", "Navigate to System", Icons.Default.Settings),
 )
 
 @Composable
@@ -93,9 +93,9 @@ fun PrankstarBottomDock(
                             if (isSelected) {
                                 Modifier
                                     .border(width = 2.dp, brush = glowBrush, shape = RoundedCornerShape(18.dp))
-                                    .background(Color(0x882DE2E6), shape = RoundedCornerShape(18.dp))
+                                    .background(Color(0xA02DE2E6), shape = RoundedCornerShape(18.dp))
                             } else {
-                                Modifier
+                                Modifier.background(Color(0x33000000), shape = RoundedCornerShape(18.dp))
                             }
                         )
                         .clickable { onNavigate(tab.route) }
