@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Dedicated header drawable alias for settings surfaces. -->
 <bitmap xmlns:android="http://schemas.android.com/apk/res/android"
-    android:src="@drawable/prankstar_core" />
+    android:src="@drawable/prankstar_core"
+    android:gravity="center_crop" />
