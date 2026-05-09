@@ -88,14 +88,15 @@ fun HomeScreen(
     }
 
     fun triggerReactor(category: String, intensity: Int) {
+        val acceptsGeneratedVoice = category.equals("VOICE", true) || category.equals("GENERATED", true)
         val candidates = soundsList.filter { 
             it.isSafeForRandomMode && 
-            it.category.equals(category, ignoreCase = true) &&
+            (it.category.equals(category, ignoreCase = true) || (acceptsGeneratedVoice && it.category.equals("VOICE_GENERATED", true))) &&
             (if (intensity > 1) it.intensityLevel >= intensity else true)
         }
         
         val sound = if (candidates.isNotEmpty()) candidates.random() else {
-            soundsList.filter { it.category.equals(category, ignoreCase = true) }.randomOrNull()
+            soundsList.filter { it.category.equals(category, ignoreCase = true) || (acceptsGeneratedVoice && it.category.equals("VOICE_GENERATED", true)) }.randomOrNull()
         }
 
         if (sound != null) {
