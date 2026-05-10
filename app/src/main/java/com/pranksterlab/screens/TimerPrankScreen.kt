@@ -18,9 +18,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.pranksterlab.R
 import com.pranksterlab.components.GlassPanel
 import com.pranksterlab.components.HeadlineText
 import com.pranksterlab.components.LabelCaps
+import com.pranksterlab.components.PrankstarHeader
+import com.pranksterlab.components.ScanlineOverlay
 import com.pranksterlab.core.audio.AudioPlayerController
 import com.pranksterlab.core.model.PrankSound
 import com.pranksterlab.core.repository.SoundRepository
@@ -78,7 +81,21 @@ fun TimerPrankScreen(soundRepository: SoundRepository, audioPlayerController: Au
         }
     }
 
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+    Box(modifier = Modifier.fillMaxSize().background(BackgroundDark)) {
+        ScanlineOverlay()
+        Column(modifier = Modifier.fillMaxSize()) {
+        PrankstarHeader(
+            title = "Timer Prank",
+            subtitle = "Delayed Detonation Console",
+            imageRes = R.drawable.header_sound_gen,
+            statusLabel = when (timerState) {
+                TimerState.COUNTDOWN -> "ARMED"
+                TimerState.PLAYING -> "LIVE"
+                TimerState.IDLE -> "READY"
+            },
+            modifier = Modifier.padding(horizontal = 16.dp)
+        )
+        Column(modifier = Modifier.fillMaxWidth().weight(1f).padding(16.dp)) {
         HeadlineText("TIMER PRANK", color = CyanAccent)
         Spacer(modifier = Modifier.height(8.dp))
         LabelCaps("Set a delay, hide your device, and watch.", color = OnBackground.copy(alpha=0.6f))
@@ -215,6 +232,8 @@ fun TimerPrankScreen(soundRepository: SoundRepository, audioPlayerController: Au
                 }
             }
         }
+        }
+    }
     }
 
     if (showSoundPicker) {

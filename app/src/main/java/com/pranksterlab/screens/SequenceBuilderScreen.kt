@@ -55,8 +55,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.pranksterlab.R
 import com.pranksterlab.components.HUDCard
 import com.pranksterlab.components.LabelCaps
+import com.pranksterlab.components.PrankstarHeader
 import com.pranksterlab.components.ScanlineOverlay
 import com.pranksterlab.core.audio.AudioPlayerController
 import com.pranksterlab.core.model.PrankSound
@@ -134,6 +136,15 @@ fun SequenceBuilderScreen(soundRepository: SoundRepository, audioPlayerControlle
             verticalArrangement = Arrangement.spacedBy(14.dp),
             contentPadding = PaddingValues(top = 18.dp, bottom = 110.dp)
         ) {
+            item {
+                PrankstarHeader(
+                    title = "Sequence Builder",
+                    subtitle = "Multi-Stage Prank Timeline",
+                    imageRes = R.drawable.prankstar_sn3,
+                    statusLabel = if (isPlaying) "RUNNING" else "${sequence.size} STEPS"
+                )
+            }
+
             item {
                 SequenceHeader(
                     stepCount = sequence.size,
@@ -332,22 +343,10 @@ private suspend fun runSequence(
 
 @Composable
 private fun SequenceHeader(stepCount: Int, presetCount: Int, blockedCount: Int) {
-    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        Text(
-            "SEQUENCE BUILDER",
-            style = MaterialTheme.typography.displayLarge.copy(fontSize = 34.sp, letterSpacing = 2.sp),
-            color = CyanAccent
-        )
-        Text(
-            "MULTI-SOUND PRANK PLAYLIST HUD",
-            color = Color.Gray,
-            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold)
-        )
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-            StatusChip("STEPS", stepCount.toString(), LimeAccent, Modifier.weight(1f))
-            StatusChip("PRESETS", presetCount.toString(), CyanAccent, Modifier.weight(1f))
-            StatusChip("BLOCKED", blockedCount.toString(), OrangeAccent, Modifier.weight(1f))
-        }
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+        StatusChip("STEPS", stepCount.toString(), LimeAccent, Modifier.weight(1f))
+        StatusChip("PRESETS", presetCount.toString(), CyanAccent, Modifier.weight(1f))
+        StatusChip("BLOCKED", blockedCount.toString(), OrangeAccent, Modifier.weight(1f))
     }
 }
 

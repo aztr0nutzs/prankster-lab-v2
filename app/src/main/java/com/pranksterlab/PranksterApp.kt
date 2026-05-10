@@ -10,10 +10,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.pranksterlab.components.BottomNavBar
+import com.pranksterlab.components.PrankstarBottomDock
 import com.pranksterlab.components.TopBar
 import com.pranksterlab.screens.*
 import com.pranksterlab.screens.soundforge.SoundForgeScreen
+import com.pranksterlab.screens.voice.VoiceJokeGeneratorScreen
 import com.pranksterlab.screens.soundforge.SoundForgeViewModel
 import com.pranksterlab.core.audio.generator.SoundGeneratorEngine
 import com.pranksterlab.core.repository.CustomSoundManager
@@ -42,6 +43,14 @@ fun PranksterApp() {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route ?: "home"
+    val dockRoute = when (currentRoute) {
+        "home", "randomizer", "timer" -> "home"
+        "library", "lab" -> "library"
+        "forge" -> "forge"
+        "voice_lab", "messages" -> "voice_lab"
+        "system" -> "system"
+        else -> "home"
+    }
 
     Scaffold(
         topBar = { 
@@ -51,8 +60,8 @@ fun PranksterApp() {
         },
         containerColor = Color.Black,
         bottomBar = {
-            BottomNavBar(
-                currentRoute = currentRoute,
+            PrankstarBottomDock(
+                currentRoute = dockRoute,
                 onNavigate = { route ->
                     navController.navigate(route) {
                         popUpTo(navController.graph.startDestinationId) { saveState = true }
@@ -73,7 +82,7 @@ fun PranksterApp() {
                 LibraryScreen(
                     soundRepository = soundRepository,
                     audioPlayerController = audioPlayerController,
-                    onOpenSequence = { navController.navigate("sequence") },
+                    onOpenSequence = { navController.navigate("voice_lab") },
                     onOpenTimer = { navController.navigate("timer") }
                 )
             }
@@ -81,7 +90,7 @@ fun PranksterApp() {
             composable("forge") { SoundForgeScreen(soundForgeViewModel, audioPlayerController) }
             composable("lab") { SoundPacksScreen(soundRepository, audioPlayerController, onOpenLibrary = { navController.navigate("library") }) }
             composable("system") { SettingsScreen(soundRepository, audioPlayerController) }
-            composable("sequence") { SequenceBuilderScreen(soundRepository, audioPlayerController) }
+            composable("voice_lab") { VoiceJokeGeneratorScreen(soundRepository) }
             composable("randomizer") { RandomizerScreen(soundRepository, audioPlayerController) }
             composable("messages") { PrankMessagesScreen() }
         }

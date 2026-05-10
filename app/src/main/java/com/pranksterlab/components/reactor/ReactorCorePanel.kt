@@ -2,6 +2,7 @@ package com.pranksterlab.components.reactor
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -22,7 +23,9 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -69,7 +72,8 @@ fun ReactorCorePanel(
     safeSoundCount: Int = 0,
     onTrigger: (category: String, intensity: Int) -> Unit,
     onStop: () -> Unit,
-    onCategoryChange: (String) -> Unit
+    onCategoryChange: (String) -> Unit,
+    coreImageRes: Int = com.pranksterlab.R.drawable.prankstar_core
 ) {
     val baseCategories = listOf("FUNNY", "CREEPY", "ANIMAL", "VOICE", "FIGHTER", "CARTOON")
     val categories = if (hasCustomSounds) baseCategories + "CUSTOM" else baseCategories
@@ -415,12 +419,18 @@ fun ReactorCorePanel(
                 }
             }
 
-            // Layer 8 — central core
+            // Layer 8 — central core (prankstar_core image is the centerpiece)
             Box(
                 modifier = Modifier
-                    .size(150.dp)
+                    .size(160.dp)
                     .graphicsLayer {
-                        val s = if (state == ReactorState.PLAYING || state == ReactorState.CHARGING) corePulse else 1f
+                        // Outer chassis breathes/scales with state. Inner image
+                        // does NOT compound this — it has its own subtle breath.
+                        val s = when (state) {
+                            ReactorState.PLAYING, ReactorState.CHARGING -> corePulse
+                            ReactorState.IDLE, ReactorState.ARMED -> 0.98f + (corePulse - 0.94f) * 0.25f
+                            else -> 1f
+                        }
                         scaleX = s
                         scaleY = s
                     }
@@ -428,12 +438,12 @@ fun ReactorCorePanel(
                     .background(
                         Brush.radialGradient(
                             0.0f to when (state) {
-                                ReactorState.PLAYING -> accentColor.copy(alpha = 0.18f)
-                                ReactorState.CHARGING -> Color(0xFFFFD400).copy(alpha = 0.2f)
-                                ReactorState.ERROR -> Color(0xFFFF1744).copy(alpha = 0.25f * errorFlash)
-                                else -> Color(0xFF101418)
+                                ReactorState.PLAYING -> accentColor.copy(alpha = 0.10f)
+                                ReactorState.CHARGING -> Color(0xFFFFD400).copy(alpha = 0.12f)
+                                ReactorState.ERROR -> Color(0xFFFF1744).copy(alpha = 0.18f * errorFlash)
+                                else -> Color(0xFF0A0D10)
                             },
-                            0.6f to Color(0xFF050708),
+                            0.7f to Color(0xFF030506),
                             1.0f to Color.Black
                         )
                     )
@@ -452,28 +462,116 @@ fun ReactorCorePanel(
                     ),
                 contentAlignment = Alignment.Center
             ) {
-                // Crosshair lines for HUD feel
-                Canvas(modifier = Modifier.fillMaxSize().padding(20.dp)) {
-                    val a = accentColor.copy(alpha = 0.28f)
-                    drawLine(a, Offset(0f, center.y), Offset(size.width, center.y), 1.dp.toPx())
-                    drawLine(a, Offset(center.x, 0f), Offset(center.x, size.height), 1.dp.toPx())
-                    drawCircle(a, radius = size.minDimension / 4f, style = Stroke(0.8.dp.toPx()))
+                // 8a — Faint HUD crosshair sits BEHIND the artwork as a backplate.
+                Canvas(modifier = Modifier.fillMaxSize().padding(18.dp)) {
+                    val a = accentColor.copy(alpha = 0.10f)
+                    drawLine(a, Offset(0f, center.y), Offset(size.width, center.y), 0.8.dp.toPx())
+                    drawLine(a, Offset(center.x, 0f), Offset(center.x, size.height), 0.8.dp.toPx())
+                    drawCircle(a, radius = size.minDimension / 4f, style = Stroke(0.6.dp.toPx()))
                 }
 
-                if (state == ReactorState.PLAYING) {
-                    IconButton(onClick = {
-                        haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                        onStop()
-                    }, modifier = Modifier.fillMaxSize()) {
-                        Icon(
-                            imageVector = Icons.Default.Stop,
-                            contentDescription = "Stop",
-                            tint = accentColor,
-                            modifier = Modifier.size(60.dp)
+                // 8b — prankstar_core artwork is the visual centerpiece.
+                // Clipped circular, full clarity, only a tiny breath/charge scale.
+                val imageScale = when (state) {
+                    ReactorState.CHARGING -> 1.0f + animatedCharge * 0.06f
+                    ReactorState.PLAYING -> 0.99f + (corePulse - 0.94f) * 0.35f
+                    ReactorState.IDLE, ReactorState.ARMED -> 0.985f + (corePulse - 0.94f) * 0.25f
+                    else -> 1f
+                }
+                Image(
+                    painter = painterResource(id = coreImageRes),
+                    contentDescription = "Prankstar Reactor Core",
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(6.dp)
+                        .clip(CircleShape)
+                        .graphicsLayer {
+                            scaleX = imageScale
+                            scaleY = imageScale
+                            alpha = when (state) {
+                                ReactorState.ERROR -> 0.55f + 0.35f * errorFlash
+                                ReactorState.COOLDOWN -> 0.85f
+                                else -> 1f
+                            }
+                        },
+                    contentScale = ContentScale.Crop
+                )
+
+                // 8c — Animated pulse overlay sits ON TOP of the image.
+                // Subtle radial wash that intensifies during PLAYING / CHARGING / ERROR.
+                Canvas(modifier = Modifier.fillMaxSize().padding(6.dp)) {
+                    val washAlpha = when (state) {
+                        ReactorState.PLAYING -> 0.18f + (haloPulse - 0.92f) * 0.6f
+                        ReactorState.CHARGING -> 0.20f + animatedCharge * 0.25f
+                        ReactorState.ERROR -> 0.30f * errorFlash
+                        ReactorState.COOLDOWN -> 0.10f
+                        else -> 0.06f + (corePulse - 0.94f) * 0.4f
+                    }.coerceIn(0f, 0.6f)
+                    val washColor = when (state) {
+                        ReactorState.CHARGING -> Color(0xFFFFD400)
+                        ReactorState.ERROR -> Color(0xFFFF1744)
+                        else -> accentColor
+                    }
+                    // Soft inner ring highlight blends image into reactor.
+                    drawCircle(
+                        brush = Brush.radialGradient(
+                            0.0f to Color.Transparent,
+                            0.55f to Color.Transparent,
+                            0.85f to washColor.copy(alpha = washAlpha * 0.55f),
+                            1.0f to washColor.copy(alpha = washAlpha)
+                        ),
+                        radius = size.minDimension / 2f
+                    )
+                    // Center bloom on activity for "live" feel.
+                    if (state == ReactorState.PLAYING || state == ReactorState.CHARGING) {
+                        drawCircle(
+                            brush = Brush.radialGradient(
+                                0.0f to washColor.copy(alpha = washAlpha * 0.45f),
+                                0.5f to Color.Transparent
+                            ),
+                            radius = size.minDimension / 2.2f
                         )
                     }
+                }
+
+                // 8d — Interaction highlight + state affordance / stop button.
+                if (state == ReactorState.PLAYING) {
+                    Box(
+                        modifier = Modifier
+                            .size(56.dp)
+                            .clip(CircleShape)
+                            .background(Color.Black.copy(alpha = 0.55f))
+                            .border(1.5.dp, accentColor.copy(alpha = 0.85f), CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        IconButton(
+                            onClick = {
+                                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                                onStop()
+                            },
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Stop,
+                                contentDescription = "Stop",
+                                tint = accentColor,
+                                modifier = Modifier.size(28.dp)
+                            )
+                        }
+                    }
                 } else {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(Color.Black.copy(alpha = 0.45f))
+                            .border(
+                                1.dp,
+                                accentColor.copy(alpha = 0.45f),
+                                RoundedCornerShape(10.dp)
+                            )
+                            .padding(horizontal = 10.dp, vertical = 6.dp)
+                    ) {
                         Icon(
                             imageVector = when (state) {
                                 ReactorState.CHARGING -> Icons.Default.FlashOn
@@ -483,7 +581,7 @@ fun ReactorCorePanel(
                             },
                             contentDescription = null,
                             tint = accentColor,
-                            modifier = Modifier.size(46.dp)
+                            modifier = Modifier.size(26.dp)
                         )
                         Text(
                             text = when (state) {
@@ -493,7 +591,7 @@ fun ReactorCorePanel(
                                 ReactorState.IDLE -> "READY"
                                 else -> "DEPLOY"
                             },
-                            style = MaterialTheme.typography.labelLarge.copy(
+                            style = MaterialTheme.typography.labelSmall.copy(
                                 fontWeight = FontWeight.Black,
                                 letterSpacing = 1.5.sp
                             ),

@@ -21,9 +21,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.pranksterlab.R
 import com.pranksterlab.components.GlassPanel
 import com.pranksterlab.components.HeadlineText
 import com.pranksterlab.components.LabelCaps
+import com.pranksterlab.components.PrankstarHeader
+import com.pranksterlab.components.ScanlineOverlay
 import com.pranksterlab.theme.*
 import kotlin.random.Random
 
@@ -69,11 +72,25 @@ fun PrankMessagesScreen() {
         TEMPLATES.filter { it.category == selectedCategory }
     }
 
-    LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+    Box(modifier = Modifier.fillMaxSize().background(BackgroundDark)) {
+        ScanlineOverlay()
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = androidx.compose.foundation.layout.PaddingValues(
+            horizontal = 16.dp,
+            top = 8.dp,
+            bottom = 80.dp
+        )
+    ) {
         item {
-            HeadlineText("PRANK MESSAGES", color = CyanAccent)
-            Text("Harmless prank texts, sent transparently", color = Color.Gray, style = MaterialTheme.typography.bodySmall)
-            Spacer(modifier = Modifier.height(24.dp))
+            PrankstarHeader(
+                title = "Prank Messages",
+                subtitle = "Transparent Prank Text Console",
+                imageRes = R.drawable.header_joke_gen,
+                statusLabel = selectedCategory,
+                modifier = Modifier.padding(horizontal = 0.dp)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
         }
 
         item {
@@ -241,7 +258,7 @@ fun PrankMessagesScreen() {
                 Spacer(modifier = Modifier.width(8.dp))
                 LabelCaps("SHARE PRANK TEXT", color = FuchsiaAccent)
             }
-            Spacer(modifier = Modifier.height(80.dp))
         }
+    }
     }
 }

@@ -28,7 +28,9 @@ import androidx.compose.ui.unit.sp
 import com.pranksterlab.components.GlassPanel
 import com.pranksterlab.components.HeadlineText
 import com.pranksterlab.components.LabelCaps
+import com.pranksterlab.components.PrankstarHeader
 import com.pranksterlab.components.ScanlineOverlay
+import com.pranksterlab.R
 import com.pranksterlab.components.reactor.ReactorCorePanel
 import com.pranksterlab.components.reactor.StatusReadout
 import com.pranksterlab.components.reactor.QuickDeployPanel
@@ -86,14 +88,15 @@ fun HomeScreen(
     }
 
     fun triggerReactor(category: String, intensity: Int) {
+        val acceptsGeneratedVoice = category.equals("VOICE", true) || category.equals("GENERATED", true)
         val candidates = soundsList.filter { 
             it.isSafeForRandomMode && 
-            it.category.equals(category, ignoreCase = true) &&
+            (it.category.equals(category, ignoreCase = true) || (acceptsGeneratedVoice && it.category.equals("VOICE_GENERATED", true))) &&
             (if (intensity > 1) it.intensityLevel >= intensity else true)
         }
         
         val sound = if (candidates.isNotEmpty()) candidates.random() else {
-            soundsList.filter { it.category.equals(category, ignoreCase = true) }.randomOrNull()
+            soundsList.filter { it.category.equals(category, ignoreCase = true) || (acceptsGeneratedVoice && it.category.equals("VOICE_GENERATED", true)) }.randomOrNull()
         }
 
         if (sound != null) {
@@ -125,9 +128,18 @@ fun HomeScreen(
     Box(modifier = Modifier.fillMaxSize().background(BackgroundDark)) {
         ScanlineOverlay()
         LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(16.dp),
+            modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
+            contentPadding = androidx.compose.foundation.layout.PaddingValues(top = 16.dp, bottom = 80.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+        item {
+            PrankstarHeader(
+                title = "Prankster Reactor",
+                subtitle = "Command Console / Live Deploy",
+                imageRes = R.drawable.prankstar_sn1,
+                statusLabel = if (playbackState.isPlaying) "LIVE" else "ARMED"
+            )
+        }
         item { WaveformHeader() }
         item {
             val hasCustom = soundsList.any { it.isCustom }
@@ -142,7 +154,8 @@ fun HomeScreen(
                 safeSoundCount = safeCount,
                 onTrigger = { cat, intensity -> triggerReactor(cat, intensity) },
                 onStop = { audioPlayerController.stopAll() },
-                onCategoryChange = { selectedCategory = it }
+                onCategoryChange = { selectedCategory = it },
+                coreImageRes = R.drawable.prankstar_core
             )
         }
         item {

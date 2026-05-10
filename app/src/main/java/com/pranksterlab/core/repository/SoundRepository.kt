@@ -119,7 +119,7 @@ class SoundRepository(private val context: Context) {
     }
 
     fun buildPackSummaries(sounds: List<PrankSound>): List<PackSummary> {
-        return sounds
+        val base = sounds
             .filter { !it.packId.isNullOrBlank() }
             .groupBy { it.packId!!.trim() }
             .map { (packId, packSounds) ->
@@ -130,7 +130,12 @@ class SoundRepository(private val context: Context) {
                     categoryFocus = categoryFocus
                 )
             }
-            .sortedBy { it.packId }
+            .toMutableList()
+        val voiceGeneratedCount = sounds.count { it.category.equals("VOICE_GENERATED", true) || it.packId.equals("voice_lab", true) }
+        if (voiceGeneratedCount > 0 && base.none { it.packId.equals("voice_lab", true) }) {
+            base.add(PackSummary(packId = "voice_lab", soundCount = voiceGeneratedCount, categoryFocus = "VOICE_GENERATED"))
+        }
+        return base.sortedBy { it.packId }
     }
 
     fun setActivePackFilter(packId: String?) {
@@ -326,6 +331,23 @@ class SoundRepository(private val context: Context) {
             preferences[CUSTOM_SOUNDS_KEY] = gson.toJson(remaining)
         }
         return toRemove.size
+    }
+
+    suspend fun clearMissingGeneratedMetadata(): Int {
+        val sounds = getCustomSoundsFlow().first()
+        var changed = 0
+        val updated = sounds.map { sound ->
+            if (sound.generatedMetadata != null && !isSoundPlayable(sound)) {
+                changed++
+                sound.copy(generatedMetadata = null)
+            } else sound
+        }
+        if (changed > 0) {
+            context.dataStore.edit { preferences ->
+                preferences[CUSTOM_SOUNDS_KEY] = gson.toJson(updated)
+            }
+        }
+        return changed
     }
 
     suspend fun resetSoundForgePresets(): Int {

@@ -1,0 +1,19 @@
+{
+  "name": "Android Gradle Build Environment",
+  "image": "mcr.microsoft.com/devcontainers/java:17-bookworm",
+  "features": {},
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "vscjava.vscode-java-pack",
+        "fwcd.kotlin"
+      ]
+    }
+  },
+  "postCreateCommand": "bash .devcontainer/setup-android-sdk.sh",
+  "remoteEnv": {
+    "ANDROID_HOME": "/opt/android-sdk",
+    "ANDROID_SDK_ROOT": "/opt/android-sdk",
+    "PATH": "/opt/android-sdk/platform-tools:/opt/android-sdk/cmdline-tools/latest/bin:${containerEnv:PATH}"
+  }
+}
