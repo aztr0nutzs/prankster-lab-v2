@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.sp
 import com.pranksterlab.theme.CyanAccent
 
 @Composable
-fun TopBar() {
+fun TopBar(onSettingsClick: () -> Unit = {}) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -46,7 +46,7 @@ fun TopBar() {
                 )
             }
         }
-        IconButton(onClick = { /*TODO*/ }) {
+        IconButton(onClick = onSettingsClick) {
             Icon(imageVector = Icons.Default.Settings, contentDescription = "Settings", tint = CyanAccent)
         }
     }
