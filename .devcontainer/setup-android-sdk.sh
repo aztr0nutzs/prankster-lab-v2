@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+
 ANDROID_HOME="/opt/android-sdk"
 CMDLINE_TOOLS_DIR="$ANDROID_HOME/cmdline-tools"
 LATEST_DIR="$CMDLINE_TOOLS_DIR/latest"
@@ -9,6 +12,10 @@ echo ""
 echo "========================================"
 echo " Installing Android SDK Command Line Tools"
 echo "========================================"
+echo ""
+echo "Project root: $PROJECT_ROOT"
+echo "local.properties path: $PROJECT_ROOT/local.properties"
+echo "sdk.dir value: $ANDROID_HOME"
 echo ""
 
 sudo mkdir -p "$CMDLINE_TOOLS_DIR"
@@ -41,11 +48,14 @@ sdkmanager \
   "build-tools;35.0.0" \
   "cmdline-tools;latest"
 
-echo "sdk.dir=$ANDROID_HOME" > "$OLDPWD/local.properties" 2>/dev/null || true
+echo "sdk.dir=$ANDROID_HOME" > "$PROJECT_ROOT/local.properties"
 
 echo ""
 echo "Android SDK installed at:"
 echo "  $ANDROID_HOME"
+echo "local.properties written:"
+echo "  $PROJECT_ROOT/local.properties"
+echo "  sdk.dir=$ANDROID_HOME"
 echo ""
 sdkmanager --list_installed
 echo ""

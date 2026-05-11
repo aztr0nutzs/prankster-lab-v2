@@ -27,6 +27,8 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,9 +45,11 @@ import com.pranksterlab.core.repository.SoundRepository
 import com.pranksterlab.core.voice.AndroidTextToSpeechEngine
 import com.pranksterlab.core.voice.GeneratedVoiceRepository
 import com.pranksterlab.core.voice.VoiceCategory
+import com.pranksterlab.core.voice.VoiceEngineReadiness
 import com.pranksterlab.core.voice.VoiceGeneratorSettings
 import com.pranksterlab.core.voice.VoicePreset
 import com.pranksterlab.core.voice.VoicePresetLibrary
+import com.pranksterlab.core.voice.VoiceSynthesisResult
 import com.pranksterlab.theme.BackgroundDark
 import com.pranksterlab.theme.CyanAccent
 import com.pranksterlab.theme.FuchsiaAccent
@@ -54,6 +58,7 @@ import com.pranksterlab.theme.LimeAccent
 import com.pranksterlab.theme.OrangeAccent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 
 @Composable
@@ -63,6 +68,7 @@ fun VoiceJokeGeneratorScreen(soundRepository: SoundRepository) {
     val tts = remember { AndroidTextToSpeechEngine(context) }
     val generatedRepo = remember { GeneratedVoiceRepository(soundRepository) }
     val allPresets = VoicePresetLibrary.presets
+    val ttsReadiness by tts.readiness.collectAsState()
 
     var preset by remember { mutableStateOf(allPresets.first()) }
     var selectedCategory by remember { mutableStateOf<VoiceCategory?>(null) }
@@ -74,8 +80,10 @@ fun VoiceJokeGeneratorScreen(soundRepository: SoundRepository) {
     var volume by remember { mutableStateOf(preset.volume) }
     var effect by remember { mutableStateOf(0.2f) }
     var echo by remember { mutableStateOf(false) }
-    var status by remember { mutableStateOf("READY") }
+    var status by remember { mutableStateOf("INITIALIZING VOICE ENGINE") }
+    var statusDetail by remember { mutableStateOf("Preparing Android TextToSpeech.") }
     var generatedFile by remember { mutableStateOf<File?>(null) }
+    var generatedResult by remember { mutableStateOf<VoiceSynthesisResult?>(null) }
 
     fun applyPreset(selected: VoicePreset) {
         preset = selected
@@ -91,6 +99,35 @@ fun VoiceJokeGeneratorScreen(soundRepository: SoundRepository) {
 
     DisposableEffect(Unit) { onDispose { tts.release() } }
 
+    fun settings() = VoiceGeneratorSettings(preset, text, pitch, speed, volume, preset.toneStyle, effect, echo, outputName)
+    fun isValidGeneratedFile(file: File?) = file != null && file.exists() && file.length() > 0L
+
+    LaunchedEffect(ttsReadiness) {
+        when (val readiness = ttsReadiness) {
+            VoiceEngineReadiness.Initializing -> {
+                status = "INITIALIZING VOICE ENGINE"
+                statusDetail = "Preparing Android TextToSpeech."
+            }
+            VoiceEngineReadiness.Ready -> {
+                if (status == "INITIALIZING VOICE ENGINE" || status == "ERROR") {
+                    status = "READY"
+                    statusDetail = "Voice engine is ready."
+                }
+            }
+            VoiceEngineReadiness.Unavailable -> {
+                status = "ERROR"
+                statusDetail = "TextToSpeech engine is unavailable on this device."
+            }
+            is VoiceEngineReadiness.Error -> {
+                status = "ERROR"
+                statusDetail = readiness.message
+            }
+        }
+    }
+
+    val canGenerate = ttsReadiness is VoiceEngineReadiness.Ready && text.isNotBlank() && status != "GENERATING"
+    val canUseGeneratedFile = isValidGeneratedFile(generatedFile)
+
     Box(Modifier.fillMaxSize().background(BackgroundDark)) {
         ScanlineOverlay()
         LazyColumn(
@@ -101,6 +138,15 @@ fun VoiceJokeGeneratorScreen(soundRepository: SoundRepository) {
             item { PrankstarHeader("Voice Lab", "Joke / Comment Generator", R.drawable.header_joke_gen, statusLabel = status) }
             item { Text("Synthetic Presets", color = LimeAccent) }
             item { Text("Warning: All voices are synthetic styling presets, not real-person clones.", color = OrangeAccent) }
+            item {
+                Column(Modifier.fillMaxWidth().background(GlassBackground, RoundedCornerShape(14.dp)).border(1.dp, if (status == "ERROR") OrangeAccent else CyanAccent, RoundedCornerShape(14.dp)).padding(12.dp)) {
+                    Text(status, color = if (status == "ERROR") OrangeAccent else LimeAccent)
+                    Text(statusDetail, color = Color.LightGray, style = MaterialTheme.typography.bodySmall)
+                    generatedResult?.let {
+                        Text("Output: ${it.formatLabel} • ${it.outputFile.name} • ${it.outputFile.length()} bytes", color = CyanAccent, style = MaterialTheme.typography.bodySmall)
+                    }
+                }
+            }
 
             item {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -169,36 +215,90 @@ fun VoiceJokeGeneratorScreen(soundRepository: SoundRepository) {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Button(onClick = { applyPreset(preset) }) { Text("Quick Reset") }
                     Button(onClick = {
-                        status = "PREVIEW"
+                        if (ttsReadiness !is VoiceEngineReadiness.Ready) {
+                            status = "ERROR"
+                            statusDetail = "Voice engine is not ready."
+                            return@Button
+                        }
+                        status = "PREVIEWING"
+                        statusDetail = "Previewing ${preset.displayName}."
                         tts.preview(VoiceGeneratorSettings(preset, preset.samplePhrase, pitch, speed, volume, preset.toneStyle, effect, echo, outputName))
-                    }) { Text("Preview Voice Style") }
+                    }, enabled = ttsReadiness is VoiceEngineReadiness.Ready) { Text("Preview Voice Style") }
                 }
             }
             item {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Button(onClick = {
-                        if (text.isBlank() || text.contains("police", true) || text.contains("emergency", true)) { status = "ERROR"; return@Button }
-                        scope.launch(Dispatchers.IO) {
+                        if (text.isBlank() || text.contains("police", true) || text.contains("emergency", true)) {
+                            status = "ERROR"
+                            statusDetail = "Enter harmless text that does not impersonate emergency or official alerts."
+                            return@Button
+                        }
+                        scope.launch {
                             status = "GENERATING"
+                            statusDetail = "Generating engine-specific audio output."
+                            generatedFile = null
+                            generatedResult = null
                             val file = File(context.filesDir, "voice_${System.currentTimeMillis()}.wav")
-                            tts.synthesizeToFile(VoiceGeneratorSettings(preset, text, pitch, speed, volume, preset.toneStyle, effect, echo, outputName), file)
-                            generatedFile = file
-                            status = "SAVED"
+                            val result = withContext(Dispatchers.IO) { tts.synthesizeToFile(settings(), file) }
+                            if (result.success && isValidGeneratedFile(result.outputFile)) {
+                                generatedFile = result.outputFile
+                                generatedResult = result
+                                status = "GENERATED"
+                                statusDetail = "Generated ${result.formatLabel} audio. Save to Library when ready."
+                            } else {
+                                generatedFile = null
+                                generatedResult = result
+                                status = "ERROR"
+                                statusDetail = result.errorMessage ?: "Generated audio file is missing or empty."
+                            }
                         }
-                    }, enabled = text.isNotBlank()) { Text("Generate") }
+                    }, enabled = canGenerate) { Text("Generate") }
                     Button(onClick = {
-                        generatedFile?.let {
-                            MediaPlayer().apply { setDataSource(it.absolutePath); prepare(); start() }
+                        val file = generatedFile ?: return@Button
+                        if (!isValidGeneratedFile(file)) {
+                            status = "ERROR"
+                            statusDetail = "Generated audio file is missing or empty."
+                            return@Button
                         }
-                    }, enabled = generatedFile != null) { Text("Preview") }
+                        runCatching {
+                            MediaPlayer().apply {
+                                setDataSource(file.absolutePath)
+                                setOnCompletionListener { player -> player.release() }
+                                prepare()
+                                start()
+                            }
+                        }.onSuccess {
+                            status = "PREVIEWING"
+                            statusDetail = "Previewing generated audio."
+                        }.onFailure {
+                            status = "ERROR"
+                            statusDetail = it.message ?: "Unable to preview generated audio."
+                        }
+                    }, enabled = canUseGeneratedFile) { Text("Preview") }
                     Button(onClick = { tts.stopPreview() }) { Text("Stop") }
                 }
             }
             item {
                 Button(onClick = {
                     val file = generatedFile ?: return@Button
-                    scope.launch { generatedRepo.saveGeneratedVoice(file, VoiceGeneratorSettings(preset, text, pitch, speed, volume, preset.toneStyle, effect, echo, outputName), null) }
-                }, enabled = generatedFile != null) { Text("Save to Library (WAV)") }
+                    if (!isValidGeneratedFile(file)) {
+                        status = "ERROR"
+                        statusDetail = "Cannot save an empty or missing generated file."
+                        return@Button
+                    }
+                    scope.launch {
+                        runCatching {
+                            generatedRepo.saveGeneratedVoice(file, settings(), generatedResult?.durationMs)
+                        }.onSuccess {
+                            status = "SAVED TO LIBRARY"
+                            statusDetail = "Generated audio was saved to Library."
+                        }.onFailure {
+                            status = "ERROR"
+                            statusDetail = it.message ?: "Unable to save generated audio."
+                        }
+                    }
+                }, enabled = canUseGeneratedFile) { Text("Save to Library (WAV)") }
             }
             item { Text("Safety: Keep pranks harmless. No real-person or official-alert impersonation.", color = OrangeAccent) }
         }
