@@ -23,7 +23,12 @@ find_sdk() {
     "/opt/android-sdk"
     "/usr/local/lib/android/sdk"
     "/usr/lib/android-sdk"
+    "/mnt/c/Users/${USER:-}/AppData/Local/Android/Sdk"
   )
+
+  if command -v wslpath >/dev/null 2>&1 && [[ -n "${USERPROFILE:-}" ]]; then
+    candidates+=("$(wslpath -u "$USERPROFILE")/AppData/Local/Android/Sdk")
+  fi
 
   local path
   for path in "${candidates[@]}"; do
