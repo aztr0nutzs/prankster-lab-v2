@@ -325,7 +325,7 @@ fun ModeGridSection(soundsList: List<PrankSound>, onNavigate: (String) -> Unit) 
             ModeCard("Sound Forge", "SYNTHESIS", Icons.Default.PrecisionManufacturing, Modifier.weight(1f)) { onNavigate("forge") }
         }
         Row(modifier = Modifier.fillMaxWidth()) {
-            ModeCard("Sequences", "MULTI_STAGE", Icons.Default.Reorder, Modifier.weight(1f)) { onNavigate("sequence") }
+            ModeCard("Jokes", "VOICE LAB", Icons.Default.RecordVoiceOver, Modifier.weight(1f)) { onNavigate("voice_lab") }
             Spacer(modifier = Modifier.width(16.dp))
             ModeCard("Randomizer", "CHAOS ALGO", Icons.Default.Shuffle, Modifier.weight(1f)) { onNavigate("randomizer") }
         }

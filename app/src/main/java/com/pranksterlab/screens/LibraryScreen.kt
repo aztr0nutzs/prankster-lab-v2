@@ -82,7 +82,7 @@ private const val FILTER_GENERATED = "GENERATED"
 fun LibraryScreen(
     soundRepository: SoundRepository,
     audioPlayerController: AudioPlayerController,
-    onOpenSequence: () -> Unit = {},
+    onOpenVoiceLab: () -> Unit = {},
     onOpenTimer: () -> Unit = {}
 ) {
     var bundledSounds by remember { mutableStateOf(emptyList<PrankSound>()) }
@@ -242,10 +242,7 @@ fun LibraryScreen(
                         isPlaying = playbackState.isPlaying && playbackState.currentSoundId == sound.id,
                         isFavorite = favoriteIds.contains(sound.id),
                         onToggleFavorite = { scope.launch { soundRepository.toggleFavorite(sound.id) } },
-                        onAddToSequence = {
-                            soundRepository.queueSoundForSequence(sound.id)
-                            onOpenSequence()
-                        },
+                        onOpenVoiceLab = onOpenVoiceLab,
                         onTimerShortcut = {
                             soundRepository.queueSoundForTimer(sound.id)
                             onOpenTimer()
@@ -306,7 +303,7 @@ fun HUDSoundCard(
     isPlaying: Boolean,
     isFavorite: Boolean,
     onToggleFavorite: () -> Unit,
-    onAddToSequence: () -> Unit,
+    onOpenVoiceLab: () -> Unit,
     onTimerShortcut: () -> Unit
 ) {
     var loopEnabled by remember(sound.id) { mutableStateOf(sound.loopable) }
@@ -361,8 +358,8 @@ fun HUDSoundCard(
                     Spacer(modifier = Modifier.size(6.dp))
                     Text(if (isPlaying) "STOP" else "PLAY", color = accentColor)
                 }
-                Button(onClick = onAddToSequence, colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent), border = androidx.compose.foundation.BorderStroke(1.dp, CyanAccent.copy(alpha = 0.4f))) {
-                    Icon(Icons.Default.Add, "Add to sequence", tint = CyanAccent)
+                Button(onClick = onOpenVoiceLab, colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent), border = androidx.compose.foundation.BorderStroke(1.dp, CyanAccent.copy(alpha = 0.4f))) {
+                    Icon(Icons.Default.Add, "Open Voice Lab", tint = CyanAccent)
                 }
                 Button(onClick = onTimerShortcut, colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent), border = androidx.compose.foundation.BorderStroke(1.dp, OrangeAccent.copy(alpha = 0.4f))) {
                     Icon(Icons.Default.Timer, "Timer shortcut", tint = OrangeAccent)
