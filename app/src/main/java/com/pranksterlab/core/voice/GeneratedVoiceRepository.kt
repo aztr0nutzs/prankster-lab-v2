@@ -18,7 +18,7 @@ class GeneratedVoiceRepository(private val soundRepository: SoundRepository) {
             isSafeForRandomMode = settings.preset.isSafeForRandomMode, intensityLevel = settings.preset.intensityLevel,
             generatedMetadata = GeneratedSoundMetadata(
                 generatorType = "VOICE_LAB",
-                parametersJson = """{"voicePresetId":"${settings.preset.id}","toneStyle":"${settings.toneStyle}","effectStyle":"${settings.effectStyle}"}""",
+                parametersJson = """{"voicePresetId":"${settings.preset.id}","toneStyle":"${settings.toneStyle}","effectStyle":"${settings.preset.effectStyle}","effectAmount":${settings.effectAmount}}""",
                 sourceText = settings.text,
                 voicePresetId = settings.preset.id,
                 voicePresetName = settings.preset.displayName,
@@ -26,7 +26,7 @@ class GeneratedVoiceRepository(private val soundRepository: SoundRepository) {
                 speechRate = settings.speechRate,
                 volume = settings.volume,
                 toneStyle = settings.toneStyle,
-                effectStyle = settings.effectStyle
+                effectStyle = settings.preset.effectStyle
             )
         )
         soundRepository.saveCustomSound(sound)

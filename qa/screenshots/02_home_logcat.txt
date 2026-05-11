@@ -1,0 +1,239 @@
+--------- beginning of main
+05-10 16:05:18.386  5158  5166 D PrefCtrlListHelper: Could not find Context-only controller for pref: com.android.settings.deviceinfo.aboutphone.TopLevelAboutDevicePreferenceController
+05-10 16:05:18.386  5158  5166 D PrefCtrlListHelper: Could not find Context-only controller for pref: com.android.settings.safetycenter.TopLevelSafetyCenterEntryPreferenceController
+05-10 16:05:18.386  5158  5166 D PrefCtrlListHelper: Could not find Context-only controller for pref: com.android.settings.security.TopLevelSecurityEntryPreferenceController
+05-10 16:05:18.390   646   755 D AudioFlinger: mixer(0x7e80af3fd790) throttle end: throttle time(28)
+05-10 16:05:18.428  5158  5166 D PrefCtrlListHelper: Could not find Context-only controller for pref: com.android.settings.privacy.TopLevelPrivacyEntryPreferenceController
+05-10 16:05:18.429  5158  5166 D PrefCtrlListHelper: Could not find Context-only controller for pref: com.android.settings.location.TopLevelLocationPreferenceController
+05-10 16:05:18.440   646   755 D AudioFlinger: mixer(0x7e80af3fd790) throttle end: throttle time(5)
+05-10 16:05:18.443  5158  5167 V WifiVerboseLogging: isVerboseLoggingEnabled:false
+05-10 16:05:18.485   646   755 D AudioFlinger: mixer(0x7e80af3fd790) throttle end: throttle time(7)
+05-10 16:05:18.534  5158  5167 V WifiManager: registerSoftApCallback: callback=com.android.settings.wifi.repository.WifiHotspotRepository$SoftApCallback@3566c9b, executor=android.os.HandlerExecutor@bc5a838
+05-10 16:05:18.548  5158  5166 D PrefCtrlListHelper: Could not find Context-only controller for pref: com.android.settings.accounts.TopLevelAccountEntryPreferenceController
+05-10 16:05:18.552  5158  5166 D PrefCtrlListHelper: Could not find Context-only controller for pref: com.android.settings.supervision.TopLevelSupervisionPreferenceController
+05-10 16:05:18.552  5158  5166 D PrefCtrlListHelper: Could not find Context-only controller for pref: com.android.settings.accessibility.TopLevelAccessibilityPreferenceController
+05-10 16:05:18.552  5158  5166 D PrefCtrlListHelper: Could not find Context-only controller for pref: com.android.settings.support.SupportPreferenceController
+05-10 16:05:18.616  5158  5158 D SlotSimStatus: Number of active SIM: 1
+05-10 16:05:18.631  5158  5158 D WifiHotspotRepository: onStateChanged(), state:11, failureReason:0
+05-10 16:05:18.645  5158  5172 V WifiManager: SoftApCallbackProxy on mode 1, send InfoChanged, newInfo: SoftApInfo{bandwidth= 0, frequency= 0, wifiStandard= 0, mApInstanceIdentifier= null, mIdleShutdownTimeoutMillis= 0, mVendorData= []}
+05-10 16:05:18.647  5158  5172 V WifiManager: SoftApCallbackProxy on mode 1, send InfoChanged, changedInfoList: []
+05-10 16:05:18.647  5158  5172 V WifiManager: SoftApCallbackProxy on mode 1, send onConnectedClientsChanged(clients): []
+05-10 16:05:18.668   646   755 D AudioFlinger: mixer(0x7e80af3fd790) throttle end: throttle time(4)
+05-10 16:05:18.689  1532  1927 W GLSUser : [AppCertManager] Exception while requesting key: 
+05-10 16:05:18.689  1532  1927 W GLSUser : java.util.concurrent.ExecutionException: cyjc: Parsing Exception
+05-10 16:05:18.689  1532  1927 W GLSUser : 	at hjhm.j(:com.google.android.gms@261434038@26.14.34 (260800-899752054):21)
+05-10 16:05:18.689  1532  1927 W GLSUser : 	at hjhv.t(:com.google.android.gms@261434038@26.14.34 (260800-899752054):73)
+05-10 16:05:18.689  1532  1927 W GLSUser : 	at amfq.b(:com.google.android.gms@261434038@26.14.34 (260800-899752054):435)
+05-10 16:05:18.689  1532  1927 W GLSUser : 	at amfo.a(:com.google.android.gms@261434038@26.14.34 (260800-899752054):67)
+05-10 16:05:18.689  1532  1927 W GLSUser : 	at amfo.dispatchTransaction(:com.google.android.gms@261434038@26.14.34 (260800-899752054):16)
+05-10 16:05:18.689  1532  1927 W GLSUser : 	at cara.a(:com.google.android.gms@261434038@26.14.34 (260800-899752054):78)
+05-10 16:05:18.689  1532  1927 W GLSUser : 	at zqc.onTransact(:com.google.android.gms@261434038@26.14.34 (260800-899752054):23)
+05-10 16:05:18.689  1532  1927 W GLSUser : 	at android.os.Binder.transact(Binder.java:1325)
+05-10 16:05:18.689  1532  1927 W GLSUser : 	at cobg.onTransact(:com.google.android.gms@261434038@26.14.34 (260800-899752054):12)
+05-10 16:05:18.689  1532  1927 W GLSUser : 	at android.os.Binder.transact(Binder.java:1325)
+05-10 16:05:18.689  1532  1927 W GLSUser : 	at caro.onTransact(:com.google.android.gms@261434038@26.14.34 (260800-899752054):169)
+05-10 16:05:18.689  1532  1927 W GLSUser : 	at android.os.Binder.execTransactInternal(Binder.java:1473)
+05-10 16:05:18.689  1532  1927 W GLSUser : 	at android.os.Binder.execTransact(Binder.java:1418)
+05-10 16:05:18.689  1532  1927 W GLSUser : Caused by: cyjc: Parsing Exception
+05-10 16:05:18.689  1532  1927 W GLSUser : 	at cykg.a(:com.google.android.gms@261434038@26.14.34 (260800-899752054):15)
+05-10 16:05:18.689  1532  1927 W GLSUser : 	at hjkf.run(:com.google.android.gms@261434038@26.14.34 (260800-899752054):56)
+05-10 16:05:18.689  1532  1927 W GLSUser : 	at bjnf.c(:com.google.android.gms@261434038@26.14.34 (260800-899752054):50)
+05-10 16:05:18.689  1532  1927 W GLSUser : 	at bjnf.run(:com.google.android.gms@261434038@26.14.34 (260800-899752054):85)
+05-10 16:05:18.689  1532  1927 W GLSUser : 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1154)
+05-10 16:05:18.689  1532  1927 W GLSUser : 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:652)
+05-10 16:05:18.689  1532  1927 W GLSUser : 	at bjsw.run(:com.google.android.gms@261434038@26.14.34 (260800-899752054):8)
+05-10 16:05:18.689  1532  1927 W GLSUser : 	at java.lang.Thread.run(Thread.java:1563)
+05-10 16:05:18.689  1532  1927 W GLSUser : Caused by: ituu: Protocol message end-group tag did not match expected tag.
+05-10 16:05:18.689  1532  1927 W GLSUser : 	at itwv.a(:com.google.android.gms@261434038@26.14.34 (260800-899752054):57)
+05-10 16:05:18.689  1532  1927 W GLSUser : 	at itvs.l(:com.google.android.gms@261434038@26.14.34 (260800-899752054):60)
+05-10 16:05:18.689  1532  1927 W GLSUser : 	at ittt.s(:com.google.android.gms@261434038@26.14.34 (260800-899752054):26)
+05-10 16:05:18.689  1532  1927 W GLSUser : 	at itro.f(:com.google.android.gms@261434038@26.14.34 (260800-899752054):7)
+05-10 16:05:18.689  1532  1927 W GLSUser : 	at itro.c(:com.google.android.gms@261434038@26.14.34 (260800-899752054):1)
+05-10 16:05:18.689  1532  1927 W GLSUser : 	at itro.o(:com.google.android.gms@261434038@26.14.34 (260800-899752054):1)
+05-10 16:05:18.689  1532  1927 W GLSUser : 	at cykf.a(:com.google.android.gms@261434038@26.14.34 (260800-899752054):15)
+05-10 16:05:18.689  1532  1927 W GLSUser : 	at cykk.call(:com.google.android.gms@261434038@26.14.34 (260800-899752054):8)
+05-10 16:05:18.689  1532  1927 W GLSUser : 	at java.util.concurrent.FutureTask.run(FutureTask.java:317)
+05-10 16:05:18.689  1532  1927 W GLSUser : 	at bjnf.c(:com.google.android.gms@261434038@26.14.34 (260800-899752054):50)
+05-10 16:05:18.689  1532  1927 W GLSUser : 	at bjnf.run(:com.google.android.gms@261434038@26.14.34 (260800-899752054):66)
+05-10 16:05:18.689  1532  1927 W GLSUser : 	... 4 more
+05-10 16:05:18.690  1532  1927 W GLSUser : [DeviceKeyStore] Cannot load key: Device key file not found.
+05-10 16:05:18.693   646   755 D AudioFlinger: mixer(0x7e80af3fd790) throttle end: throttle time(2)
+05-10 16:05:18.701  1532  1927 W libbinder.Binder: Binder transaction to com.google.android.gms.auth.appcert.IAppCertService code 2 took 1461ms. Data bytes: 172 Reply bytes: 188 Flags: 18
+05-10 16:05:18.704  5158  5166 D PrefCtrlListHelper: Could not find Context-only controller for pref: com.android.settings.deviceinfo.DeviceNamePreferenceController
+05-10 16:05:18.704  5158  5166 D PrefCtrlListHelper: Could not find Context-only controller for pref: com.android.settings.deviceinfo.BrandedAccountPreferenceController
+05-10 16:05:18.705  5158  5167 D PrefControllerMixin: shouldHidePreference():true
+--------- beginning of system
+05-10 16:05:18.808  5158  5158 W ContextImpl: Calling a method in the system process without a qualified user: android.app.ContextImpl.sendBroadcast:1308 android.content.ContextWrapper.sendBroadcast:508 android.content.ContextWrapper.sendBroadcast:508 com.android.settings.fuelgauge.batteryusage.BootBroadcastReceiver.$r8$lambda$NYbzklSftprvatAlISPsV0wCKqc:86 com.android.settings.fuelgauge.batteryusage.BootBroadcastReceiver$$ExternalSyntheticLambda0.run:0 
+05-10 16:05:18.815  5158  5166 D PrefCtrlListHelper: Could not find Context-only controller for pref: com.android.settings.deviceinfo.PhoneNumberPreferenceController
+05-10 16:05:18.816  5158  5158 D BootBroadcastReceiver: refresh periodic job from action=com.android.settings.battery.action.PERIODIC_JOB_RECHECK
+05-10 16:05:18.830  5158  5166 D PrefCtrlListHelper: Could not find Context-only controller for pref: com.google.android.settings.warranty.WarrantyPreferenceController
+05-10 16:05:18.844  5158  5166 D PrefCtrlListHelper: Could not find Context-only controller for pref: com.android.settings.deviceinfo.simstatus.SimStatusPreferenceController
+05-10 16:05:18.845  5158  5166 D PrefCtrlListHelper: Could not find Context-only controller for pref: com.android.settings.deviceinfo.HardwareInfoPreferenceController
+05-10 16:05:18.845  5158  5166 D PrefCtrlListHelper: Could not find Context-only controller for pref: com.android.settings.deviceinfo.simstatus.SimEidPreferenceController
+05-10 16:05:18.845  5158  5166 D PrefCtrlListHelper: Could not find Context-only controller for pref: com.android.settings.deviceinfo.imei.ImeiInfoPreferenceController
+05-10 16:05:18.845  5158  5166 D PrefCtrlListHelper: Could not find Context-only controller for pref: com.android.settings.deviceinfo.firmwareversion.FirmwareVersionPreferenceController
+05-10 16:05:18.845  5158  5166 D PrefCtrlListHelper: Could not find Context-only controller for pref: com.android.settings.deviceinfo.batteryinfo.BatteryInfoPreferenceController
+05-10 16:05:18.845  5158  5166 D PrefCtrlListHelper: Could not find Context-only controller for pref: com.android.settings.deviceinfo.BuildNumberPreferenceController
+05-10 16:05:18.874   820   936 W ProcessStats: Tracking association SourceState{d7a459f system/1000 BFgs #1893} whose proc state 4 is better than process ProcessState{1cc8417 com.google.android.ext.services/10218 pkg=com.google.android.ext.services} proc state 14 (3 skipped)
+05-10 16:05:18.886  1358  1540 D SatelliteController: iisInCarrierRoamingNbIotNtn: satellite is disabled
+05-10 16:05:18.888  5315  5315 W libbinder.BackendUnifiedServiceManager: Thread Pool max thread count is 0. Cannot cache binder as linkToDeath cannot be implemented. serviceName: SurfaceFlingerAIDL
+05-10 16:05:18.889  5315  5315 W libbinder.BpBinder: Linking to death on android.gui.ISurfaceComposer but there are no threads (yet?) listening to incoming transactions. See ProcessState::startThreadPool and ProcessState::setThreadPoolMaxThreadCount. Generally you should setup the binder threadpool before other initialization steps.
+05-10 16:05:18.891  5315  5315 W libbinder.ProcessState: Extra binder thread started, but 0 threads requested. Do not use *startThreadPool when zero threads are requested.
+05-10 16:05:18.892  1358  1540 D SatelliteController: getCarrierRoamingNtnConnectType: Falling back to global carrier config connect type: 0
+05-10 16:05:18.906   730  5284 D AudioTrack: getTimestamp_l(16): device stall time corrected using current time 284431586800
+05-10 16:05:18.986   820  1223 D FileUtils: Rounded bytes from 2061058048 to 4000000000
+05-10 16:05:19.010  4494  4501 W id.gms.unstable: Suspending all threads took: 13.026ms
+05-10 16:05:19.035  3474  4788 I Finsky:background: [102] IV2::ATD: Fetching metadata done. com.android.chrome[iid:30] [isid:XcFfqkbtQ1KQJ0kFYUbN7A] [tid: 1000000032]
+05-10 16:05:19.037  4494  4509 W id.gms.unstable: Weak pointer dereference blocked for 17 milliseconds.
+05-10 16:05:19.040  4494  4509 W SystemServiceRegistry: No service published for: persistent_data_block
+05-10 16:05:19.044  3474  4788 I Finsky:background: [102] IV2::ATD: Validate start. com.android.chrome[iid:30] [isid:XcFfqkbtQ1KQJ0kFYUbN7A] [tid: 1000000032]
+05-10 16:05:19.073   730  5284 D AudioTrack: getTimestamp_l(16): device stall time corrected using current time 284598572700
+05-10 16:05:19.077   646   755 D AudioFlinger: mixer(0x7e80af3fd790) throttle end: throttle time(2)
+05-10 16:05:19.166   646   755 D AudioFlinger: mixer(0x7e80af3fd790) throttle end: throttle time(7)
+05-10 16:05:19.244  4494  4509 W libc    : Access denied finding property "persist.adb.tls_server.enable"
+05-10 16:05:19.240  4494  4494 W binder:4494_3: type=1400 audit(0.0:33): avc:  denied  { read } for  name="u:object_r:adbd_prop:s0" dev="tmpfs" ino=59 scontext=u:r:gmscore_app:s0:c512,c768 tcontext=u:object_r:adbd_prop:s0 tclass=file permissive=0 app=com.google.android.gms
+05-10 16:05:19.249  4494  4509 W libc    : Access denied finding property "service.adb.tls.port"
+05-10 16:05:19.255   730  5284 W NuPlayerRenderer: getPendingAudioPlayoutDurationUs: pendingUs -5267 < 0, clamping to zero, potential resume after pause writtenAudioDurationUs: 1140979, audioSinkPlayedUs: 1146246
+05-10 16:05:19.269  5158  5166 W PrefCtrlListHelper: eid_info already has a controller
+05-10 16:05:19.273  5158  5158 D PeriodicJobManager: schedule next alarm job at May 10, 2026, 17:00:00
+05-10 16:05:19.277   730  5284 D AudioTrack: getTimestamp_l(16): device stall time corrected using current time 284802920700
+05-10 16:05:19.419   646   755 D AudioFlinger: mixer(0x7e80af3fd790) throttle end: throttle time(15)
+05-10 16:05:19.514  3474  4130 I Finsky:background: [83] ICalc: Partition available space: 634458112, install size: 264759015, min free: 311405772, additional needed: 0
+05-10 16:05:19.529  3474  3646 I Finsky:background: [56] AV::DSC: sufficient disk space space available for com.android.chrome[iid:30] [isid:XcFfqkbtQ1KQJ0kFYUbN7A] [tid: 1000000032]: 264759015
+05-10 16:05:19.540   730  5284 D AudioTrack: getTimestamp_l(16): device stall time corrected using current time 285065616100
+05-10 16:05:19.560   646   755 D AudioFlinger: mixer(0x7e80af3fd790) throttle end: throttle time(1)
+05-10 16:05:19.614   820  1456 D OomAdjuster: Not killing cached processes
+05-10 16:05:19.638  2942  3168 W Settings: Setting install_non_market_apps has moved from android.provider.Settings.Global to android.provider.Settings.Secure, returning read-only value.
+05-10 16:05:19.657  5158  5162 W ndroid.settings: Suspending all threads took: 117.569ms
+05-10 16:05:19.784  5266  5266 D ProcessLifecycleG3: androidx.startup is not available, initializing using ProcessLifecycleOwnerInitializer instead.
+05-10 16:05:19.803  3474  3625 W Finsky:background: [50] AV::PV: Can't download patch for package com.android.chrome, artifact com.android.chrome.apk, because didn't receive one in delivery response.
+05-10 16:05:19.816  5158  5167 D WifiTetherMaximizeCompatibilityPref: mShouldHidePreference:true
+05-10 16:05:19.838   820  1108 D BackgroundInstallControlService: Package event received: 0
+05-10 16:05:19.841   820  1456 V GrammaticalInflectionUtils: AttributionSource: android.content.AttributionSource@b214984 does not have READ_SYSTEM_GRAMMATICAL_GENDER permission.
+05-10 16:05:19.848   820  1456 D CompatChangeReporter: Compat change id reported: 151861875; UID 10157; state: ENABLED
+05-10 16:05:19.872   576   576 D Zygote  : Forked child process 5335
+05-10 16:05:19.882  5158  5167 D PrefCtrlListHelper: Could not find Context-only controller for pref: com.android.settings.gestures.GestureNavigationSettingsAssistController
+05-10 16:05:19.906   820   860 W ActivityManager: Slow operation: 53ms so far, now at startProcess: returned from zygote!
+05-10 16:05:19.927   646   755 D AudioFlinger: mixer(0x7e80af3fd790) throttle end: throttle time(12)
+05-10 16:05:19.929  5158  5167 D PrefCtrlListHelper: Could not find Context-only controller for pref: com.android.settings.inputmethod.KeyboardAccessibilityStickyKeysController
+05-10 16:05:19.934  5335  5335 I Zygote  : Process 5335 created for com.google.android.settings.intelligence
+05-10 16:05:19.936  5335  5335 I gs.intelligence: Using CollectorTypeCMC GC.
+05-10 16:05:19.936  5158  5167 W PrefCtrlListHelper: Cannot instantiate controller from reflection: com.android.settings.inputmethod.KeyboardAccessibilityStickyKeysController
+05-10 16:05:19.937  5158  5167 D PrefCtrlListHelper: Could not find Context-only controller for pref: com.android.settings.inputmethod.KeyboardAccessibilityBounceKeysController
+05-10 16:05:19.940  5335  5335 W gs.intelligence: Unexpected CPU variant for x86: x86_64.
+05-10 16:05:19.940  5335  5335 W gs.intelligence: Known variants: atom, sandybridge, silvermont, goldmont, goldmont-plus, goldmont-without-sha-xsaves, tremont, kabylake, alderlake, default
+05-10 16:05:19.945   820   860 W ActivityManager: Slow operation: 92ms so far, now at startProcess: done updating battery stats
+05-10 16:05:19.945   820   860 W ActivityManager: Slow operation: 93ms so far, now at startProcess: building log message
+05-10 16:05:19.946   820   860 I ActivityManager: Start proc 5335:com.google.android.settings.intelligence/u0a157 for content provider {com.google.android.settings.intelligence/com.google.android.settings.intelligence.modules.gmscoreproxy.impl.PhenotypeProxyContentProvider}
+05-10 16:05:19.946   820   860 W ActivityManager: Slow operation: 93ms so far, now at startProcess: starting to update pids map
+05-10 16:05:19.946   820   860 W ActivityManager: Slow operation: 93ms so far, now at startProcess: done updating pids map
+05-10 16:05:19.947  5158  5167 W PrefCtrlListHelper: Cannot instantiate controller from reflection: com.android.settings.inputmethod.KeyboardAccessibilityBounceKeysController
+05-10 16:05:19.956  5158  5167 D PrefCtrlListHelper: Could not find Context-only controller for pref: com.android.settings.inputmethod.KeyboardAccessibilitySlowKeysController
+05-10 16:05:19.959  5158  5167 W PrefCtrlListHelper: Cannot instantiate controller from reflection: com.android.settings.inputmethod.KeyboardAccessibilitySlowKeysController
+05-10 16:05:19.960  5158  5167 D PrefCtrlListHelper: Could not find Context-only controller for pref: com.android.settings.inputmethod.KeyboardAccessibilityMouseKeysController
+05-10 16:05:19.960  5158  5167 W PrefCtrlListHelper: Cannot instantiate controller from reflection: com.android.settings.inputmethod.KeyboardAccessibilityMouseKeysController
+05-10 16:05:19.978  5158  5167 D PrefCtrlListHelper: Could not find Context-only controller for pref: com.android.settings.bluetooth.BluetoothAutoOnPreferenceController
+05-10 16:05:20.020  5158  5167 D LocalBluetoothProfileManager: LocalBluetoothProfileManager construction complete
+05-10 16:05:20.079   646   755 D AudioFlinger: mixer(0x7e80af3fd790) throttle end: throttle time(2)
+05-10 16:05:20.165   730  5284 D AudioTrack: getTimestamp_l(16): device stall time corrected using current time 285690349100
+05-10 16:05:20.167   730  5284 D AudioTrack: stop(16): called with 78336 frames delivered
+05-10 16:05:20.170   820  2477 E AppOps  : attributionTag  not declared in manifest of com.pranksterlab
+05-10 16:05:20.180  2043  2436 W Conscrypt: Could not set socket write timeout: java.net.SocketException: Socket closed
+05-10 16:05:20.184   820  2063 E AppOps  : attributionTag  not declared in manifest of com.pranksterlab
+05-10 16:05:20.204   646   755 D AudioFlinger: mixer(0x7e80af3fd790) throttle end: throttle time(2)
+05-10 16:05:20.242   730  5284 W libprocessgroup: A JoinCgroup action in the SystemMemoryProcess profile is used for controller memory in the cgroup v2 hierarchy and will be ignored
+05-10 16:05:20.323  4181  4458 I GoogleTTSServiceImpl: TTS dispatch: en-us-x-tpf-seanet-embedded
+05-10 16:05:20.336  4181  4458 I LocalSynthesizer: Attempting to load synthesizer for voice: en-us-x-tpf-seanet-embedded
+05-10 16:05:20.337  4181  4458 I LocalSynthesizer: Voice en-us-x-tpf-seanet-embedded is already supported by loaded synthesizer en-us-x-multi.
+05-10 16:05:20.358  4181  4458 I ComposerWrapperImpl: Skipping initialization, can already run voice en-us-x-tpf-seanet-embedded.
+05-10 16:05:20.384  2043  2436 W Conscrypt: 	at com.google.android.gms.org.conscrypt.Platform.setSocketWriteTimeout(:com.google.android.gms@261434038@26.14.34 (260800-899752054):204)
+05-10 16:05:20.386  2043  2436 W Conscrypt: 	at com.google.android.gms.org.conscrypt.ConscryptFileDescriptorSocket.setSoWriteTimeout(:com.google.android.gms@261434038@26.14.34 (260800-899752054):4)
+05-10 16:05:20.406  1154  1154 I wpa_supplicant: wlan0: CTRL-EVENT-BEACON-LOSS 
+05-10 16:05:20.416  5335  5335 I berberis: Initialized Berberis ((null)), version 16.0.0
+05-10 16:05:20.532  2043  2436 W Conscrypt: Could not set socket write timeout: java.net.SocketException: Socket closed
+05-10 16:05:20.533  2043  2436 W Conscrypt: 	at com.google.android.gms.org.conscrypt.Platform.setSocketWriteTimeout(:com.google.android.gms@261434038@26.14.34 (260800-899752054):204)
+05-10 16:05:20.533  2043  2436 W Conscrypt: 	at com.google.android.gms.org.conscrypt.ConscryptFileDescriptorSocket.setSoWriteTimeout(:com.google.android.gms@261434038@26.14.34 (260800-899752054):4)
+05-10 16:05:20.553  3082  3082 D AudioPlayerController: Completion soundId=sounds_funny_freesound_community_laugh_that_was_funny_104610_mp3 path='sounds/funny/freesound_community-laugh-that-was-funny-104610.mp3'
+05-10 16:05:20.584   730  2288 D NuPlayerDriver: reset(0x7d5a048125d0) at state 6
+05-10 16:05:20.645   730  5286 I hw-BpHwBinder: onLastStrongRef automatically unlinking death recipients
+05-10 16:05:20.651   733   789 I hw-BpHwBinder: onLastStrongRef automatically unlinking death recipients
+05-10 16:05:20.651   733   789 I hw-BpHwBinder: onLastStrongRef automatically unlinking death recipients
+05-10 16:05:20.655  1179  1433 W Looper  : Slow dispatch took 1388ms SysUiBg app=com.android.systemui main=false group=FOREGROUND h=android.os.Handler c=android.telephony.TelephonyCallback$IPhoneStateListenerStub$$ExternalSyntheticLambda52@a04b505 m=0
+05-10 16:05:20.657  2942  3164 W Finsky  : [54] PSR: Package com.google.android.trichromelibrary not installed
+05-10 16:05:20.665   733   789 D BufferPoolAccessor2.0: Destruction - bufferpool2 0x7d4513e09c88 cached: 0/0M, 0/0% in use; allocs: 0, 0% recycled; transfers: 0, 0% unfetched
+05-10 16:05:20.721   730  5261 D NuPlayerDriver: notifyResetComplete(0x7d5a048125d0)
+05-10 16:05:20.742   820  1038 I HalDevMgr: bestIfaceCreationProposal is null, requestIface=STA, existingIface=[name=wlan0 type=STA]
+05-10 16:05:20.743   730  2491 D NuPlayerDriver: reset(0x7d5a048125d0) at state 0
+05-10 16:05:20.751   730  2491 W AMessage: failed to post message as target looper for handler 0 is gone.
+05-10 16:05:20.772  3082  3082 V MediaPlayer: resetDrmState:  mDrmInfo=null mDrmProvisioningThread=null mPrepareDrmInProgress=false mActiveDrmScheme=false
+05-10 16:05:20.772  3082  3082 V MediaPlayer: cleanDrmObj: mDrmObj=null mDrmSessionId=null
+05-10 16:05:20.772  3082  3082 V MediaPlayer: resetDrmState:  mDrmInfo=null mDrmProvisioningThread=null mPrepareDrmInProgress=false mActiveDrmScheme=false
+05-10 16:05:20.773  3082  3082 V MediaPlayer: cleanDrmObj: mDrmObj=null mDrmSessionId=null
+05-10 16:05:20.827  4181  4458 I tflite  : Created TensorFlow Lite XNNPACK delegate for CPU.
+05-10 16:05:20.833  4181  4458 W tflite  : Attempting to use a delegate that only supports static-sized tensors with a graph that has dynamic-sized tensors (tensor#26 is a dynamic-sized tensor).
+05-10 16:05:20.904   820   820 W Looper  : Slow dispatch took 190ms main app=system_server main=true group=FOREGROUND h=com.android.server.media.AudioPlayerStateMonitor$MessageHandler c=null m=1
+05-10 16:05:20.931  1532  1539 W .gms.persistent: Suspending all threads took: 627.793ms
+05-10 16:05:20.941  1179  2258 D BufferPoolAccessor2.0: evictor expired: 3, evicted: 0
+05-10 16:05:21.029  4181  5340 I tflite  : Replacing 301 out of 301 node(s) with delegate (TfLiteXNNPackDelegate) node, yielding 1 partitions for subgraph 0.
+05-10 16:05:21.080  1532  1927 W .gms.persistent: Weak pointer dereference blocked for 15 milliseconds.
+05-10 16:05:21.088  5346  5346 W libbinder.BackendUnifiedServiceManager: Thread Pool max thread count is 0. Cannot cache binder as linkToDeath cannot be implemented. serviceName: audio
+05-10 16:05:21.115  5335  5335 D nativeloader: Load libframework-connectivity-tiramisu-jni.so using APEX ns com_android_tethering for caller /apex/com.android.tethering/javalib/framework-connectivity-t.jar: ok
+05-10 16:05:21.170  1324  2351 W libbinder.Binder: Binder transaction to android.bluetooth.IBluetooth code 24 took 1085ms. Data bytes: 184 Reply bytes: 60 Flags: 16
+05-10 16:05:21.171  5158  5167 D LocalBluetoothProfileManager: Adding local A2DP profile
+05-10 16:05:21.220  3082  5227 I HWUI    : Davey! duration=779ms; Flags=0, FrameTimelineVsyncId=23043, IntendedVsync=285852168552, Vsync=286335501866, InputEventId=0, HandleInputStart=286396404300, AnimationStart=286396465000, PerformTraversalsStart=286470616500, DrawStart=286470773800, FrameDeadline=286185501872, FrameStartTime=286347776500, FrameInterval=16666666, WorkloadTarget=16666666, SyncQueued=286495320000, SyncStart=286498003900, IssueDrawCommandsStart=286498187300, SwapBuffers=286512058800, FrameCompleted=286634195600, DequeueBufferDuration=171200, QueueBufferDuration=543800, GpuCompleted=286633577100, SwapBuffersCompleted=286634195600, DisplayPresentTime=0, CommandSubmissionCompleted=286512058800, 
+05-10 16:05:21.220  5158  5167 D BluetoothAdapter: A2DP connected
+05-10 16:05:21.221  5158  5167 D LocalBluetoothProfileManager: Adding local HEADSET profile
+05-10 16:05:21.245  5158  5167 D BluetoothAdapter: HEADSET connected
+05-10 16:05:21.246  5158  5167 D LocalBluetoothProfileManager: Adding local MAP profile
+05-10 16:05:21.249  5158  5167 D BluetoothMap: Create BluetoothMap proxy object
+05-10 16:05:21.252  5158  5167 D BluetoothAdapter: MAP connected
+05-10 16:05:21.253  5158  5167 D LocalBluetoothProfileManager: Adding local OPP profile
+05-10 16:05:21.255  5158  5167 D LocalBluetoothProfileManager: Adding local Hearing Aid profile
+05-10 16:05:21.294  5158  5167 D BluetoothAdapter: HEARING_AID connected
+05-10 16:05:21.300  5158  5167 D LocalBluetoothProfileManager: Adding local HID_HOST profile
+05-10 16:05:21.308  5158  5167 D BluetoothAdapter: HID_HOST connected
+05-10 16:05:21.318  5158  5167 D LocalBluetoothProfileManager: Adding local HID_DEVICE profile
+05-10 16:05:21.321  5158  5167 D BluetoothAdapter: HID_DEVICE connected
+05-10 16:05:21.322  5158  5167 D LocalBluetoothProfileManager: Adding local PAN profile
+05-10 16:05:21.325  5158  5167 D BluetoothAdapter: PAN connected
+05-10 16:05:21.329  5158  5167 D LocalBluetoothProfileManager: Adding local PBAP profile
+05-10 16:05:21.332  5158  5167 D BluetoothAdapter: PBAP connected
+05-10 16:05:21.375  5158  5158 D BluetoothMap: getConnectedDevices()
+05-10 16:05:21.453  1532  2678 I NetworkScheduler.Stats: (REDACTED) Task %s/%s started execution. cause:%s exec_start_elapsed_seconds: %s
+05-10 16:05:21.453  1532  2678 I NetworkScheduler.Stats: (REDACTED) Task %s/%s started execution. cause:%s exec_start_elapsed_seconds: %s
+05-10 16:05:21.468  1532  2678 I NetworkScheduler.Stats: (REDACTED) Task %s/%s finished executing. cause:%s result: %s elapsed_millis: %s uptime_millis: %s exec_start_elapsed_seconds: %s
+05-10 16:05:21.486  1324  1334 I BluetoothAdapterProperties: getBondedDevices: length=0
+05-10 16:05:21.490  5158  5167 D PrefCtrlListHelper: Could not find Context-only controller for pref: com.android.settings.bluetooth.BluetoothDeviceRenamePreferenceController
+05-10 16:05:21.495  5158  5167 D PrefCtrlListHelper: Could not find Context-only controller for pref: com.android.settings.connecteddevice.AddDevicePreferenceController
+05-10 16:05:21.505  5158  5167 D PrefCtrlListHelper: Could not find Context-only controller for pref: com.android.settings.accessibility.CaptioningTogglePreferenceController
+05-10 16:05:21.524  5158  5167 D PrefCtrlListHelper: Could not find Context-only controller for pref: com.android.settings.accessibility.CaptioningAppearancePreferenceController
+05-10 16:05:21.529  5158  5167 D PrefCtrlListHelper: Could not find Context-only controller for pref: com.android.settings.accessibility.CaptioningFooterPreferenceController
+05-10 16:05:21.540  5266  5365 D nativeloader: Load /data/app/~~GwjVQw8-7PIjfeilPDIyRg==/com.google.android.googlequicksearchbox-t0MZcUH_FiXZ7W8lhaJCwA==/base.apk!/lib/x86_64/libnative_crash_handler_jni.so using class loader ns clns-10 (caller=/data/app/~~GwjVQw8-7PIjfeilPDIyRg==/com.google.android.googlequicksearchbox-t0MZcUH_FiXZ7W8lhaJCwA==/base.apk!classes2.dex): ok
+05-10 16:05:21.544  5335  5335 D ApplicationLoaders: Returning zygote-cached class loader: /system/framework/org.apache.http.legacy.jar
+05-10 16:05:21.547  5335  5335 D ApplicationLoaders: Returning zygote-cached class loader: /system_ext/framework/androidx.window.extensions.jar
+05-10 16:05:21.548  5335  5335 D ApplicationLoaders: Returning zygote-cached class loader: /system_ext/framework/androidx.window.sidecar.jar
+05-10 16:05:21.560   820   820 W Looper  : Slow delivery took 210ms main app=system_server main=true group=FOREGROUND h=com.android.server.notification.NotificationManagerService$WorkerHandler c=com.android.server.notification.NotificationManagerService$CancelNotificationRunnable@428a23d m=0
+05-10 16:05:21.570  3501  5368 I AiAiCaptions: TtsSynthesizerImpl::handleRequestSuccess(): requestId: requestId: 1
+05-10 16:05:21.580  2942  3164 W Finsky  : [54] PSR: Package com.google.android.trichromelibrary not installed
+05-10 16:05:21.613  5158  5167 D PrefCtrlListHelper: Could not find Context-only controller for pref: com.android.settings.applications.specialaccess.interactacrossprofiles.InteractAcrossProfilesController
+05-10 16:05:21.621  5158  5167 D PrefCtrlListHelper: Could not find Context-only controller for pref: com.android.settings.privacy.AccessibilityUsagePreferenceController
+05-10 16:05:21.628  5158  5167 D PrefCtrlListHelper: Could not find Context-only controller for pref: com.android.settings.notification.LockScreenNotificationsPreferencePageController
+05-10 16:05:21.629  5158  5167 D PrefCtrlListHelper: Could not find Context-only controller for pref: com.android.settings.sound.MediaControlsLockScreenPreferenceController
+05-10 16:05:21.629  5158  5167 D PrefCtrlListHelper: Could not find Context-only controller for pref: com.android.settings.privacy.CameraExtensionsFallbackPreferenceController
+05-10 16:05:21.630  5158  5167 D PrefCtrlListHelper: Could not find Context-only controller for pref: com.android.settings.privacy.EnableContentCapturePreferenceController
+05-10 16:05:21.630  5158  5167 D PrefCtrlListHelper: Could not find Context-only controller for pref: com.android.settings.privacy.EnableContentCaptureWithServiceSettingsPreferenceController
+05-10 16:05:21.633  5158  5167 D PrefCtrlListHelper: Could not find Context-only controller for pref: com.android.settings.network.CellularSecurityPreferenceController
+05-10 16:05:21.634  3082  3082 I Choreographer: Skipped 33 frames!  The application may be doing too much work on its main thread.
+05-10 16:05:21.634  5158  5167 D PrefCtrlListHelper: Could not find Context-only controller for pref: com.android.settings.security.ContentProtectionPreferenceController
+05-10 16:05:21.635  5158  5167 D PrefCtrlListHelper: Could not find Context-only controller for pref: com.android.settings.enterprise.ManageDeviceAdminPreferenceController
+05-10 16:05:21.640  5158  5167 D PrefCtrlListHelper: Could not find Context-only controller for pref: com.android.settings.enterprise.EnterprisePrivacyPreferenceController
+05-10 16:05:21.641  5158  5167 D PrefCtrlListHelper: Could not find Context-only controller for pref: com.android.settings.enterprise.FinancedPrivacyPreferenceController
+05-10 16:05:21.641  5158  5167 D PrefCtrlListHelper: Could not find Context-only controller for pref: com.android.settings.devicelock.DeviceLockPreferenceController
+05-10 16:05:21.646   820   859 I ActivityManager: Test idle passed
+05-10 16:05:21.652   820   820 W Looper  : Drained
+05-10 16:05:21.656  5158  5167 D PrefCtrlListHelper: Could not find Context-only controller for pref: com.android.settings.security.SimLockPreferenceController
+05-10 16:05:21.656  5158  5167 D PrefCtrlListHelper: Could not find Context-only controller for pref: com.android.settings.security.EncryptionStatusPreferenceController
+05-10 16:05:21.656  5158  5167 D PrefCtrlListHelper: Could not find Context-only controller for pref: com.android.settings.security.trustagent.ManageTrustAgentsPreferenceController
+05-10 16:05:21.657  5158  5167 D PrefCtrlListHelper: Could not find Context-only controller for pref: com.android.settings.security.ScreenPinningPreferenceController
+05-10 16:05:21.660  5158  5167 D PrefCtrlListHelper: Could not find Context-only controller for pref: com.android.settings.security.MemtagPagePreferenceController
+05-10 16:05:21.725  5266  5266 I elaj    : SslGuard completed installation.

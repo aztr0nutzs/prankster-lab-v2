@@ -76,7 +76,7 @@ fun SoundPacksScreen(soundRepository: SoundRepository, audioPlayerController: Au
                 subtitle = "Featured Data Pack Catalogue",
                 imageRes = R.drawable.header_sound_stash,
                 statusLabel = "${packSummaries.size} PACKS",
-                modifier = Modifier.padding(horizontal = 16.dp, top = 8.dp)
+                modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp)
             )
             Column(modifier = Modifier.fillMaxWidth().weight(1f).padding(16.dp)) {
             HeadlineText("FEATURED DATA PACKS", color = CyanAccent)

@@ -77,7 +77,8 @@ fun PrankMessagesScreen() {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = androidx.compose.foundation.layout.PaddingValues(
-            horizontal = 16.dp,
+            start = 16.dp,
+            end = 16.dp,
             top = 8.dp,
             bottom = 80.dp
         )

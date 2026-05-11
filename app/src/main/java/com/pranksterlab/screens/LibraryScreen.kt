@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -149,7 +150,7 @@ fun LibraryScreen(
                 subtitle = "Library / Catalog Browser",
                 imageRes = R.drawable.header_sound_stash,
                 statusLabel = "${validSounds.size} ASSETS",
-                modifier = Modifier.padding(horizontal = 16.dp, top = 8.dp)
+                modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp)
             )
             Header(
                 onSearchClick = { isSearchActive = !isSearchActive },
