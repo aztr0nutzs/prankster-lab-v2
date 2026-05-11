@@ -109,7 +109,8 @@ fun TimerPrankScreen(soundRepository: SoundRepository, audioPlayerController: Au
                 TimerState.PLAYING -> "LIVE"
                 TimerState.IDLE -> "READY"
             },
-            modifier = Modifier.padding(horizontal = 16.dp)
+            showTextOverlay = false,
+            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp)
         )
         Column(modifier = Modifier.fillMaxWidth().weight(1f).padding(16.dp)) {
         HeadlineText("TIMER PRANK", color = CyanAccent)

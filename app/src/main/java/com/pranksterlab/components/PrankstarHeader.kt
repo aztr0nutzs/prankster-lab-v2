@@ -63,7 +63,7 @@ private fun accentForImage(imageRes: Int): Color = when (imageRes) {
  * Reusable, premium-looking top header used by every major screen in the app.
  *
  * Renders the supplied drawable at the top of the screen, layers a dark gradient
- * over it for legibility, and overlays the screen title, subtitle, an optional
+ * over it for legibility, and can overlay the screen title, subtitle, an optional
  * status pill, and optional trailing controls. The header is wrapped in a neon
  * frame compatible with the existing dark cyberpunk theme so it enhances rather
  * than replaces the screen layout below it.
@@ -75,6 +75,7 @@ fun PrankstarHeader(
     imageRes: Int,
     modifier: Modifier = Modifier,
     statusLabel: String? = null,
+    showTextOverlay: Boolean = true,
     trailingContent: (@Composable RowScope.() -> Unit)? = null,
 ) {
     val accent = accentForImage(imageRes)
@@ -133,51 +134,48 @@ fun PrankstarHeader(
                 )
         )
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp, vertical = 14.dp),
-            verticalArrangement = Arrangement.SpaceBetween,
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.Top,
-                horizontalArrangement = Arrangement.End,
-            ) {
-                if (statusLabel != null) {
-                    StatusPill(label = statusLabel, accent = accent)
-                }
-            }
+        if (statusLabel != null) {
+            StatusPill(
+                label = statusLabel,
+                accent = accent,
+                modifier = Modifier.align(Alignment.TopEnd).padding(14.dp)
+            )
+        }
 
+        if (showTextOverlay || trailingContent != null) {
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.align(Alignment.BottomStart).fillMaxWidth().padding(horizontal = 16.dp, vertical = 14.dp),
                 verticalAlignment = Alignment.Bottom,
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(2.dp),
-                ) {
-                    Text(
-                        text = title.uppercase(),
-                        color = Color.White,
-                        style = MaterialTheme.typography.headlineSmall.copy(
-                            fontWeight = FontWeight.Black,
-                            letterSpacing = 1.5.sp,
-                        ),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                    Text(
-                        text = subtitle,
-                        color = accent.copy(alpha = 0.88f),
-                        style = MaterialTheme.typography.labelSmall.copy(
-                            fontWeight = FontWeight.Bold,
-                            letterSpacing = 1.sp,
-                        ),
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                    )
+                if (showTextOverlay) {
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(2.dp),
+                    ) {
+                        Text(
+                            text = title.uppercase(),
+                            color = Color.White,
+                            style = MaterialTheme.typography.headlineSmall.copy(
+                                fontWeight = FontWeight.Black,
+                                letterSpacing = 1.5.sp,
+                            ),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                        Text(
+                            text = subtitle,
+                            color = accent.copy(alpha = 0.88f),
+                            style = MaterialTheme.typography.labelSmall.copy(
+                                fontWeight = FontWeight.Bold,
+                                letterSpacing = 1.sp,
+                            ),
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
+                } else {
+                    Spacer(modifier = Modifier.weight(1f))
                 }
                 if (trailingContent != null) {
                     Spacer(modifier = Modifier.width(12.dp))
@@ -193,9 +191,9 @@ fun PrankstarHeader(
 }
 
 @Composable
-private fun StatusPill(label: String, accent: Color) {
+private fun StatusPill(label: String, accent: Color, modifier: Modifier = Modifier) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .clip(RoundedCornerShape(50))
             .background(Color.Black.copy(alpha = 0.55f))
             .border(1.dp, accent.copy(alpha = 0.7f), RoundedCornerShape(50))

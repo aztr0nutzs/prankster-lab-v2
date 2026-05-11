@@ -106,7 +106,8 @@ fun SettingsScreen(soundRepository: SoundRepository, audioPlayerController: Audi
                     title = "System Setup",
                     subtitle = "Diagnostics / Safety / App Control",
                     imageRes = R.drawable.header_settings,
-                    statusLabel = if ((diagnostics?.invalidCatalogSounds ?: 0) > 0) "ALERT" else "STABLE"
+                    statusLabel = if ((diagnostics?.invalidCatalogSounds ?: 0) > 0) "ALERT" else "STABLE",
+                    showTextOverlay = false
                 )
             }
 

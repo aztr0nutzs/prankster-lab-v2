@@ -11,7 +11,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.pranksterlab.components.PrankstarBottomDock
-import com.pranksterlab.components.TopBar
 import com.pranksterlab.screens.*
 import com.pranksterlab.screens.soundforge.SoundForgeScreen
 import com.pranksterlab.screens.voice.VoiceJokeGeneratorScreen
@@ -53,11 +52,6 @@ fun PranksterApp() {
     }
 
     Scaffold(
-        topBar = { 
-            if (currentRoute != "library") {
-                TopBar() 
-            }
-        },
         containerColor = Color.Black,
         bottomBar = {
             PrankstarBottomDock(

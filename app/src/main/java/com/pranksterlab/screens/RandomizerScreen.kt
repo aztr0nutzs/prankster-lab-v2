@@ -130,6 +130,7 @@ fun RandomizerScreen(
                     subtitle = "Chaos Algorithm Engine",
                     imageRes = R.drawable.header_sound_gen,
                     statusLabel = if (state.isRunning) "RUNNING" else "ARMED",
+                    showTextOverlay = false,
                     modifier = Modifier.padding(top = 8.dp)
                 )
             }

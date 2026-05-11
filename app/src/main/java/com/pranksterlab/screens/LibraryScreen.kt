@@ -158,6 +158,7 @@ fun LibraryScreen(
                 subtitle = "Library / Catalog Browser",
                 imageRes = R.drawable.header_sound_stash,
                 statusLabel = "${validSounds.size} ASSETS",
+                showTextOverlay = false,
                 modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp)
             )
             Header(
