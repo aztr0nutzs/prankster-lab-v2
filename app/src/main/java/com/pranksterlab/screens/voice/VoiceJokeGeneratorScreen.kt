@@ -84,6 +84,7 @@ fun VoiceJokeGeneratorScreen(soundRepository: SoundRepository) {
     var statusDetail by remember { mutableStateOf("Preparing Android TextToSpeech.") }
     var generatedFile by remember { mutableStateOf<File?>(null) }
     var generatedResult by remember { mutableStateOf<VoiceSynthesisResult?>(null) }
+    var savedGeneratedFilePath by remember { mutableStateOf<String?>(null) }
 
     fun applyPreset(selected: VoicePreset) {
         preset = selected
@@ -239,6 +240,7 @@ fun VoiceJokeGeneratorScreen(soundRepository: SoundRepository) {
                             statusDetail = "Generating engine-specific audio output."
                             generatedFile = null
                             generatedResult = null
+                            savedGeneratedFilePath = null
                             val file = File(context.filesDir, "voice_${System.currentTimeMillis()}.wav")
                             val result = withContext(Dispatchers.IO) { tts.synthesizeToFile(settings(), file) }
                             if (result.success && isValidGeneratedFile(result.outputFile)) {
@@ -291,6 +293,7 @@ fun VoiceJokeGeneratorScreen(soundRepository: SoundRepository) {
                         runCatching {
                             generatedRepo.saveGeneratedVoice(file, settings(), generatedResult?.durationMs)
                         }.onSuccess {
+                            savedGeneratedFilePath = file.absolutePath
                             status = "SAVED TO LIBRARY"
                             statusDetail = "Generated audio was saved to Library."
                         }.onFailure {
@@ -298,7 +301,7 @@ fun VoiceJokeGeneratorScreen(soundRepository: SoundRepository) {
                             statusDetail = it.message ?: "Unable to save generated audio."
                         }
                     }
-                }, enabled = canUseGeneratedFile) { Text("Save to Library (WAV)") }
+                }, enabled = canUseGeneratedFile && savedGeneratedFilePath != generatedFile?.absolutePath) { Text("Save to Library (WAV)") }
             }
             item { Text("Safety: Keep pranks harmless. No real-person or official-alert impersonation.", color = OrangeAccent) }
         }

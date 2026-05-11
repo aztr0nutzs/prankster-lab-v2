@@ -139,10 +139,12 @@ fun LibraryScreen(
         }
         val matchesPack = selectedPack == null || sound.packId == selectedPack
         val matchesSearch = if (searchQuery.isBlank()) true else {
-            sound.name.contains(searchQuery, true) ||
+                sound.name.contains(searchQuery, true) ||
                 sound.category.contains(searchQuery, true) ||
                 sound.tags.any { it.contains(searchQuery, true) } ||
-                (sound.packId?.contains(searchQuery, true) == true)
+                (sound.packId?.contains(searchQuery, true) == true) ||
+                (sound.generatedMetadata?.voicePresetName?.contains(searchQuery, true) == true) ||
+                (sound.generatedMetadata?.sourceText?.contains(searchQuery, true) == true)
         }
         matchesCategory && matchesPack && matchesSearch
     }
@@ -234,6 +236,7 @@ fun LibraryScreen(
                 items(filteredSounds, key = { it.id }) { sound ->
                     HUDSoundCard(
                         sound = sound,
+                        categoryLabel = soundRepository.readableCategory(sound),
                         audioPlayerController = audioPlayerController,
                         isPlaying = playbackState.isPlaying && playbackState.currentSoundId == sound.id,
                         isFavorite = favoriteIds.contains(sound.id),
@@ -297,6 +300,7 @@ fun Header(
 @Composable
 fun HUDSoundCard(
     sound: PrankSound,
+    categoryLabel: String,
     audioPlayerController: AudioPlayerController,
     isPlaying: Boolean,
     isFavorite: Boolean,
@@ -317,7 +321,7 @@ fun HUDSoundCard(
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Top) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(sound.name.uppercase(), color = LimeAccent, style = MaterialTheme.typography.headlineSmall.copy(letterSpacing = 1.sp))
-                    Text("${sound.category} • ${sound.packId ?: "UNPACKED"}", color = Color.Gray)
+                    Text("$categoryLabel • ${sound.packId ?: "UNPACKED"}", color = Color.Gray)
                     if (sound.isGeneratedSound()) {
                         sound.generatedMetadata?.voicePresetName?.let { preset ->
                             Text("VOICE: $preset", color = CyanAccent, style = MaterialTheme.typography.bodySmall)

@@ -45,6 +45,8 @@ fun TimerPrankScreen(soundRepository: SoundRepository, audioPlayerController: Au
     var remainingSeconds by remember { mutableIntStateOf(0) }
     var timerState by remember { mutableStateOf(TimerState.IDLE) }
     var showSoundPicker by remember { mutableStateOf(false) }
+    var timerError by remember { mutableStateOf<String?>(null) }
+    var invalidGeneratedCount by remember { mutableIntStateOf(0) }
 
     val playbackState by audioPlayerController.playbackState.collectAsState()
 
@@ -54,6 +56,9 @@ fun TimerPrankScreen(soundRepository: SoundRepository, audioPlayerController: Au
             soundsList = withContext(Dispatchers.IO) {
                 (bundled + custom).filter { soundRepository.isSoundPlayable(it) }
             }
+            invalidGeneratedCount = withContext(Dispatchers.IO) {
+                custom.count { soundRepository.missingGeneratedFile(it) }
+            }
         }
     }
 
@@ -61,6 +66,7 @@ fun TimerPrankScreen(soundRepository: SoundRepository, audioPlayerController: Au
         if (soundsList.isEmpty()) return@LaunchedEffect
         val pendingSoundId = soundRepository.consumePendingTimerSoundId() ?: return@LaunchedEffect
         selectedSound = soundsList.firstOrNull { it.id == pendingSoundId }
+        if (selectedSound == null) timerError = "Selected sound is missing or no longer playable."
     }
 
     LaunchedEffect(timerState, remainingSeconds) {
@@ -70,8 +76,14 @@ fun TimerPrankScreen(soundRepository: SoundRepository, audioPlayerController: Au
             if (remainingSeconds == 0) {
                 timerState = TimerState.PLAYING
                 selectedSound?.let {
+                    if (!soundRepository.isSoundPlayable(it)) {
+                        timerError = "Selected sound is missing or empty."
+                        timerState = TimerState.IDLE
+                        return@let
+                    }
                     val started = audioPlayerController.playPrankSound(it, isLooping = it.loopable)
                     if (!started) {
+                        timerError = audioPlayerController.playbackState.value.lastError ?: "Selected sound could not be played."
                         timerState = TimerState.IDLE
                     }
                 }
@@ -175,7 +187,7 @@ fun TimerPrankScreen(soundRepository: SoundRepository, audioPlayerController: Au
                         style = MaterialTheme.typography.titleMedium
                     )
                     if (selectedSound != null) {
-                        LabelCaps(text = selectedSound!!.category, color = FuchsiaAccent)
+                        LabelCaps(text = soundRepository.readableCategory(selectedSound!!), color = FuchsiaAccent)
                     }
                 }
                 Spacer(modifier = Modifier.weight(1f))
@@ -184,6 +196,13 @@ fun TimerPrankScreen(soundRepository: SoundRepository, audioPlayerController: Au
         }
 
         Spacer(modifier = Modifier.weight(1f))
+        if (timerError != null || invalidGeneratedCount > 0) {
+            LabelCaps(
+                text = timerError ?: "$invalidGeneratedCount generated voice clip(s) unavailable",
+                color = OrangeAccent
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+        }
 
         // Safety Copy
         Text(
@@ -261,7 +280,7 @@ fun TimerPrankScreen(soundRepository: SoundRepository, audioPlayerController: Au
                                 Spacer(modifier = Modifier.width(16.dp))
                                 Column {
                                     Text(sound.name, color = Color.White)
-                                    LabelCaps(sound.category, color = OnBackground.copy(alpha=0.6f))
+                                    LabelCaps(soundRepository.readableCategory(sound), color = OnBackground.copy(alpha=0.6f))
                                 }
                             }
                         }

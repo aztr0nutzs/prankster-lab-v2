@@ -95,6 +95,21 @@ class SoundRepository(private val context: Context) {
         }
     }
 
+    fun isGeneratedVoiceClip(sound: PrankSound): Boolean {
+        return sound.category.equals("VOICE_GENERATED", true) ||
+            sound.packId.equals("voice_lab", true) ||
+            sound.generatedMetadata?.generatorType.equals("VOICE_LAB", true) ||
+            (sound.createdByUser && sound.tags.any { it.equals("generated", true) } && sound.tags.any { it.equals("voice", true) })
+    }
+
+    fun readableCategory(sound: PrankSound): String {
+        return if (isGeneratedVoiceClip(sound)) "Voice Generated" else sound.category.replace('_', ' ')
+    }
+
+    fun missingGeneratedFile(sound: PrankSound): Boolean {
+        return isGeneratedVoiceClip(sound) && !isSoundPlayable(sound)
+    }
+
     private fun hasSupportedExtension(path: String): Boolean {
         return path.substringAfterLast('.', "").lowercase() in SUPPORTED_AUDIO_EXTENSIONS
     }
@@ -112,7 +127,7 @@ class SoundRepository(private val context: Context) {
                 )
             }
             .toMutableList()
-        val voiceGeneratedCount = sounds.count { it.category.equals("VOICE_GENERATED", true) || it.packId.equals("voice_lab", true) }
+        val voiceGeneratedCount = sounds.count { isGeneratedVoiceClip(it) }
         if (voiceGeneratedCount > 0 && base.none { it.packId.equals("voice_lab", true) }) {
             base.add(PackSummary(packId = "voice_lab", soundCount = voiceGeneratedCount, categoryFocus = "VOICE_GENERATED"))
         }
@@ -305,8 +320,14 @@ class SoundRepository(private val context: Context) {
 
     suspend fun deleteGeneratedSounds(): Int {
         val sounds = getCustomSoundsFlow().first()
-        val toRemove = sounds.filter { it.tags.any { tag -> tag.equals("generated", true) } || it.createdByUser && it.generatedMetadata != null }
+        val toRemove = sounds.filter { isGeneratedVoiceClip(it) }
         if (toRemove.isEmpty()) return 0
+        toRemove.forEach { sound ->
+            val path = sound.localUri ?: sound.assetPath
+            if (path.isNotBlank() && !path.startsWith("content://") && !path.startsWith("file://")) {
+                runCatching { File(path).takeIf { it.exists() && it.isFile }?.delete() }
+            }
+        }
         context.dataStore.edit { preferences ->
             val remaining = sounds.filterNot { s -> toRemove.any { it.id == s.id } }
             preferences[CUSTOM_SOUNDS_KEY] = gson.toJson(remaining)
@@ -317,11 +338,13 @@ class SoundRepository(private val context: Context) {
     suspend fun clearMissingGeneratedMetadata(): Int {
         val sounds = getCustomSoundsFlow().first()
         var changed = 0
-        val updated = sounds.map { sound ->
-            if (sound.generatedMetadata != null && !isSoundPlayable(sound)) {
+        val updated = sounds.filterNot { sound ->
+            if (missingGeneratedFile(sound)) {
                 changed++
-                sound.copy(generatedMetadata = null)
-            } else sound
+                true
+            } else {
+                false
+            }
         }
         if (changed > 0) {
             context.dataStore.edit { preferences ->

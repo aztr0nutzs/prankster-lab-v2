@@ -82,6 +82,7 @@ fun SettingsScreen(soundRepository: SoundRepository, audioPlayerController: Audi
     var actionResult by remember { mutableStateOf<String?>(null) }
     var showDeveloperDiagnostics by remember { mutableStateOf(false) }
     var generatedCount by remember { mutableIntStateOf(0) }
+    var missingGeneratedCount by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(savedVolume) {
         audioPlayerController.setMasterVolume(savedVolume)
@@ -89,7 +90,10 @@ fun SettingsScreen(soundRepository: SoundRepository, audioPlayerController: Audi
     LaunchedEffect(Unit) {
         diagnostics = withContext(Dispatchers.IO) { soundRepository.getAudioDiagnostics() }
         soundRepository.getCustomSoundsFlow().collect { sounds ->
-            generatedCount = sounds.count { it.category.equals("VOICE_GENERATED", true) || it.packId.equals("voice_lab", true) || it.tags.any { tag -> tag.equals("generated", true) } }
+            generatedCount = sounds.count { soundRepository.isGeneratedVoiceClip(it) }
+            missingGeneratedCount = withContext(Dispatchers.IO) {
+                sounds.count { soundRepository.missingGeneratedFile(it) }
+            }
         }
     }
 
@@ -166,6 +170,7 @@ fun SettingsScreen(soundRepository: SoundRepository, audioPlayerController: Audi
                         DiagnosticReadout("INVALID", diagnostics?.invalidCatalogSounds ?: 0, OrangeAccent, Modifier.weight(1f))
                     }
                     DiagnosticLine("Generated clips", "$generatedCount", CyanAccent)
+                    DiagnosticLine("Missing generated files", "$missingGeneratedCount", if (missingGeneratedCount > 0) OrangeAccent else Color.Gray)
                     if (showDeveloperDiagnostics) {
                         DiagnosticLine("Missing assets", "${diagnostics?.missingAssets ?: 0}")
                         DiagnosticLine("Uncataloged assets", "${diagnostics?.uncatalogedAssets ?: 0}")
@@ -186,8 +191,8 @@ fun SettingsScreen(soundRepository: SoundRepository, audioPlayerController: Audi
                     LabelCaps("DATA CONTROL", color = CyanAccent)
                     ActionButton("Clear recent sounds") { confirmAction = "clear_recent" }
                     ActionButton("Clear favorites") { confirmAction = "clear_favorites" }
-                    ActionButton("Delete generated sounds") { confirmAction = "delete_generated" }
-                    ActionButton("Clear missing generated metadata") { confirmAction = "clear_missing_generated_meta" }
+                    ActionButton("Delete generated voice clips") { confirmAction = "delete_generated" }
+                    ActionButton("Clear missing generated voice entries") { confirmAction = "clear_missing_generated_meta" }
                     ActionButton("Reset Sound Forge presets") { confirmAction = "reset_forge" }
                     ActionButton("Open validation report") {
                         val report = findValidationReport(context.filesDir, context.cacheDir, context.getExternalFilesDir(null))
@@ -260,7 +265,7 @@ fun SettingsScreen(soundRepository: SoundRepository, audioPlayerController: Audi
                             }
                             "delete_generated" -> {
                                 val removed = soundRepository.deleteGeneratedSounds()
-                                actionResult = "Deleted $removed generated sounds."
+                                actionResult = "Deleted $removed generated voice clip(s). Sound Forge presets were not removed."
                             }
                             "reset_forge" -> {
                                 val removed = soundRepository.resetSoundForgePresets()
@@ -272,7 +277,7 @@ fun SettingsScreen(soundRepository: SoundRepository, audioPlayerController: Audi
                             }
                             "clear_missing_generated_meta" -> {
                                 val cleared = soundRepository.clearMissingGeneratedMetadata()
-                                actionResult = "Cleared generated metadata for $cleared missing file entries."
+                                actionResult = "Removed $cleared generated voice entry/entries with missing files."
                             }
                         }
                         diagnostics = withContext(Dispatchers.IO) { soundRepository.getAudioDiagnostics() }

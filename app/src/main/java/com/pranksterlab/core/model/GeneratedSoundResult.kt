@@ -12,7 +12,9 @@ data class GeneratedSoundMetadata(
     val speechRate: Float? = null,
     val volume: Float? = null,
     val toneStyle: String? = null,
-    val effectStyle: String? = null
+    val effectStyle: String? = null,
+    val createdAt: Long? = null,
+    val durationMs: Long? = null
 )
 
 data class GeneratedSoundResult(

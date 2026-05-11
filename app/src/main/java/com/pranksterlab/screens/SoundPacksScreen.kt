@@ -134,11 +134,13 @@ fun SoundPacksScreen(soundRepository: SoundRepository, audioPlayerController: Au
 @Composable
 fun PackCard(pack: PackSummary, sampleSound: PrankSound?, onPreview: () -> Unit, onOpen: () -> Unit) {
     val color = when (pack.categoryFocus) {
-        "VOICE" -> OrangeAccent
+        "VOICE", "VOICE_GENERATED" -> OrangeAccent
         "CREEPY" -> FuchsiaAccent
         "AMBIENCE" -> CyanAccent
         else -> LimeAccent
     }
+    val packTitle = if (pack.packId.equals("voice_lab", true)) "Voice Lab" else pack.packId.replace('_', ' ')
+    val categoryLabel = if (pack.categoryFocus.equals("VOICE_GENERATED", true)) "Voice Generated" else pack.categoryFocus.replace('_', ' ')
 
     HUDCard(modifier = Modifier.fillMaxWidth(), accentColor = color) {
         Column(modifier = Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -155,7 +157,7 @@ fun PackCard(pack: PackSummary, sampleSound: PrankSound?, onPreview: () -> Unit,
                     modifier = Modifier.fillMaxWidth().height(72.dp).align(Alignment.Center)
                 )
                 LabelCaps(
-                    pack.categoryFocus,
+                    categoryLabel,
                     color = Color.Black,
                     modifier = Modifier
                         .align(Alignment.BottomStart)
@@ -164,7 +166,7 @@ fun PackCard(pack: PackSummary, sampleSound: PrankSound?, onPreview: () -> Unit,
                         .padding(horizontal = 8.dp, vertical = 4.dp)
                 )
             }
-            HeadlineText(pack.packId.uppercase(), color = color)
+            HeadlineText(packTitle.uppercase(), color = color)
             Text("${pack.soundCount} VALID SOUNDS", color = Color.Gray, style = MaterialTheme.typography.bodySmall)
             Text(
                 sampleSound?.name ?: "No preview sample",
