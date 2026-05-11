@@ -1,7 +1,6 @@
 package com.pranksterlab.core.audio
 
 import android.content.Context
-import android.media.MediaMetadataRetriever
 import android.media.MediaPlayer
 import android.util.Log
 import com.pranksterlab.core.model.PrankSound
@@ -212,32 +211,9 @@ class AudioPlayerController(private val context: Context) {
             } catch (e: Exception) {
                 return "Asset not found in bundle"
             }
-            if (!canDecodeAsset(path)) return "Asset is not decodable audio"
         }
 
         return null
-    }
-
-    private fun canDecodeAsset(assetPath: String): Boolean {
-        val retriever = MediaMetadataRetriever()
-        return try {
-            context.assets.openFd(assetPath).use { descriptor ->
-                retriever.setDataSource(
-                    descriptor.fileDescriptor,
-                    descriptor.startOffset,
-                    descriptor.length
-                )
-            }
-            val duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-            val hasAudio = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_HAS_AUDIO)
-            val durationMs = duration?.toLongOrNull() ?: 0L
-            durationMs > 0L && (hasAudio == null || hasAudio == "yes")
-        } catch (e: Exception) {
-            Log.w(TAG, "Decode probe failed path='$assetPath' reason=${e.message}")
-            false
-        } finally {
-            try { retriever.release() } catch (_: Exception) {}
-        }
     }
 
     private fun markInvalid(soundId: String) {

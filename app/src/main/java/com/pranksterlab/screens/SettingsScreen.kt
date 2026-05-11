@@ -61,6 +61,8 @@ import com.pranksterlab.theme.FuchsiaAccent
 import com.pranksterlab.theme.LimeAccent
 import com.pranksterlab.theme.OrangeAccent
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 
 @Composable
@@ -85,7 +87,7 @@ fun SettingsScreen(soundRepository: SoundRepository, audioPlayerController: Audi
         audioPlayerController.setMasterVolume(savedVolume)
     }
     LaunchedEffect(Unit) {
-        diagnostics = soundRepository.getAudioDiagnostics()
+        diagnostics = withContext(Dispatchers.IO) { soundRepository.getAudioDiagnostics() }
         soundRepository.getCustomSoundsFlow().collect { sounds ->
             generatedCount = sounds.count { it.category.equals("VOICE_GENERATED", true) || it.packId.equals("voice_lab", true) || it.tags.any { tag -> tag.equals("generated", true) } }
         }
@@ -170,7 +172,7 @@ fun SettingsScreen(soundRepository: SoundRepository, audioPlayerController: Audi
                         DiagnosticLine("Last validation", diagnostics?.lastValidationResult ?: "Not run")
                         DiagnosticLine("Last playback error", playbackState.lastError ?: "None", if (playbackState.lastError == null) Color.Gray else Color(0xFFFCA5A5))
                     }
-                    Button(onClick = { diagnostics = soundRepository.getAudioDiagnostics() }, colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent), border = androidx.compose.foundation.BorderStroke(1.dp, FuchsiaAccent.copy(alpha = 0.4f))) {
+                    Button(onClick = { scope.launch { diagnostics = withContext(Dispatchers.IO) { soundRepository.getAudioDiagnostics() } } }, colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent), border = androidx.compose.foundation.BorderStroke(1.dp, FuchsiaAccent.copy(alpha = 0.4f))) {
                         Icon(Icons.Default.Refresh, "Refresh diagnostics", tint = FuchsiaAccent)
                         Text("REFRESH SCAN", color = FuchsiaAccent, modifier = Modifier.padding(start = 8.dp))
                     }
@@ -273,7 +275,7 @@ fun SettingsScreen(soundRepository: SoundRepository, audioPlayerController: Audi
                                 actionResult = "Cleared generated metadata for $cleared missing file entries."
                             }
                         }
-                        diagnostics = soundRepository.getAudioDiagnostics()
+                        diagnostics = withContext(Dispatchers.IO) { soundRepository.getAudioDiagnostics() }
                         confirmAction = null
                     }
                 }) { Text("CONFIRM", color = Color(0xFFF87171)) }

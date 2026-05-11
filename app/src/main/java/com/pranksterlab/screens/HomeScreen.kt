@@ -60,6 +60,8 @@ import com.pranksterlab.theme.OnBackground
 import com.pranksterlab.theme.OrangeAccent
 import com.pranksterlab.theme.OutlineDark
 import com.pranksterlab.theme.PrimaryContainer
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @Composable
 fun HomeScreen(
@@ -76,7 +78,7 @@ fun HomeScreen(
     val playbackState by audioPlayerController.playbackState.collectAsState()
 
     LaunchedEffect(Unit) {
-        val bundled = soundRepository.getBundledSounds()
+        val bundled = withContext(Dispatchers.IO) { soundRepository.getBundledSounds() }
         soundRepository.getCustomSoundsFlow().collect { custom ->
             soundsList = bundled + custom
         }

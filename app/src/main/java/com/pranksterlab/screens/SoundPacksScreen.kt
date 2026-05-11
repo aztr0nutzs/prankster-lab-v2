@@ -30,6 +30,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,6 +54,8 @@ import com.pranksterlab.theme.FuchsiaAccent
 import com.pranksterlab.theme.GlassBackground
 import com.pranksterlab.theme.LimeAccent
 import com.pranksterlab.theme.OrangeAccent
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @Composable
 fun SoundPacksScreen(soundRepository: SoundRepository, audioPlayerController: AudioPlayerController, onOpenLibrary: () -> Unit) {
@@ -60,12 +63,16 @@ fun SoundPacksScreen(soundRepository: SoundRepository, audioPlayerController: Au
     var customSounds by remember { mutableStateOf(emptyList<PrankSound>()) }
 
     LaunchedEffect(Unit) {
-        bundledSounds = soundRepository.getBundledSounds()
+        bundledSounds = withContext(Dispatchers.IO) { soundRepository.getBundledSounds() }
         soundRepository.getCustomSoundsFlow().collect { customSounds = it }
     }
 
-    val validSounds = (bundledSounds + customSounds).filter { soundRepository.isSoundPlayable(it) }
-    val packSummaries = soundRepository.buildPackSummaries(validSounds)
+    val validSounds by produceState(initialValue = emptyList<PrankSound>(), bundledSounds, customSounds) {
+        value = withContext(Dispatchers.IO) {
+            (bundledSounds + customSounds).filter { soundRepository.isSoundPlayable(it) }
+        }
+    }
+    val packSummaries = remember(validSounds) { soundRepository.buildPackSummaries(validSounds) }
 
     Box(modifier = Modifier.fillMaxSize().background(BackgroundDark)) {
         ScanlineOverlay()

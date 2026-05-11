@@ -26,6 +26,9 @@ android {
         compose = true
         buildConfig = true
     }
+    androidResources {
+        noCompress += listOf("mp3", "ogg", "oga", "wav", "m4a", "aac", "flac", "opus", "amr")
+    }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.14"
     }

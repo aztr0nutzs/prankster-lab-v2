@@ -45,6 +45,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -68,7 +69,9 @@ import com.pranksterlab.theme.CyanAccent
 import com.pranksterlab.theme.FuchsiaAccent
 import com.pranksterlab.theme.LimeAccent
 import com.pranksterlab.theme.OrangeAccent
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 private const val FILTER_ALL = "ALL"
 private const val FILTER_FAVORITES = "FAVORITES"
@@ -90,12 +93,13 @@ fun LibraryScreen(
     var isSearchActive by remember { mutableStateOf(false) }
     var showDiagnostics by remember { mutableStateOf(false) }
     val activePackFilter by soundRepository.activePackFilter.collectAsState()
+    val playbackState by audioPlayerController.playbackState.collectAsState()
 
     val favoriteIds by soundRepository.getFavoritesFlow().collectAsState(initial = emptySet())
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
-        bundledSounds = soundRepository.getBundledSounds()
+        bundledSounds = withContext(Dispatchers.IO) { soundRepository.getBundledSounds() }
         soundRepository.getCustomSoundsFlow().collect { customSounds = it }
     }
 
@@ -103,14 +107,16 @@ fun LibraryScreen(
         selectedPack = activePackFilter
     }
 
-    val allSounds = bundledSounds + customSounds
-    val validSounds = allSounds.filter { sound ->
-        soundRepository.isSoundPlayable(sound)
+    val validSounds by produceState(initialValue = emptyList<PrankSound>(), bundledSounds, customSounds) {
+        value = withContext(Dispatchers.IO) {
+            (bundledSounds + customSounds).filter { soundRepository.isSoundPlayable(it) }
+        }
     }
+    val allSounds = bundledSounds + customSounds
     val invalidSounds = allSounds - validSounds.toSet()
 
-    val packCounts = validSounds.mapNotNull { it.packId }.groupingBy { it }.eachCount()
-    val categoryCounts = validSounds.groupingBy { it.category }.eachCount()
+    val packCounts = remember(validSounds) { validSounds.mapNotNull { it.packId }.groupingBy { it }.eachCount() }
+    val categoryCounts = remember(validSounds) { validSounds.groupingBy { it.category }.eachCount() }
 
     val categoryChips = buildList {
         add("$FILTER_ALL (${validSounds.size})")
@@ -229,6 +235,7 @@ fun LibraryScreen(
                     HUDSoundCard(
                         sound = sound,
                         audioPlayerController = audioPlayerController,
+                        isPlaying = playbackState.isPlaying && playbackState.currentSoundId == sound.id,
                         isFavorite = favoriteIds.contains(sound.id),
                         onToggleFavorite = { scope.launch { soundRepository.toggleFavorite(sound.id) } },
                         onAddToSequence = {
@@ -291,13 +298,12 @@ fun Header(
 fun HUDSoundCard(
     sound: PrankSound,
     audioPlayerController: AudioPlayerController,
+    isPlaying: Boolean,
     isFavorite: Boolean,
     onToggleFavorite: () -> Unit,
     onAddToSequence: () -> Unit,
     onTimerShortcut: () -> Unit
 ) {
-    val playbackState by audioPlayerController.playbackState.collectAsState()
-    val isPlaying = playbackState.isPlaying && playbackState.currentSoundId == sound.id
     var loopEnabled by remember(sound.id) { mutableStateOf(sound.loopable) }
     val accentColor = when (sound.category) {
         "FUNNY", "CARTOON" -> FuchsiaAccent

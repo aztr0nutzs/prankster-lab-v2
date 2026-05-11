@@ -29,6 +29,8 @@ import com.pranksterlab.core.model.PrankSound
 import com.pranksterlab.core.repository.SoundRepository
 import com.pranksterlab.theme.*
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 enum class TimerState {
     IDLE, COUNTDOWN, PLAYING
@@ -47,9 +49,11 @@ fun TimerPrankScreen(soundRepository: SoundRepository, audioPlayerController: Au
     val playbackState by audioPlayerController.playbackState.collectAsState()
 
     LaunchedEffect(Unit) {
-        val bundled = soundRepository.getBundledSounds()
+        val bundled = withContext(Dispatchers.IO) { soundRepository.getBundledSounds() }
         soundRepository.getCustomSoundsFlow().collect { custom ->
-            soundsList = (bundled + custom).filter { soundRepository.isSoundPlayable(it) }
+            soundsList = withContext(Dispatchers.IO) {
+                (bundled + custom).filter { soundRepository.isSoundPlayable(it) }
+            }
         }
     }
 
