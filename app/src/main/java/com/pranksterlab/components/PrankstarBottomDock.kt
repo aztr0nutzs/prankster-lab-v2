@@ -6,10 +6,9 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -50,10 +49,10 @@ data class DockTab(
 
 private val dockTabs = listOf(
     DockTab("home", "CORE", "Navigate to Core", Icons.Default.Bolt),
-    DockTab("library", "LIBRARY", "Navigate to Library", Icons.Default.LibraryMusic),
+    DockTab("library", "STASH", "Navigate to Library", Icons.Default.LibraryMusic),
     DockTab("forge", "FORGE", "Navigate to Forge", Icons.Default.Extension),
     DockTab("voice_lab", "JOKES", "Navigate to Jokes", Icons.Default.RecordVoiceOver),
-    DockTab("system", "SYSTEM", "Navigate to System", Icons.Default.Settings),
+    DockTab("system", "SYS", "Navigate to System", Icons.Default.Settings),
 )
 
 @Composable
@@ -65,16 +64,28 @@ fun PrankstarBottomDock(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 12.dp, vertical = 8.dp)
-            .height(92.dp)
-            .clip(RoundedCornerShape(26.dp))
+            .padding(horizontal = 12.dp, vertical = 6.dp)
+            .height(78.dp)
+            .clip(RoundedCornerShape(22.dp))
+            .background(Color(0xFF0B1017))
+            .border(
+                width = 1.dp,
+                brush = Brush.horizontalGradient(
+                    listOf(
+                        Color(0xFF4A6576).copy(alpha = 0.9f),
+                        Color(0xFF1E2732),
+                        Color(0xFF63879C).copy(alpha = 0.85f),
+                    )
+                ),
+                shape = RoundedCornerShape(22.dp)
+            )
     ) {
         Image(
             painter = painterResource(id = R.drawable.prankstar_dock_main),
             contentDescription = null,
             modifier = Modifier.matchParentSize(),
-            contentScale = ContentScale.FillBounds,
-            alpha = 0.56f,
+            contentScale = ContentScale.Fit,
+            alpha = 0.14f,
         )
 
         Box(
@@ -94,8 +105,8 @@ fun PrankstarBottomDock(
         Row(
             modifier = Modifier
                 .matchParentSize()
-                .padding(horizontal = 9.dp, vertical = 9.dp),
-            horizontalArrangement = Arrangement.spacedBy(7.dp),
+                .padding(horizontal = 6.dp, vertical = 6.dp),
+            horizontalArrangement = Arrangement.spacedBy(5.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             dockTabs.forEach { tab ->
@@ -106,8 +117,7 @@ fun PrankstarBottomDock(
                 Box(
                     modifier = Modifier
                         .weight(1f)
-                        .fillMaxHeight()
-                        .defaultMinSize(minHeight = 48.dp)
+                        .height(66.dp)
                         .clip(tabShape)
                         .then(
                             if (isSelected) {
@@ -153,19 +163,19 @@ fun PrankstarBottomDock(
                                 )
                         )
                     }
-                    Row(horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
                         Icon(
                             imageVector = tab.icon,
                             contentDescription = null,
                             tint = if (isSelected) Color.White else Color(0xFF8EA0A9),
-                            modifier = Modifier.size(16.dp),
+                            modifier = Modifier.size(17.dp),
                         )
                         Text(
                             text = tab.label,
                             color = if (isSelected) Color.White else Color(0xFF8EA0A9),
                             fontSize = 10.sp,
                             fontWeight = if (isSelected) FontWeight.Black else FontWeight.Medium,
-                            modifier = Modifier.padding(start = 4.dp),
+                            maxLines = 1,
                         )
                     }
                 }

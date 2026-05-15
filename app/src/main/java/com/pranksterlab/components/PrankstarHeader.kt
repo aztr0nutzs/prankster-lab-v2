@@ -84,7 +84,7 @@ fun PrankstarHeader(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .heightIn(min = 132.dp, max = 156.dp)
+            .heightIn(min = 88.dp, max = 108.dp)
             .clip(shape)
             .background(Color.Black)
             .border(
@@ -103,7 +103,7 @@ fun PrankstarHeader(
             painter = painterResource(id = imageRes),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop,
+            contentScale = ContentScale.Fit,
         )
 
         Box(
