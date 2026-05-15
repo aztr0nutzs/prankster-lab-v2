@@ -1,0 +1,1 @@
+No device logs captured; environment lacks Android SDK/adb.

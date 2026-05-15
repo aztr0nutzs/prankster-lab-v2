@@ -18,7 +18,7 @@ import kotlin.coroutines.resume
 
 class AndroidTextToSpeechEngine(context: Context) : VoiceSynthesisEngine {
     private val initResult = CompletableDeferred<VoiceEngineReadiness>()
-    private val _readiness = MutableStateFlow<VoiceEngineReadiness>(VoiceEngineReadiness.Initializing)
+    private val _readiness = MutableStateFlow<VoiceEngineReadiness>(VoiceEngineReadiness.INITIALIZING)
     override val readiness: StateFlow<VoiceEngineReadiness> = _readiness
     private val mainHandler = Handler(Looper.getMainLooper())
     private var tts: TextToSpeech? = null
@@ -27,20 +27,20 @@ class AndroidTextToSpeechEngine(context: Context) : VoiceSynthesisEngine {
         tts = TextToSpeech(context.applicationContext) { status ->
             mainHandler.post {
                 if (status != TextToSpeech.SUCCESS) {
-                    publishReadiness(VoiceEngineReadiness.Unavailable)
+                    publishReadiness(VoiceEngineReadiness.UNAVAILABLE)
                     return@post
                 }
 
                 val engine = tts
                 if (engine == null) {
-                    publishReadiness(VoiceEngineReadiness.Error("TextToSpeech engine did not initialize."))
+                    publishReadiness(VoiceEngineReadiness.ERROR("TextToSpeech engine did not initialize."))
                     return@post
                 }
 
                 when (engine.setLanguage(Locale.getDefault())) {
-                    TextToSpeech.LANG_MISSING_DATA -> publishReadiness(VoiceEngineReadiness.Error("TTS language data is missing."))
-                    TextToSpeech.LANG_NOT_SUPPORTED -> publishReadiness(VoiceEngineReadiness.Error("TTS language is unsupported on this device."))
-                    else -> publishReadiness(VoiceEngineReadiness.Ready)
+                    TextToSpeech.LANG_MISSING_DATA -> publishReadiness(VoiceEngineReadiness.ERROR("TTS language data is missing."))
+                    TextToSpeech.LANG_NOT_SUPPORTED -> publishReadiness(VoiceEngineReadiness.ERROR("TTS language is unsupported on this device."))
+                    else -> publishReadiness(VoiceEngineReadiness.READY)
                 }
             }
         }
@@ -48,7 +48,7 @@ class AndroidTextToSpeechEngine(context: Context) : VoiceSynthesisEngine {
 
     override suspend fun synthesizeToFile(settings: VoiceGeneratorSettings, outputFile: File): VoiceSynthesisResult {
         val readyState = awaitReady()
-        if (readyState !is VoiceEngineReadiness.Ready) {
+        if (readyState !is VoiceEngineReadiness.READY) {
             return failure(outputFile, readinessMessage(readyState))
         }
 
@@ -73,6 +73,7 @@ class AndroidTextToSpeechEngine(context: Context) : VoiceSynthesisEngine {
 
                     override fun onDone(doneUtteranceId: String?) {
                         if (doneUtteranceId == utteranceId && cont.isActive) {
+                            engine.setOnUtteranceProgressListener(null)
                             cont.resume(validateOutput(outputFile))
                         }
                     }
@@ -80,30 +81,38 @@ class AndroidTextToSpeechEngine(context: Context) : VoiceSynthesisEngine {
                     @Deprecated("Deprecated in Java")
                     override fun onError(errorUtteranceId: String?) {
                         if (errorUtteranceId == utteranceId && cont.isActive) {
+                            engine.setOnUtteranceProgressListener(null)
                             cont.resume(failure(outputFile, "TextToSpeech synthesis failed."))
                         }
                     }
 
                     override fun onError(errorUtteranceId: String?, errorCode: Int) {
                         if (errorUtteranceId == utteranceId && cont.isActive) {
+                            engine.setOnUtteranceProgressListener(null)
                             cont.resume(failure(outputFile, "TextToSpeech synthesis failed with error code $errorCode."))
                         }
                     }
                 })
 
                 val startResult = engine.synthesizeToFile(settings.text, params, outputFile, utteranceId)
-                if (startResult == TextToSpeech.ERROR && cont.isActive) {
+                if (startResult != TextToSpeech.SUCCESS && cont.isActive) {
+                    engine.setOnUtteranceProgressListener(null)
                     cont.resume(failure(outputFile, "TextToSpeech could not start file synthesis."))
                 }
+                cont.invokeOnCancellation { engine.setOnUtteranceProgressListener(null) }
             }
         }
 
-        return synthesisResult ?: failure(outputFile, "TextToSpeech synthesis timed out.")
+        if (synthesisResult == null) {
+            engine.setOnUtteranceProgressListener(null)
+            return failure(outputFile, "TextToSpeech synthesis timed out.")
+        }
+        return synthesisResult
     }
 
     override fun preview(settings: VoiceGeneratorSettings) {
         val engine = tts ?: return
-        if (readiness.value !is VoiceEngineReadiness.Ready) return
+        if (readiness.value !is VoiceEngineReadiness.READY) return
         engine.setPitch(settings.pitch)
         engine.setSpeechRate(settings.speechRate)
         val params = Bundle().apply { putFloat(TextToSpeech.Engine.KEY_PARAM_VOLUME, settings.volume) }
@@ -115,8 +124,8 @@ class AndroidTextToSpeechEngine(context: Context) : VoiceSynthesisEngine {
 
     private suspend fun awaitReady(): VoiceEngineReadiness {
         return when (val current = readiness.value) {
-            VoiceEngineReadiness.Initializing -> withTimeoutOrNull(INIT_TIMEOUT_MS) { initResult.await() }
-                ?: VoiceEngineReadiness.Error("TextToSpeech initialization timed out.")
+            VoiceEngineReadiness.INITIALIZING -> withTimeoutOrNull(INIT_TIMEOUT_MS) { initResult.await() }
+                ?: VoiceEngineReadiness.ERROR("TextToSpeech initialization timed out.")
             else -> current
         }
     }
@@ -155,10 +164,10 @@ class AndroidTextToSpeechEngine(context: Context) : VoiceSynthesisEngine {
 
     private fun readinessMessage(state: VoiceEngineReadiness): String {
         return when (state) {
-            VoiceEngineReadiness.Initializing -> "TextToSpeech is still initializing."
-            VoiceEngineReadiness.Ready -> ""
-            VoiceEngineReadiness.Unavailable -> "TextToSpeech engine is unavailable on this device."
-            is VoiceEngineReadiness.Error -> state.message
+            VoiceEngineReadiness.INITIALIZING -> "TextToSpeech is still initializing."
+            VoiceEngineReadiness.READY -> ""
+            VoiceEngineReadiness.UNAVAILABLE -> "TextToSpeech engine is unavailable on this device."
+            is VoiceEngineReadiness.ERROR -> state.message
         }
     }
 
