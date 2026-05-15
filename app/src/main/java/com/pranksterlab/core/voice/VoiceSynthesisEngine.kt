@@ -4,10 +4,10 @@ import java.io.File
 import kotlinx.coroutines.flow.StateFlow
 
 sealed interface VoiceEngineReadiness {
-    data object Initializing : VoiceEngineReadiness
-    data object Ready : VoiceEngineReadiness
-    data object Unavailable : VoiceEngineReadiness
-    data class Error(val message: String) : VoiceEngineReadiness
+    data object INITIALIZING : VoiceEngineReadiness
+    data object READY : VoiceEngineReadiness
+    data object UNAVAILABLE : VoiceEngineReadiness
+    data class ERROR(val message: String) : VoiceEngineReadiness
 }
 
 data class VoiceSynthesisResult(
