@@ -96,6 +96,20 @@
      release() }` would skip `reset()`/`release()` if `isPlaying`
      threw on an illegally-stated player.
 - The new player:
+  - Constructs the `MediaPlayer` inside the `try` block so a thrown
+    constructor (e.g. `OutOfMemoryError`) cannot leak resources or
+    bypass the error callback.
+  - Assigns `mediaPlayer = player` immediately after construction so
+    a concurrent `stop()` (e.g. screen dispose during preparation)
+    actually finds the player to release. The `OnPreparedListener`
+    re-checks `mediaPlayer === prepared` before calling `start()` so
+    a player that was cancelled mid-`prepareAsync()` does not begin
+    playback after release.
+  - Uses `prepareAsync()` + `setOnPreparedListener` rather than the
+    blocking `prepare()` so the call cannot stall the Compose UI
+    thread on slow storage or large files. The UI status shows
+    "Preparing preview..." until `onStarted` fires, then flips to
+    "Previewing generated audio."
   - Constructs the `MediaPlayer` outside the lambda scope so the
     listeners' `stop()` unambiguously calls `ManagedPreviewPlayer.stop()`.
   - Validates the file exists and is non-empty before touching the

@@ -64,15 +64,31 @@ import java.io.File
 private class ManagedPreviewPlayer {
     private var mediaPlayer: MediaPlayer? = null
 
-    fun play(file: File, onError: (String) -> Unit, onComplete: () -> Unit): Boolean {
+    fun play(
+        file: File,
+        onStarted: () -> Unit,
+        onError: (String) -> Unit,
+        onComplete: () -> Unit
+    ): Boolean {
         stop()
         if (!file.exists() || file.length() <= 0L) {
             onError("Preview source is missing or empty.")
             return false
         }
-        val player = MediaPlayer()
         return try {
+            val player = MediaPlayer()
+            mediaPlayer = player
             player.setDataSource(file.absolutePath)
+            player.setOnPreparedListener { prepared ->
+                if (mediaPlayer !== prepared) return@setOnPreparedListener
+                try {
+                    prepared.start()
+                    onStarted()
+                } catch (t: Throwable) {
+                    stop()
+                    onError(t.message ?: "Unable to start preview playback.")
+                }
+            }
             player.setOnCompletionListener {
                 stop()
                 onComplete()
@@ -82,13 +98,10 @@ private class ManagedPreviewPlayer {
                 onError("Preview playback failed ($what/$extra).")
                 true
             }
-            player.prepare()
-            player.start()
-            mediaPlayer = player
+            player.prepareAsync()
             true
         } catch (t: Throwable) {
-            releasePlayer(player)
-            if (mediaPlayer === player) mediaPlayer = null
+            stop()
             onError(t.message ?: "Unable to preview generated audio.")
             false
         }
@@ -318,8 +331,12 @@ fun VoiceJokeGeneratorScreen(soundRepository: SoundRepository) {
                             return@Button
                         }
                         tts.stopPreview()
-                        val started = previewPlayer.play(
+                        val scheduled = previewPlayer.play(
                             file = file,
+                            onStarted = {
+                                status = "PREVIEWING"
+                                statusDetail = "Previewing generated audio."
+                            },
                             onError = {
                                 status = "ERROR"
                                 statusDetail = it
@@ -329,9 +346,9 @@ fun VoiceJokeGeneratorScreen(soundRepository: SoundRepository) {
                                 statusDetail = "Preview complete. Save to Library when ready."
                             }
                         )
-                        if (started) {
+                        if (scheduled) {
                             status = "PREVIEWING"
-                            statusDetail = "Previewing generated audio."
+                            statusDetail = "Preparing preview..."
                         }
                     }, enabled = canUseGeneratedFile && status != "GENERATING") { Text("Preview") }
                     Button(onClick = {
