@@ -64,33 +64,59 @@ import java.io.File
 private class ManagedPreviewPlayer {
     private var mediaPlayer: MediaPlayer? = null
 
-    fun play(file: File, onError: (String) -> Unit, onComplete: () -> Unit): Boolean {
+    fun play(
+        file: File,
+        onStarted: () -> Unit,
+        onError: (String) -> Unit,
+        onComplete: () -> Unit
+    ): Boolean {
         stop()
-        return runCatching {
-            MediaPlayer().apply {
-                setDataSource(file.absolutePath)
-                setOnCompletionListener {
+        if (!file.exists() || file.length() <= 0L) {
+            onError("Preview source is missing or empty.")
+            return false
+        }
+        return try {
+            val player = MediaPlayer()
+            mediaPlayer = player
+            player.setDataSource(file.absolutePath)
+            player.setOnPreparedListener { prepared ->
+                if (mediaPlayer !== prepared) return@setOnPreparedListener
+                try {
+                    prepared.start()
+                    onStarted()
+                } catch (t: Throwable) {
                     stop()
-                    onComplete()
+                    onError(t.message ?: "Unable to start preview playback.")
                 }
-                setOnErrorListener { _, what, extra ->
-                    stop()
-                    onError("Preview playback failed ($what/$extra).")
-                    true
-                }
-                prepare()
-                start()
-            }.also { mediaPlayer = it }
-        }.onFailure { onError(it.message ?: "Unable to preview generated audio.") }.isSuccess
+            }
+            player.setOnCompletionListener {
+                stop()
+                onComplete()
+            }
+            player.setOnErrorListener { _, what, extra ->
+                stop()
+                onError("Preview playback failed ($what/$extra).")
+                true
+            }
+            player.prepareAsync()
+            true
+        } catch (t: Throwable) {
+            stop()
+            onError(t.message ?: "Unable to preview generated audio.")
+            false
+        }
     }
 
     fun stop() {
-        mediaPlayer?.runCatching {
-            if (isPlaying) stop()
-            reset()
-            release()
-        }
+        val player = mediaPlayer ?: return
         mediaPlayer = null
+        releasePlayer(player)
+    }
+
+    private fun releasePlayer(player: MediaPlayer) {
+        try { if (player.isPlaying) player.stop() } catch (_: Throwable) {}
+        try { player.reset() } catch (_: Throwable) {}
+        try { player.release() } catch (_: Throwable) {}
     }
 }
 
@@ -261,10 +287,11 @@ fun VoiceJokeGeneratorScreen(soundRepository: SoundRepository) {
                             statusDetail = "Voice engine is not ready."
                             return@Button
                         }
+                        previewPlayer.stop()
                         status = "PREVIEWING"
                         statusDetail = "Previewing ${preset.displayName}."
                         tts.preview(VoiceGeneratorSettings(preset, preset.samplePhrase, pitch, speed, volume, preset.toneStyle, effect, echo, outputName))
-                    }, enabled = ttsReadiness is VoiceEngineReadiness.READY) { Text("Preview Voice Style") }
+                    }, enabled = ttsReadiness is VoiceEngineReadiness.READY && status != "GENERATING") { Text("Preview Voice Style") }
                 }
             }
             item {
@@ -303,8 +330,13 @@ fun VoiceJokeGeneratorScreen(soundRepository: SoundRepository) {
                             statusDetail = "Generated audio file is missing or empty."
                             return@Button
                         }
-                        val started = previewPlayer.play(
+                        tts.stopPreview()
+                        val scheduled = previewPlayer.play(
                             file = file,
+                            onStarted = {
+                                status = "PREVIEWING"
+                                statusDetail = "Previewing generated audio."
+                            },
                             onError = {
                                 status = "ERROR"
                                 statusDetail = it
@@ -314,11 +346,11 @@ fun VoiceJokeGeneratorScreen(soundRepository: SoundRepository) {
                                 statusDetail = "Preview complete. Save to Library when ready."
                             }
                         )
-                        if (started) {
+                        if (scheduled) {
                             status = "PREVIEWING"
-                            statusDetail = "Previewing generated audio."
+                            statusDetail = "Preparing preview..."
                         }
-                    }, enabled = canUseGeneratedFile) { Text("Preview") }
+                    }, enabled = canUseGeneratedFile && status != "GENERATING") { Text("Preview") }
                     Button(onClick = {
                         previewPlayer.stop()
                         tts.stopPreview()
