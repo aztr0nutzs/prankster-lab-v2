@@ -89,6 +89,7 @@ fun PrankMessagesScreen() {
                 subtitle = "Transparent Prank Text Console",
                 imageRes = R.drawable.header_joke_gen,
                 statusLabel = selectedCategory,
+                showTextOverlay = false,
                 modifier = Modifier.padding(horizontal = 0.dp)
             )
             Spacer(modifier = Modifier.height(16.dp))

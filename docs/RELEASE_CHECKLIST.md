@@ -1,111 +1,94 @@
-# RELEASE_CHECKLIST.md
+# Release Checklist
 
-Last updated: 2026-05-07
+Last updated: 2026-05-11
 
-## RELEASE READINESS SCORE
+## Release Position
 
-Current score:
-82 / 100
+Do not claim production-ready status yet. The debug APK builds through the Windows SDK/JDK flow and audio validators pass, but live device QA has not completed in the latest pass.
 
-Recommendation:
-Do not publish yet. The APK builds and automated audio validation passes, but device manual QA and dependency audit remediation remain open.
+## Build
 
-## REQUIRED COMMANDS
+- [x] Run Android environment check before Gradle
+- [ ] Linux/devcontainer `./scripts/build-android-debug.sh` passes
+- [x] Windows `.\scripts\build-android-debug.ps1` passes
+- [x] APK exists at `app/build/outputs/apk/debug/app-debug.apk`
+- [ ] Build warnings reviewed and triaged
+- [ ] Release signing build validated
 
-Run before every release candidate:
+## Validators
 
-```powershell
-.\gradlew.bat clean assembleDebug --stacktrace --console=plain
-python tools\validate_sound_catalog.py
-node tools\validate_sound_assets.cjs
-node tools\validator_v3.cjs
-npm audit --audit-level=high
-```
+- [x] `python3 tools/validate_sound_catalog.py`
+- [x] `node tools/advanced_validate.cjs`
+- [ ] Optional broader validator sweep reviewed
+- [ ] Dependency audit triaged
 
-## CURRENT AUTOMATED RESULTS
+## Install
 
-Build:
-PASS
+- [ ] `adb devices` lists a target
+- [ ] `adb install -r app/build/outputs/apk/debug/app-debug.apk`
+- [ ] App launches through monkey command
+- [ ] No launch crash in logcat
 
-Audio validation:
-PASS
+## Screen QA
 
-npm audit:
-FAIL
+- [ ] Home/Core loads, header/core visible, dock active Core
+- [ ] Library loads 369 catalog sounds, search/filter works
+- [ ] Sound Forge loads and controls remain accessible
+- [ ] Voice Lab loads, preset library visible
+- [ ] Randomizer starts/stops
+- [ ] Timer selects sound and counts down
+- [ ] Packs shows real pack counts and opens Library
+- [ ] Settings diagnostics load
+- [ ] Prank Messages opens without sending SMS/share during QA
 
-Audit blocker:
-- `google-tts-api` depends on vulnerable `axios`.
+## Audio QA
 
-## AUDIO CHECKLIST
+- [ ] Home reactor play/stop
+- [ ] Library play/stop five sounds
+- [ ] No filename-reader audio
+- [ ] Randomizer plays only valid sounds
+- [ ] Timer playback works
+- [ ] Packs preview plays random valid pack sound
+- [ ] Stop All / kill switch behavior verified
 
-- [x] Catalog entries exist
-- [x] Catalog entries decode under validators
-- [x] No missing assets
-- [x] No unsupported extensions
-- [x] No UTF-8/TTS-substitute corruption
-- [x] No uncataloged packaged audio
-- [x] No orphan catalog rows
-- [x] No duplicate IDs
-- [x] No duplicate asset paths
-- [x] No unsafe filenames
+## Generated Voice QA
 
-## MANUAL DEVICE QA CHECKLIST
+- [ ] TTS unavailable path shows error without crash
+- [ ] TTS ready path enables Generate
+- [ ] Generated output file exists and is non-empty
+- [ ] Preview generated voice works
+- [ ] Save to Library works
+- [ ] Saved generated voice appears in Library
+- [ ] Generated voice can be played from Library
+- [ ] Generated voice can be selected in Timer
+- [ ] Randomizer include/exclude generated voice toggle works
+- [ ] Settings generated clip count is correct
 
-Status:
-NOT EXECUTED in current environment because `adb` is unavailable.
+## Screenshot QA
 
-Required on emulator or physical device:
-- [ ] Install debug APK
-- [ ] Launch app
-- [ ] Home loads
-- [ ] Reactor triggers real sound
-- [ ] Stop All works
-- [ ] Library search works
-- [ ] Library category filters work
-- [ ] SoundCard play/stop works
-- [ ] Timer plays selected real sound
-- [ ] Randomizer plays valid random sounds
-- [ ] Sequence Builder creates and plays a real sequence
-- [ ] Sound Forge generates WAV
-- [ ] Sound Forge preview works
-- [ ] Sound Forge save works
-- [ ] Generated sound appears in Library
-- [ ] Settings persist after app restart
+Capture current screenshots to `qa/screenshots/`:
 
-## PERFORMANCE CHECKLIST
+- [ ] `home_core.png`
+- [ ] `library.png`
+- [ ] `library_playing.png`
+- [ ] `forge.png`
+- [ ] `voice_lab.png`
+- [ ] `voice_lab_generated.png`
+- [ ] `randomizer.png`
+- [ ] `timer.png`
+- [ ] `packs.png`
+- [ ] `settings.png`
+- [ ] `messages.png`
 
-- [x] Shared app-level `AudioPlayerController`
-- [x] MediaPlayer release on stop/error/dispose
-- [x] Randomizer jobs cancellable
-- [x] Sequence playback job cancellable
-- [x] Catalog playability cache present
-- [ ] Device profiler pass
-- [ ] Long-session playback soak
+## Safety Review
 
-## ACCESSIBILITY CHECKLIST
+- [x] UI warns against real-person and official-alert impersonation
+- [x] Voice Lab does not claim MP3 export
+- [x] Generated clips are not classified as bundled assets
+- [ ] Device QA confirms safety warnings are visible
+- [ ] SMS/share flows are tested without sending messages
 
-- [x] Bottom dock labels/content descriptions
-- [x] Main action buttons generally labeled
-- [x] Strong dark/neon contrast
-- [x] Reduced animation setting persisted
-- [ ] TalkBack pass on device
-- [ ] Reduced animation applied globally
-- [ ] Icon-only controls reviewed screen-by-screen
+## Legacy / Inactive Areas
 
-## RELEASE BLOCKERS
-
-1. Manual device QA not executed.
-2. npm audit high severity vulnerabilities.
-3. Build warnings not fully triaged.
-4. No release signing/Play Store build validation performed.
-
-## RELEASE RECOMMENDATION
-
-Internal debug QA:
-Allowed.
-
-External beta:
-Not recommended until manual device QA passes.
-
-Production release:
-Blocked.
+- Sequence Builder code remains in the repository but no active `sequence` route is registered in `PranksterApp.kt`.
+- Do not list Sequence Builder as a release-critical active feature unless the route is restored and live QA passes.

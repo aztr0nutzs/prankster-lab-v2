@@ -67,10 +67,10 @@ Static/build-level inspection indicates these flows are implemented:
 - Reactor invokes real catalog playback through `AudioPlayerController`.
 - Stop All calls `audioPlayerController.stopAll()`.
 - Library search/filter uses real catalog metadata and validated playable sounds.
-- Sound cards support favorite, play/stop, loop toggle, sequence handoff, and timer handoff.
+- Sound cards support favorite, play/stop, loop toggle, generated-workflow handoff, and timer handoff.
 - Timer filters to playable sounds and accepts Library handoff.
 - Randomizer uses a ViewModel job, validates candidates, and stops MediaPlayer on shutdown.
-- Sequence Builder adds, removes, reorders, saves, loads, deletes, and plays real sounds.
+- Legacy Sequence Builder code remains in the repository, but no active `sequence` route is currently registered in `PranksterApp.kt`.
 - Sound Forge generates WAV files, previews them, and saves generated sounds into custom storage.
 - Settings persists DataStore-backed preferences.
 
@@ -83,7 +83,7 @@ Positive:
 - Single shared `AudioPlayerController` is remembered at app level and released on dispose.
 - `AudioPlayerController` releases MediaPlayer on stop/error/release.
 - Randomizer jobs are cancelled in `dispose()` and `onCleared()`.
-- Sequence playback job is cancellable and calls stop in cleanup.
+- Legacy sequence playback job code is cancellable and calls stop in cleanup, but it is inactive until the route is restored.
 - Repository caches playability probes for catalog assets.
 
 Risks:

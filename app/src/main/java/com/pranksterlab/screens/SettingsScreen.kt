@@ -61,6 +61,8 @@ import com.pranksterlab.theme.FuchsiaAccent
 import com.pranksterlab.theme.LimeAccent
 import com.pranksterlab.theme.OrangeAccent
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 
 @Composable
@@ -80,14 +82,18 @@ fun SettingsScreen(soundRepository: SoundRepository, audioPlayerController: Audi
     var actionResult by remember { mutableStateOf<String?>(null) }
     var showDeveloperDiagnostics by remember { mutableStateOf(false) }
     var generatedCount by remember { mutableIntStateOf(0) }
+    var missingGeneratedCount by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(savedVolume) {
         audioPlayerController.setMasterVolume(savedVolume)
     }
     LaunchedEffect(Unit) {
-        diagnostics = soundRepository.getAudioDiagnostics()
+        diagnostics = withContext(Dispatchers.IO) { soundRepository.getAudioDiagnostics() }
         soundRepository.getCustomSoundsFlow().collect { sounds ->
-            generatedCount = sounds.count { it.category.equals("VOICE_GENERATED", true) || it.packId.equals("voice_lab", true) || it.tags.any { tag -> tag.equals("generated", true) } }
+            generatedCount = sounds.count { soundRepository.isGeneratedVoiceClip(it) }
+            missingGeneratedCount = withContext(Dispatchers.IO) {
+                sounds.count { soundRepository.missingGeneratedFile(it) }
+            }
         }
     }
 
@@ -100,7 +106,8 @@ fun SettingsScreen(soundRepository: SoundRepository, audioPlayerController: Audi
                     title = "System Setup",
                     subtitle = "Diagnostics / Safety / App Control",
                     imageRes = R.drawable.header_settings,
-                    statusLabel = if ((diagnostics?.invalidCatalogSounds ?: 0) > 0) "ALERT" else "STABLE"
+                    statusLabel = if ((diagnostics?.invalidCatalogSounds ?: 0) > 0) "ALERT" else "STABLE",
+                    showTextOverlay = false
                 )
             }
 
@@ -164,13 +171,14 @@ fun SettingsScreen(soundRepository: SoundRepository, audioPlayerController: Audi
                         DiagnosticReadout("INVALID", diagnostics?.invalidCatalogSounds ?: 0, OrangeAccent, Modifier.weight(1f))
                     }
                     DiagnosticLine("Generated clips", "$generatedCount", CyanAccent)
+                    DiagnosticLine("Missing generated files", "$missingGeneratedCount", if (missingGeneratedCount > 0) OrangeAccent else Color.Gray)
                     if (showDeveloperDiagnostics) {
                         DiagnosticLine("Missing assets", "${diagnostics?.missingAssets ?: 0}")
                         DiagnosticLine("Uncataloged assets", "${diagnostics?.uncatalogedAssets ?: 0}")
                         DiagnosticLine("Last validation", diagnostics?.lastValidationResult ?: "Not run")
                         DiagnosticLine("Last playback error", playbackState.lastError ?: "None", if (playbackState.lastError == null) Color.Gray else Color(0xFFFCA5A5))
                     }
-                    Button(onClick = { diagnostics = soundRepository.getAudioDiagnostics() }, colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent), border = androidx.compose.foundation.BorderStroke(1.dp, FuchsiaAccent.copy(alpha = 0.4f))) {
+                    Button(onClick = { scope.launch { diagnostics = withContext(Dispatchers.IO) { soundRepository.getAudioDiagnostics() } } }, colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent), border = androidx.compose.foundation.BorderStroke(1.dp, FuchsiaAccent.copy(alpha = 0.4f))) {
                         Icon(Icons.Default.Refresh, "Refresh diagnostics", tint = FuchsiaAccent)
                         Text("REFRESH SCAN", color = FuchsiaAccent, modifier = Modifier.padding(start = 8.dp))
                     }
@@ -184,8 +192,8 @@ fun SettingsScreen(soundRepository: SoundRepository, audioPlayerController: Audi
                     LabelCaps("DATA CONTROL", color = CyanAccent)
                     ActionButton("Clear recent sounds") { confirmAction = "clear_recent" }
                     ActionButton("Clear favorites") { confirmAction = "clear_favorites" }
-                    ActionButton("Delete generated sounds") { confirmAction = "delete_generated" }
-                    ActionButton("Clear missing generated metadata") { confirmAction = "clear_missing_generated_meta" }
+                    ActionButton("Delete generated voice clips") { confirmAction = "delete_generated" }
+                    ActionButton("Clear missing generated voice entries") { confirmAction = "clear_missing_generated_meta" }
                     ActionButton("Reset Sound Forge presets") { confirmAction = "reset_forge" }
                     ActionButton("Open validation report") {
                         val report = findValidationReport(context.filesDir, context.cacheDir, context.getExternalFilesDir(null))
@@ -258,7 +266,7 @@ fun SettingsScreen(soundRepository: SoundRepository, audioPlayerController: Audi
                             }
                             "delete_generated" -> {
                                 val removed = soundRepository.deleteGeneratedSounds()
-                                actionResult = "Deleted $removed generated sounds."
+                                actionResult = "Deleted $removed generated voice clip(s). Sound Forge presets were not removed."
                             }
                             "reset_forge" -> {
                                 val removed = soundRepository.resetSoundForgePresets()
@@ -270,10 +278,10 @@ fun SettingsScreen(soundRepository: SoundRepository, audioPlayerController: Audi
                             }
                             "clear_missing_generated_meta" -> {
                                 val cleared = soundRepository.clearMissingGeneratedMetadata()
-                                actionResult = "Cleared generated metadata for $cleared missing file entries."
+                                actionResult = "Removed $cleared generated voice entry/entries with missing files."
                             }
                         }
-                        diagnostics = soundRepository.getAudioDiagnostics()
+                        diagnostics = withContext(Dispatchers.IO) { soundRepository.getAudioDiagnostics() }
                         confirmAction = null
                     }
                 }) { Text("CONFIRM", color = Color(0xFFF87171)) }

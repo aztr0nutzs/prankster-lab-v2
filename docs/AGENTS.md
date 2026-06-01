@@ -32,7 +32,7 @@ This project must remain a premium-quality Android prank laboratory application 
 - advanced reactor-core interactions
 - procedural sound generation
 - offline playback
-- sequence builder
+- legacy sequence-builder code retained but not currently routed
 - timers and randomizers
 - generated sound management
 
@@ -112,6 +112,6 @@ Production readiness requires:
 - no missing assets
 - no duplicate IDs or paths
 - manual app flow QA on device/emulator
-- stable playback across Home, Library, Timer, Randomizer, Sequence Builder, Sound Forge, and Settings
+- stable playback across Home, Library, Timer, Randomizer, Sound Forge, Voice Lab, Packs, Settings, and Prank Messages
 - dependency audit triaged
 - visually cohesive premium UI preserved

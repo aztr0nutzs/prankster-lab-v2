@@ -29,7 +29,7 @@
   <img src="./prankstar_sn1.png" alt="Prankster Lab visual showcase 1" width="92%" />
 </div>
 
-It is designed to feel less like a basic button board and more like a **stylized audio playground**: a place where users can browse categories, trigger sounds instantly, explore curated packs, and eventually build sequences, randomizers, and generated audio experiences.
+It is designed to feel less like a basic button board and more like a **stylized audio playground**: a place where users can browse categories, trigger sounds instantly, explore curated packs, and use randomizer, timer, Sound Forge, and Voice Lab workflows.
 
 ---
 
@@ -73,7 +73,7 @@ Prankster Lab v2 is built around a few major pillars:
 
 ### 4) Expandable audio system
 - Room for randomizer workflows
-- Sequence building
+- Legacy sequence-builder code is retained, but no active `sequence` route is currently registered
 - Generated sound management
 - Voice synthesis / procedural audio
 - Sound forge style editing features
@@ -194,10 +194,17 @@ npm run dev
 
 ### Android validation build
 ```bash
-./gradlew clean assembleDebug --stacktrace
+./scripts/android-env-check.sh
+./scripts/build-android-debug.sh
 ```
 
-If you’re working on audio or release preparation, the docs also reference catalog and asset validation commands that should be run before shipping.
+If the Bash shell lacks Java on `JAVA_HOME`/`PATH`, the Windows fallback used on this workstation is:
+
+```powershell
+.\scripts\build-android-debug.ps1
+```
+
+Build details and phone-controlled Codex/devcontainer setup are documented in `docs/CODEX_ANDROID_BUILD.md` and `docs/BUILD_RECEIPT.md`.
 
 ---
 
@@ -226,12 +233,13 @@ The repo documentation indicates the project is **not yet release-ready for prod
 - dependency audit remediation
 - build and toolchain cleanup
 - audio library integrity improvements
-- completion of randomizer and sequence builder features
+- completion of live device QA for Randomizer, Timer, Sound Forge, Voice Lab, Packs, Settings, and Prank Messages
 - further refinement of advanced visual/audio interactions
 
 ### Current readiness signal
-- Build: passing
+- Build: debug APK builds through the Windows SDK/JDK wrapper; Bash wrapper is blocked until Java is available in that shell
 - Audio validation: passing
+- Live device QA: blocked until an emulator/device is attached
 - Dependency audit: still needs remediation
 
 ---
@@ -244,7 +252,7 @@ Documented next-step work includes:
 2. Repair Android audio library
 3. Implement true audio validator
 4. Complete randomizer
-5. Rebuild sequence builder
+5. Decide whether to restore the legacy Sequence Builder route or keep it inactive
 6. Upgrade reactor core visuals
 7. Upgrade sound forge / waveform features
 

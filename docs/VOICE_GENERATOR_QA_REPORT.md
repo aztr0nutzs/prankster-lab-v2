@@ -1,65 +1,90 @@
 # Voice Generator QA Report
 
-Date: 2026-05-09 (UTC)
-Project: Prankster Lab Android
-Scope: Final QA pass for Voice Joke Generator replacing Sequencer
+Last updated: 2026-05-11
 
-## Build result
-- **Command**: `./gradlew clean assembleDebug --stacktrace`
-- **Result**: **FAIL**
-- **Root cause**: Android SDK is not available in this environment.
-  - `scripts/build-android-debug.sh` failed with: `ERROR: No Android SDK found via ANDROID_HOME/ANDROID_SDK_ROOT or common paths.`
-  - Gradle failed with: `SDK location not found` and `sdk.dir ... Directory does not exist`.
+## Scope
 
-## Voice preset count
-- Source: `app/src/main/java/com/pranksterlab/core/voice/VoicePreset.kt`
-- **Total presets**: 52
-- **Preset ID uniqueness**: PASS (no duplicate IDs found by static check)
-- **Category coverage**: PASS (all `VoiceCategory` enum values represented in `VoicePresetLibrary.presets`)
+This report covers Voice Lab / Joke Gen runtime hardening and current QA status. It does not claim live TTS success because no emulator/device was attached during the latest runtime QA pass.
 
-## Generation test result
-- **Status**: BLOCKED (runtime/device/emulator required)
-- **Static observations**:
-  - Voice generation route exists and points to `VoiceJokeGeneratorScreen`.
-  - Engine class exists (`AndroidTextToSpeechEngine`) and returns `WAV/PCM` format label.
-- **Limitation**: No Android runtime / no SDK / no emulator in this environment, so TTS initialization and file generation could not be executed.
+## Voice Preset Count
 
-## Preview test result
-- **Status**: BLOCKED (runtime/device/emulator required)
-- **Limitation**: Media playback lifecycle behavior (play/stop/repeat leak checks) requires device/emulator execution.
+Source:
 
-## Save test result
-- **Status**: BLOCKED (runtime/device/emulator required)
-- **Static observations**:
-  - Generated voice persistence path exists via `GeneratedVoiceRepository` into `SoundRepository`.
-- **Limitation**: Could not verify actual file existence post-save or persistence after app restart without runtime execution.
+- `app/src/main/java/com/pranksterlab/core/voice/VoicePreset.kt`
 
-## Library integration result
-- **Status**: PARTIAL (static PASS, runtime BLOCKED)
-- **Static observations**:
-  - Library screen contains generated voice metadata rendering hooks.
-- **Limitation**: Could not validate interactive playback/visibility in running app.
+Static count:
 
-## Cross-feature integration result
-- **Status**: PARTIAL (static PASS, runtime BLOCKED)
-- **Static observations**:
-  - Randomizer has generated-voice include toggle logic.
-  - App navigation includes `voice_lab` destination.
-- **Limitation**: Timer, Reactor, Packs, and diagnostics integration require runtime verification.
+- `52` `VoicePreset(...)` entries
 
-## Safety result
-- **Status**: PARTIAL PASS
-- **Static observations**:
-  - Warning text present in Voice Lab screen indicating synthetic styling presets.
-  - Preset names/descriptions do not reference real-person or celebrity voice cloning presets.
-- **Not verified at runtime**:
-  - Full UX visibility on all screen sizes/state paths.
+## Generation Behavior
 
-## Validator results
-- `python3 tools/validate_sound_catalog.py`: PASS (369 entries validated)
-- `node tools/advanced_validate.cjs`: PASS (369 files checked)
+Voice generation uses Android `TextToSpeech` through:
 
-## Known limitations
-1. No Android SDK available (`ANDROID_HOME`/`ANDROID_SDK_ROOT` unset, local `sdk.dir` points to non-existent Windows path).
-2. No emulator/device runtime available in this environment.
-3. Therefore, required manual/runtime QA checks (navigation tap flow, TTS generation, preview stop/replay behavior, save-and-restart persistence, Reactor/Timer end-to-end usage) are blocked.
+- `app/src/main/java/com/pranksterlab/core/voice/AndroidTextToSpeechEngine.kt`
+
+Current behavior:
+
+- exposes readiness states: `Initializing`, `Ready`, `Unavailable`, `Error(message)`
+- Generate is disabled until TTS is `Ready`
+- synthesis waits for TTS initialization
+- synthesis checks `synthesizeToFile` return code
+- success is reported only after `UtteranceProgressListener.onDone`
+- errors are reported from `onError`
+- synthesis times out if completion never arrives
+- output file is rejected if missing or zero bytes
+- output label is honest: `WAV/PCM`
+
+## Preview Behavior
+
+Preview uses the local Android TTS engine. Preview is gated by TTS readiness and does not use cloud TTS.
+
+Runtime preview was not verified in the latest pass because no emulator/device was attached.
+
+## Save Behavior
+
+Generated voice clips are saved through:
+
+- `app/src/main/java/com/pranksterlab/core/voice/GeneratedVoiceRepository.kt`
+- `app/src/main/java/com/pranksterlab/core/repository/SoundRepository.kt`
+
+Saved generated voice clips use:
+
+- category `VOICE_GENERATED`
+- pack ID `voice_lab`
+- `SoundSourceType.GENERATED`
+- local file path in `assetPath` and `localUri`
+- tags `generated`, `voice`, `joke`, `custom`
+- source text and voice preset metadata when available
+
+The UI status is `GENERATED` after synthesis and changes to `SAVED TO LIBRARY` only after repository save succeeds.
+
+## Known TTS Limitations
+
+- Android TTS engine availability varies by device.
+- Language support varies by installed engine and user settings.
+- Output quality and exact file container are engine-dependent.
+- TTS cannot be verified without a device/emulator.
+- No cloud TTS has been added.
+- No MP3 export is claimed.
+
+## Safety Guardrails
+
+- Voice presets are synthetic styling presets.
+- The UI warns against real-person or official-alert impersonation.
+- Generation blocks obvious emergency/official-alert text such as `police` and `emergency`.
+- The app does not impersonate copyrighted or real voices.
+
+## QA Status
+
+- Static source audit: PASS
+- Debug build through PowerShell wrapper: PASS
+- Catalog validators: PASS
+- Live TTS generation/preview/save: BLOCKED, no device/emulator available
+
+## Remaining Voice Lab Work
+
+- Run on a physical device or emulator with a working TTS engine.
+- Confirm generation creates non-empty audio files.
+- Confirm preview starts/stops cleanly.
+- Confirm saved generated clips appear in Library after app restart.
+- Confirm unavailable TTS displays the error panel rather than crashing.

@@ -207,14 +207,9 @@ class RandomizerViewModel(
             val categoryAllowed = selectedCategories.isNotEmpty() && sound.category in selectedCategories
             val safeAllowed = !uiState.value.safeMode || sound.isSafeForRandomMode
             val durationAllowed = !uiState.value.safeMode || sound.durationMs <= 0L || sound.durationMs <= maxSafeDurationMs
-            val generatedAllowed = uiState.value.includeGeneratedVoiceClips || !sound.isGeneratedVoiceClip()
-            categoryAllowed && safeAllowed && durationAllowed && generatedAllowed && sound.id !in invalidIds
+            val generatedAllowed = uiState.value.includeGeneratedVoiceClips || !soundRepository.isGeneratedVoiceClip(sound)
+            val playable = soundRepository.isSoundPlayable(sound)
+            categoryAllowed && safeAllowed && durationAllowed && generatedAllowed && playable && sound.id !in invalidIds
         }
     }
-}
-
-private fun PrankSound.isGeneratedVoiceClip(): Boolean {
-    return category.equals("VOICE_GENERATED", true) ||
-        packId.equals("voice_lab", true) ||
-        tags.any { it.equals("generated", true) || it.equals("voice", true) }
 }

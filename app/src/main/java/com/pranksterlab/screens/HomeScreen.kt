@@ -60,6 +60,8 @@ import com.pranksterlab.theme.OnBackground
 import com.pranksterlab.theme.OrangeAccent
 import com.pranksterlab.theme.OutlineDark
 import com.pranksterlab.theme.PrimaryContainer
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @Composable
 fun HomeScreen(
@@ -76,7 +78,7 @@ fun HomeScreen(
     val playbackState by audioPlayerController.playbackState.collectAsState()
 
     LaunchedEffect(Unit) {
-        val bundled = soundRepository.getBundledSounds()
+        val bundled = withContext(Dispatchers.IO) { soundRepository.getBundledSounds() }
         soundRepository.getCustomSoundsFlow().collect { custom ->
             soundsList = bundled + custom
         }
@@ -90,13 +92,17 @@ fun HomeScreen(
     fun triggerReactor(category: String, intensity: Int) {
         val acceptsGeneratedVoice = category.equals("VOICE", true) || category.equals("GENERATED", true)
         val candidates = soundsList.filter { 
+            soundRepository.isSoundPlayable(it) &&
             it.isSafeForRandomMode && 
-            (it.category.equals(category, ignoreCase = true) || (acceptsGeneratedVoice && it.category.equals("VOICE_GENERATED", true))) &&
+            (it.category.equals(category, ignoreCase = true) || (acceptsGeneratedVoice && soundRepository.isGeneratedVoiceClip(it))) &&
             (if (intensity > 1) it.intensityLevel >= intensity else true)
         }
         
         val sound = if (candidates.isNotEmpty()) candidates.random() else {
-            soundsList.filter { it.category.equals(category, ignoreCase = true) || (acceptsGeneratedVoice && it.category.equals("VOICE_GENERATED", true)) }.randomOrNull()
+            soundsList.filter {
+                soundRepository.isSoundPlayable(it) &&
+                    (it.category.equals(category, ignoreCase = true) || (acceptsGeneratedVoice && soundRepository.isGeneratedVoiceClip(it)))
+            }.randomOrNull()
         }
 
         if (sound != null) {
@@ -171,7 +177,11 @@ fun HomeScreen(
         item {
             com.pranksterlab.components.reactor.QuickDeployPanel(
                 onDeploy = { cat ->
-                    val possible = soundsList.filter { it.category.equals(cat, ignoreCase = true) }
+                    val acceptsGeneratedVoice = cat.equals("VOICE", true) || cat.equals("GENERATED", true)
+                    val possible = soundsList.filter {
+                        soundRepository.isSoundPlayable(it) &&
+                            (it.category.equals(cat, ignoreCase = true) || (acceptsGeneratedVoice && soundRepository.isGeneratedVoiceClip(it)))
+                    }
                     val sound = possible.randomOrNull()
                     if (sound != null) {
                         val started = audioPlayerController.playPrankSound(sound)

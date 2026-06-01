@@ -25,7 +25,7 @@ Requirements:
 - stop handling
 
 ## TASK 5
-Rebuild Sequence Builder.
+Decide whether to restore the legacy Sequence Builder route or keep the code inactive.
 Requirements:
 - add/remove/reorder
 - playback chain

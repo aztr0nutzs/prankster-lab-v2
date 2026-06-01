@@ -1,7 +1,6 @@
 package com.pranksterlab.core.repository
 
 import android.content.Context
-import android.media.MediaMetadataRetriever
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -32,6 +31,7 @@ private val SUPPORTED_AUDIO_EXTENSIONS = setOf(
 class SoundRepository(private val context: Context) {
     private val gson = Gson()
     private val playabilityCache = mutableMapOf<String, Boolean>()
+    private var bundledSoundsCache: List<PrankSound>? = null
     private val CUSTOM_SOUNDS_KEY = stringPreferencesKey("custom_sounds_json")
     private val FAVORITES_KEY = stringSetPreferencesKey("favorite_sound_ids")
     private val SEQUENCE_PRESETS_KEY = stringPreferencesKey("sequence_presets_json")
@@ -51,15 +51,16 @@ class SoundRepository(private val context: Context) {
      * Loads the bundled sound catalog from assets.
      */
     fun getBundledSounds(): List<PrankSound> {
+        bundledSoundsCache?.let { return it }
         return try {
             val inputStream = context.assets.open("sound_catalog.json")
             val reader = InputStreamReader(inputStream)
             val listType = object : TypeToken<List<PrankSound>>() {}.type
-            gson.fromJson(reader, listType) ?: emptyList()
+            gson.fromJson(reader, listType) ?: emptyList<PrankSound>()
         } catch (e: Exception) {
             e.printStackTrace()
             emptyList()
-        }
+        }.also { bundledSoundsCache = it }
     }
 
     fun isCatalogSoundPlayable(sound: PrankSound): Boolean {
@@ -67,13 +68,14 @@ class SoundRepository(private val context: Context) {
         if (sound.assetPath.isBlank()) return false
         if (!hasSupportedExtension(sound.assetPath)) return false
         playabilityCache[sound.assetPath]?.let { return it }
-        return try {
+        val exists = try {
             context.assets.open(sound.assetPath).use { /* existence check */ }
-            canDecodeAsset(sound.assetPath).also { playabilityCache[sound.assetPath] = it }
+            true
         } catch (_: Exception) {
-            playabilityCache[sound.assetPath] = false
             false
         }
+        playabilityCache[sound.assetPath] = exists
+        return exists
     }
 
     fun isSoundPlayable(sound: PrankSound): Boolean {
@@ -93,29 +95,23 @@ class SoundRepository(private val context: Context) {
         }
     }
 
-    private fun hasSupportedExtension(path: String): Boolean {
-        return path.substringAfterLast('.', "").lowercase() in SUPPORTED_AUDIO_EXTENSIONS
+    fun isGeneratedVoiceClip(sound: PrankSound): Boolean {
+        return sound.category.equals("VOICE_GENERATED", true) ||
+            sound.packId.equals("voice_lab", true) ||
+            sound.generatedMetadata?.generatorType.equals("VOICE_LAB", true) ||
+            (sound.createdByUser && sound.tags.any { it.equals("generated", true) } && sound.tags.any { it.equals("voice", true) })
     }
 
-    private fun canDecodeAsset(assetPath: String): Boolean {
-        val retriever = MediaMetadataRetriever()
-        return try {
-            context.assets.openFd(assetPath).use { descriptor ->
-                retriever.setDataSource(
-                    descriptor.fileDescriptor,
-                    descriptor.startOffset,
-                    descriptor.length
-                )
-            }
-            val duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-            val hasAudio = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_HAS_AUDIO)
-            val durationMs = duration?.toLongOrNull() ?: 0L
-            durationMs > 0L && (hasAudio == null || hasAudio == "yes")
-        } catch (_: Exception) {
-            false
-        } finally {
-            try { retriever.release() } catch (_: Exception) {}
-        }
+    fun readableCategory(sound: PrankSound): String {
+        return if (isGeneratedVoiceClip(sound)) "Voice Generated" else sound.category.replace('_', ' ')
+    }
+
+    fun missingGeneratedFile(sound: PrankSound): Boolean {
+        return isGeneratedVoiceClip(sound) && !isSoundPlayable(sound)
+    }
+
+    private fun hasSupportedExtension(path: String): Boolean {
+        return path.substringAfterLast('.', "").lowercase() in SUPPORTED_AUDIO_EXTENSIONS
     }
 
     fun buildPackSummaries(sounds: List<PrankSound>): List<PackSummary> {
@@ -131,7 +127,7 @@ class SoundRepository(private val context: Context) {
                 )
             }
             .toMutableList()
-        val voiceGeneratedCount = sounds.count { it.category.equals("VOICE_GENERATED", true) || it.packId.equals("voice_lab", true) }
+        val voiceGeneratedCount = sounds.count { isGeneratedVoiceClip(it) }
         if (voiceGeneratedCount > 0 && base.none { it.packId.equals("voice_lab", true) }) {
             base.add(PackSummary(packId = "voice_lab", soundCount = voiceGeneratedCount, categoryFocus = "VOICE_GENERATED"))
         }
@@ -324,14 +320,14 @@ class SoundRepository(private val context: Context) {
 
     suspend fun deleteGeneratedSounds(): Int {
         val sounds = getCustomSoundsFlow().first()
-        val toRemove = sounds.filter { it.tags.any { tag -> tag.equals("generated", true) } || it.createdByUser && it.generatedMetadata != null }
+        val toRemove = sounds.filter { isGeneratedVoiceClip(it) }
         if (toRemove.isEmpty()) return 0
         toRemove.forEach { sound ->
             val path = sound.localUri ?: sound.assetPath
             if (path.isNotBlank() && !path.startsWith("content://") && !path.startsWith("file://")) {
                 runCatching {
                     val file = File(path)
-                    if (file.exists() && file.absolutePath.startsWith(context.filesDir.absolutePath)) {
+                    if (file.exists() && file.isFile && file.absolutePath.startsWith(context.filesDir.absolutePath)) {
                         file.delete()
                     }
                 }
@@ -347,11 +343,13 @@ class SoundRepository(private val context: Context) {
     suspend fun clearMissingGeneratedMetadata(): Int {
         val sounds = getCustomSoundsFlow().first()
         var changed = 0
-        val updated = sounds.map { sound ->
-            if (sound.generatedMetadata != null && !isSoundPlayable(sound)) {
+        val updated = sounds.filterNot { sound ->
+            if (missingGeneratedFile(sound)) {
                 changed++
-                sound.copy(generatedMetadata = null)
-            } else sound
+                true
+            } else {
+                false
+            }
         }
         if (changed > 0) {
             context.dataStore.edit { preferences ->

@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -46,6 +47,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -69,7 +71,9 @@ import com.pranksterlab.theme.CyanAccent
 import com.pranksterlab.theme.FuchsiaAccent
 import com.pranksterlab.theme.LimeAccent
 import com.pranksterlab.theme.OrangeAccent
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 private const val FILTER_ALL = "ALL"
 private const val FILTER_FAVORITES = "FAVORITES"
@@ -93,12 +97,13 @@ fun LibraryScreen(
     var isSearchActive by remember { mutableStateOf(false) }
     var showDiagnostics by remember { mutableStateOf(false) }
     val activePackFilter by soundRepository.activePackFilter.collectAsState()
+    val playbackState by audioPlayerController.playbackState.collectAsState()
 
     val favoriteIds by soundRepository.getFavoritesFlow().collectAsState(initial = emptySet())
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
-        bundledSounds = soundRepository.getBundledSounds()
+        bundledSounds = withContext(Dispatchers.IO) { soundRepository.getBundledSounds() }
         soundRepository.getCustomSoundsFlow().collect { customSounds = it }
     }
 
@@ -106,14 +111,16 @@ fun LibraryScreen(
         selectedPack = activePackFilter
     }
 
-    val allSounds = bundledSounds + customSounds
-    val validSounds = allSounds.filter { sound ->
-        soundRepository.isSoundPlayable(sound)
+    val validSounds by produceState(initialValue = emptyList<PrankSound>(), bundledSounds, customSounds) {
+        value = withContext(Dispatchers.IO) {
+            (bundledSounds + customSounds).filter { soundRepository.isSoundPlayable(it) }
+        }
     }
+    val allSounds = bundledSounds + customSounds
     val invalidSounds = allSounds - validSounds.toSet()
 
-    val packCounts = validSounds.mapNotNull { it.packId }.groupingBy { it }.eachCount()
-    val categoryCounts = validSounds.groupingBy { it.category }.eachCount()
+    val packCounts = remember(validSounds) { validSounds.mapNotNull { it.packId }.groupingBy { it }.eachCount() }
+    val categoryCounts = remember(validSounds) { validSounds.groupingBy { it.category }.eachCount() }
 
     val categoryChips = buildList {
         add("$FILTER_ALL (${validSounds.size})")
@@ -140,10 +147,12 @@ fun LibraryScreen(
         }
         val matchesPack = selectedPack == null || sound.packId == selectedPack
         val matchesSearch = if (searchQuery.isBlank()) true else {
-            sound.name.contains(searchQuery, true) ||
+                sound.name.contains(searchQuery, true) ||
                 sound.category.contains(searchQuery, true) ||
                 sound.tags.any { it.contains(searchQuery, true) } ||
-                (sound.packId?.contains(searchQuery, true) == true)
+                (sound.packId?.contains(searchQuery, true) == true) ||
+                (sound.generatedMetadata?.voicePresetName?.contains(searchQuery, true) == true) ||
+                (sound.generatedMetadata?.sourceText?.contains(searchQuery, true) == true)
         }
         matchesCategory && matchesPack && matchesSearch
     }
@@ -157,6 +166,7 @@ fun LibraryScreen(
                 subtitle = "Bundled Pranks / Generated Clips / Favorites",
                 imageRes = R.drawable.header_sound_stash,
                 statusLabel = "${validSounds.size} ASSETS",
+                showTextOverlay = false,
                 modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp)
             )
             Header(
@@ -232,10 +242,12 @@ fun LibraryScreen(
             }
 
             LazyColumn(modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(14.dp), contentPadding = PaddingValues(bottom = 100.dp)) {
-                items(filteredSounds, key = { it.id }) { sound ->
+                itemsIndexed(filteredSounds, key = { index, sound -> "${sound.id}:${sound.assetPath}:${sound.localUri ?: "bundled"}:$index" }) { _, sound ->
                     HUDSoundCard(
                         sound = sound,
+                        categoryLabel = soundRepository.readableCategory(sound),
                         audioPlayerController = audioPlayerController,
+                        isPlaying = playbackState.isPlaying && playbackState.currentSoundId == sound.id,
                         isFavorite = favoriteIds.contains(sound.id),
                         onToggleFavorite = { scope.launch { soundRepository.toggleFavorite(sound.id) } },
                         onCreateJoke = onCreateJoke,
@@ -294,14 +306,14 @@ fun Header(
 @Composable
 fun HUDSoundCard(
     sound: PrankSound,
+    categoryLabel: String,
     audioPlayerController: AudioPlayerController,
+    isPlaying: Boolean,
     isFavorite: Boolean,
     onToggleFavorite: () -> Unit,
     onCreateJoke: () -> Unit,
     onTimerShortcut: () -> Unit
 ) {
-    val playbackState by audioPlayerController.playbackState.collectAsState()
-    val isPlaying = playbackState.isPlaying && playbackState.currentSoundId == sound.id
     var loopEnabled by remember(sound.id) { mutableStateOf(sound.loopable) }
     val accentColor = when (sound.category) {
         "FUNNY", "CARTOON" -> FuchsiaAccent
@@ -315,7 +327,7 @@ fun HUDSoundCard(
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Top) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(sound.name.uppercase(), color = LimeAccent, style = MaterialTheme.typography.headlineSmall.copy(letterSpacing = 1.sp))
-                    Text("${readableCategory(sound.category)} • ${sound.packId ?: "UNPACKED"}", color = Color.Gray)
+                    Text("$categoryLabel • ${sound.packId ?: "UNPACKED"}", color = Color.Gray)
                     if (sound.isGeneratedSound()) {
                         sound.generatedMetadata?.voicePresetName?.let { preset ->
                             Text("VOICE: $preset", color = CyanAccent, style = MaterialTheme.typography.bodySmall)
