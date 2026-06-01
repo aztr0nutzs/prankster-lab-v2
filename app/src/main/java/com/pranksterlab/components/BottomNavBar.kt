@@ -29,10 +29,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pranksterlab.R
 import com.pranksterlab.theme.LimeAccent
+import com.pranksterlab.theme.OrbitronFamily
 
 @Composable
 fun BottomNavBar(currentRoute: String, onNavigate: (String) -> Unit) {
@@ -70,6 +73,15 @@ fun NavItem(icon: ImageVector, label: String, isSelected: Boolean, onClick: () -
     Column(modifier = Modifier.clickable(onClick = onClick).padding(horizontal = 4.dp, vertical = 4.dp), horizontalAlignment = Alignment.CenterHorizontally) {
         Icon(imageVector = icon, contentDescription = label, tint = color, modifier = Modifier.size(20.dp))
         Spacer(modifier = Modifier.height(2.dp))
-        Text(text = label, style = MaterialTheme.typography.labelSmall.copy(fontSize = 9.sp), color = color)
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall.copy(
+                fontFamily = OrbitronFamily,
+                fontSize = 9.sp,
+                fontStyle = FontStyle.Italic,
+                fontWeight = FontWeight.Black,
+            ),
+            color = color
+        )
     }
 }

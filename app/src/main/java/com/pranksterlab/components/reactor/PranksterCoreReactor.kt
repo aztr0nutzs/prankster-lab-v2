@@ -8,16 +8,7 @@ package com.pranksterlab.components.reactor
  * Architecture:
  *  ┌─ PranksterCoreReactor          public API composable, receives state + callbacks
  *  │   ├─ ReactorStatusBar          top telemetry row (CORE / LOADED / SAFE pills)
- *  │   ├─ ReactorCanvas             Canvas-based animated layers (rings, sweep, arcs)
- *  │   │   ├─ HudBrackets           corner bracket overlays
- *  │   │   ├─ OuterGlowHalo         radial glow + waveform rings
- *  │   │   ├─ TickRing              rotating outer tick marks
- *  │   │   ├─ SweepBeam             radar sweep arc
- *  │   │   ├─ CategoryArcRing       segmented category arcs (counter-rotates slowly)
- *  │   │   ├─ EnergySegmentRing     inner 40-segment charge/playing ring
- *  │   │   └─ (charge bar overlay)  animates during CHARGING
- *  │   ├─ CategoryIconOrbit         Box composables orbiting the centre for tap targets
- *  │   ├─ CoreImageNode             prankstar_core.png clipped to circle + overlays
+ *  │   ├─ FullReactorImage          prankstar_core.png as the complete reactor face
  *  │   └─ InfoReadout               sound name / category / error strip below reactor
  *
  * All existing ReactorCorePanel.kt behaviour is preserved here.
@@ -64,7 +55,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.PI
 import kotlin.math.abs
-import kotlin.math.cos
 import kotlin.math.sin
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -133,53 +123,6 @@ fun PranksterCoreReactor(
     // ─────────────────────────────────────────────────────────────────────
     val transition = rememberInfiniteTransition(label = "reactor_master")
 
-    val rotDuration = when (displayUiState.state) {
-        ReactorState.PLAYING    -> 1800
-        ReactorState.CHARGING   -> 1100
-        ReactorState.ERROR      -> 700
-        ReactorState.GENERATING -> 1000
-        ReactorState.ARMED      -> 6000
-        else                    -> 9000
-    }
-    val outerRotation by transition.animateFloat(
-        0f, 360f,
-        infiniteRepeatable(tween(rotDuration, easing = LinearEasing)),
-        label = "outer_rot"
-    )
-    val innerRotation by transition.animateFloat(
-        360f, 0f,
-        infiniteRepeatable(tween((rotDuration * 1.4f).toInt(), easing = LinearEasing)),
-        label = "inner_rot"
-    )
-
-    val pulseDuration = when (displayUiState.state) {
-        ReactorState.PLAYING    -> 700
-        ReactorState.CHARGING   -> 480
-        ReactorState.ERROR      -> 320
-        ReactorState.WARNING    -> 500
-        else                    -> 1700
-    }
-    val corePulse by transition.animateFloat(
-        0.94f, 1.10f,
-        infiniteRepeatable(tween(pulseDuration, easing = FastOutSlowInEasing), RepeatMode.Reverse),
-        label = "core_pulse"
-    )
-    val haloPulse by transition.animateFloat(
-        0.92f, 1.18f,
-        infiniteRepeatable(tween((pulseDuration * 1.6f).toInt(), easing = FastOutSlowInEasing), RepeatMode.Reverse),
-        label = "halo"
-    )
-    val glowAlpha by transition.animateFloat(
-        if (displayUiState.state == ReactorState.IDLE) 0.12f else 0.28f,
-        if (displayUiState.state == ReactorState.IDLE) 0.35f else 0.72f,
-        infiniteRepeatable(tween(1300, easing = LinearEasing), RepeatMode.Reverse),
-        label = "glow_alpha"
-    )
-    val sweepAngle by transition.animateFloat(
-        0f, 360f,
-        infiniteRepeatable(tween(2200, easing = LinearEasing)),
-        label = "sweep"
-    )
     val errorFlash by transition.animateFloat(
         0.2f, 1f,
         infiniteRepeatable(tween(220, easing = LinearEasing), RepeatMode.Reverse),
@@ -302,258 +245,30 @@ fun PranksterCoreReactor(
             contentAlignment = Alignment.Center
         ) {
 
-            // ── Layer 1: HUD corner brackets ─────────────────────────────
-            HudBrackets(accent = accentColor, alpha = glowAlpha)
-
-            // ── Layer 2: Outer radial glow halo ──────────────────────────
-            Canvas(modifier = Modifier.fillMaxSize().graphicsLayer { scaleX = haloPulse; scaleY = haloPulse }) {
-                drawCircle(
-                    brush = Brush.radialGradient(
-                        colors = listOf(accentColor.copy(alpha = glowAlpha * 0.45f), Color.Transparent),
-                        center = center,
-                        radius = size.minDimension / 1.05f
-                    )
-                )
-                // Concentric play rings
-                if (displayUiState.state == ReactorState.PLAYING || displayUiState.state == ReactorState.GENERATING) {
-                    for (ring in 0 until 3) {
-                        drawCircle(
-                            color = accentColor.copy(alpha = (0.22f - ring * 0.06f).coerceAtLeast(0f)),
-                            radius = size.minDimension / 2.1f + ring * 16.dp.toPx(),
-                            style = Stroke(width = 1.dp.toPx())
-                        )
-                    }
-                }
-            }
-
-            // ── Layer 3: Outer rotating tick ring ────────────────────────
-            Canvas(modifier = Modifier.size(310.dp)) {
-                rotate(outerRotation) {
-                    val ticks = 72
-                    val r = size.minDimension / 2f
-                    for (i in 0 until ticks) {
-                        val angle = i * (360f / ticks)
-                        val rad = angle * (PI / 180f).toFloat()
-                        val major = i % 6 == 0
-                        val len = if (major) 14.dp.toPx() else 6.dp.toPx()
-                        drawLine(
-                            color = if (major) accentColor.copy(alpha = 0.85f) else accentColor.copy(alpha = 0.25f),
-                            start = Offset(center.x + (r - len) * cos(rad), center.y + (r - len) * sin(rad)),
-                            end   = Offset(center.x + r * cos(rad), center.y + r * sin(rad)),
-                            strokeWidth = if (major) 1.6.dp.toPx() else 1.dp.toPx()
-                        )
-                    }
-                }
-            }
-
-            // ── Layer 4: Radar sweep beam ────────────────────────────────
-            Canvas(modifier = Modifier.size(300.dp)) {
-                rotate(sweepAngle) {
-                    drawCircle(
-                        brush = Brush.sweepGradient(
-                            0.0f to Color.Transparent,
-                            0.85f to Color.Transparent,
-                            0.97f to accentColor.copy(alpha = if (displayUiState.state == ReactorState.ERROR) errorFlash * 0.7f else 0.55f),
-                            1.0f  to Color.Transparent,
-                            center = center
-                        ),
-                        radius = size.minDimension / 2f
-                    )
-                }
-            }
-
-            // ── Layer 5: Category arc selector (counter-rotates gently) ──
-            Canvas(modifier = Modifier.size(280.dp)) {
-                rotate(outerRotation * 0.4f) {
-                    val gap = 10f
-                    val arcSweep = (360f / categories.size) - gap
-                    categories.forEachIndexed { i, cat ->
-                        val isSelected = cat == currentCategory
-                        drawArc(
-                            color = if (isSelected) accentColor else accentColor.copy(alpha = 0.18f),
-                            startAngle = i * (360f / categories.size),
-                            sweepAngle = arcSweep,
-                            useCenter = false,
-                            style = Stroke(
-                                width = if (isSelected) 7.dp.toPx() else 2.dp.toPx(),
-                                cap = StrokeCap.Round
-                            )
-                        )
-                    }
-                }
-            }
-
-            // ── Layer 6: Category icon orbit (individually tappable) ──────
-            categories.forEachIndexed { index, cat ->
-                val angle = (index * (360f / categories.size) - 90f) * (PI / 180f).toFloat()
-                val radiusDp = 132f
-                val isSelected = cat == currentCategory
-                Box(
-                    modifier = Modifier
-                        .offset(x = (radiusDp * cos(angle)).dp, y = (radiusDp * sin(angle)).dp)
-                        .size(38.dp)
-                        .clip(CircleShape)
-                        .background(if (isSelected) accentColor else Color.Black.copy(alpha = 0.85f))
-                        .border(1.dp, if (isSelected) Color.White.copy(alpha = 0.7f) else accentColor.copy(alpha = 0.25f), CircleShape)
-                        .semantics { contentDescription = "Select category: $cat" },
-                    contentAlignment = Alignment.Center
-                ) {
-                    IconButton(
-                        onClick = {
-                            haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                            onCategorySelected(cat)
-                        },
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        Icon(
-                            imageVector = getCategoryIcon(cat),
-                            contentDescription = cat,
-                            tint = if (isSelected) Color.Black else accentColor.copy(alpha = 0.7f),
-                            modifier = Modifier.size(18.dp)
-                        )
-                    }
-                }
-            }
-
-            // ── Layer 7: Inner 40-segment energy ring ────────────────────
-            Canvas(modifier = Modifier.size(210.dp)) {
-                rotate(innerRotation) {
-                    val segments = 40
-                    val gap = 2.2f
-                    val sweep = (360f / segments) - gap
-                    for (i in 0 until segments) {
-                        val threshold = i.toFloat() / segments
-                        val active = animatedCharge >= threshold
-                            || (displayUiState.state == ReactorState.PLAYING  && i % 2 == 0)
-                            || (displayUiState.state == ReactorState.GENERATING && i % 3 == 0)
-                            || (displayUiState.state == ReactorState.ARMED    && i % 8 == 0)
-                        drawArc(
-                            color = if (active) accentColor else accentColor.copy(alpha = 0.05f),
-                            startAngle = i * (sweep + gap) - 90f,
-                            sweepAngle = sweep,
-                            useCenter = false,
-                            style = Stroke(width = 7.dp.toPx())
-                        )
-                    }
-                }
-            }
-
-            // ── Layer 8: Central core node ───────────────────────────────
-            Box(
+            // The artwork is the reactor. Keep it full-size and unmasked so the
+            // image defines the whole device instead of becoming a center decal.
+            Image(
+                painter = painterResource(id = coreImageRes),
+                contentDescription = "Prankstar Reactor",
                 modifier = Modifier
-                    .size(160.dp)
+                    .fillMaxSize()
                     .graphicsLayer {
-                        val s = when (displayUiState.state) {
-                            ReactorState.PLAYING, ReactorState.CHARGING, ReactorState.GENERATING ->
-                                corePulse
-                            ReactorState.IDLE, ReactorState.ARMED ->
-                                0.98f + (corePulse - 0.94f) * 0.25f
+                        alpha = when (displayUiState.state) {
+                            ReactorState.ERROR    -> 0.72f + 0.22f * errorFlash
+                            ReactorState.DISABLED -> 0.45f
                             else -> 1f
                         }
-                        scaleX = s; scaleY = s
-                    }
-                    .clip(CircleShape)
-                    .background(
-                        Brush.radialGradient(
-                            0.0f to when (displayUiState.state) {
-                                ReactorState.PLAYING    -> accentColor.copy(alpha = 0.10f)
-                                ReactorState.CHARGING   -> Color(0xFFFFD400).copy(alpha = 0.12f)
-                                ReactorState.ERROR      -> Color(0xFFFF1744).copy(alpha = 0.18f * errorFlash)
-                                ReactorState.WARNING    -> Color(0xFFFF9800).copy(alpha = 0.14f)
-                                ReactorState.GENERATING -> CyanAccent.copy(alpha = 0.10f)
-                                else -> Color(0xFF0A0D10)
-                            },
-                            0.7f to Color(0xFF030506),
-                            1.0f to Color.Black
-                        )
-                    )
-                    .border(
-                        width = if (displayUiState.state == ReactorState.PLAYING) 3.dp else 1.5.dp,
-                        brush = Brush.sweepGradient(
-                            listOf(
-                                accentColor,
-                                accentColor.copy(alpha = 0.15f),
-                                accentColor,
-                                accentColor.copy(alpha = 0.15f),
-                                accentColor
-                            )
-                        ),
-                        shape = CircleShape
-                    )
+                    },
+                contentScale = ContentScale.Fit
+            )
+
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
                     .semantics { contentDescription = "Play random prank sound. ${if (displayUiState.state == ReactorState.PLAYING) "Currently playing. Tap to stop." else "Tap to deploy."}" },
                 contentAlignment = Alignment.Center
             ) {
-                // 8a: HUD crosshair backplate
-                Canvas(modifier = Modifier.fillMaxSize().padding(18.dp)) {
-                    val a = accentColor.copy(alpha = 0.10f)
-                    drawLine(a, Offset(0f, center.y), Offset(size.width, center.y), 0.8.dp.toPx())
-                    drawLine(a, Offset(center.x, 0f), Offset(center.x, size.height), 0.8.dp.toPx())
-                    drawCircle(a, radius = size.minDimension / 4f, style = Stroke(0.6.dp.toPx()))
-                }
-
-                // 8b: prankstar_core.png — circular clip, subtle breath scale
-                val imageScale = when (displayUiState.state) {
-                    ReactorState.CHARGING   -> 1.0f + animatedCharge * 0.06f
-                    ReactorState.PLAYING    -> 0.99f + (corePulse - 0.94f) * 0.35f
-                    ReactorState.IDLE, ReactorState.ARMED -> 0.985f + (corePulse - 0.94f) * 0.25f
-                    else -> 1f
-                }
-                Image(
-                    painter = painterResource(id = coreImageRes),
-                    contentDescription = "Prankstar Reactor Core",
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(6.dp)
-                        .clip(CircleShape)
-                        .graphicsLayer {
-                            scaleX = imageScale; scaleY = imageScale
-                            alpha = when (displayUiState.state) {
-                                ReactorState.ERROR    -> 0.55f + 0.35f * errorFlash
-                                ReactorState.COOLDOWN -> 0.85f
-                                ReactorState.DISABLED -> 0.4f
-                                else -> 1f
-                            }
-                        },
-                    contentScale = ContentScale.Crop
-                )
-
-                // 8c: Colour wash overlay on top of image
-                Canvas(modifier = Modifier.fillMaxSize().padding(6.dp)) {
-                    val washAlpha = when (displayUiState.state) {
-                        ReactorState.PLAYING    -> 0.18f + (haloPulse - 0.92f) * 0.6f
-                        ReactorState.CHARGING   -> 0.20f + animatedCharge * 0.25f
-                        ReactorState.ERROR      -> 0.30f * errorFlash
-                        ReactorState.COOLDOWN   -> 0.10f
-                        ReactorState.GENERATING -> 0.15f + (haloPulse - 0.92f) * 0.4f
-                        else -> 0.06f + (corePulse - 0.94f) * 0.4f
-                    }.coerceIn(0f, 0.6f)
-                    val washColor = when (displayUiState.state) {
-                        ReactorState.CHARGING -> Color(0xFFFFD400)
-                        ReactorState.ERROR    -> Color(0xFFFF1744)
-                        ReactorState.WARNING  -> Color(0xFFFF9800)
-                        else -> accentColor
-                    }
-                    drawCircle(
-                        brush = Brush.radialGradient(
-                            0.0f to Color.Transparent,
-                            0.55f to Color.Transparent,
-                            0.85f to washColor.copy(alpha = washAlpha * 0.55f),
-                            1.0f  to washColor.copy(alpha = washAlpha)
-                        ),
-                        radius = size.minDimension / 2f
-                    )
-                    if (displayUiState.state == ReactorState.PLAYING || displayUiState.state == ReactorState.CHARGING || displayUiState.state == ReactorState.GENERATING) {
-                        drawCircle(
-                            brush = Brush.radialGradient(
-                                0.0f to washColor.copy(alpha = washAlpha * 0.45f),
-                                0.5f to Color.Transparent
-                            ),
-                            radius = size.minDimension / 2.2f
-                        )
-                    }
-                }
-
-                // 8d: State affordance overlay / stop button
+                // State affordance overlay / stop button
                 if (displayUiState.state == ReactorState.PLAYING) {
                     Box(
                         modifier = Modifier
@@ -631,29 +346,6 @@ fun PranksterCoreReactor(
                 }
             } // end core node Box
 
-            // ── Layer 9: Charge percent bar (CHARGING state) ─────────────
-            if (displayUiState.state == ReactorState.CHARGING) {
-                Canvas(modifier = Modifier.size(185.dp)) {
-                    val barAlpha = 0.9f
-                    val sweepDeg = animatedCharge * 360f
-                    // track
-                    drawArc(
-                        color = Color(0xFFFFD400).copy(alpha = 0.15f),
-                        startAngle = -90f,
-                        sweepAngle = 360f,
-                        useCenter = false,
-                        style = Stroke(width = 5.dp.toPx(), cap = StrokeCap.Round)
-                    )
-                    // fill
-                    drawArc(
-                        color = Color(0xFFFFD400).copy(alpha = barAlpha),
-                        startAngle = -90f,
-                        sweepAngle = sweepDeg,
-                        useCenter = false,
-                        style = Stroke(width = 5.dp.toPx(), cap = StrokeCap.Round)
-                    )
-                }
-            }
         } // end main reactor Box
 
         // ── CATEGORY LABEL ROW ────────────────────────────────────────────

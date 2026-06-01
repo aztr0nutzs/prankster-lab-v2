@@ -117,7 +117,8 @@ fun LibraryScreen(
         }
     }
     val allSounds = bundledSounds + customSounds
-    val invalidSounds = allSounds - validSounds.toSet()
+    val validSoundIds = validSounds.asSequence().map { it.id }.toHashSet()
+    val invalidSounds = allSounds.filterNot { it.id in validSoundIds }
 
     val packCounts = remember(validSounds) { validSounds.mapNotNull { it.packId }.groupingBy { it }.eachCount() }
     val categoryCounts = remember(validSounds) { validSounds.groupingBy { it.category }.eachCount() }

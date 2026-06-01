@@ -35,10 +35,12 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pranksterlab.R
+import com.pranksterlab.theme.OrbitronFamily
 
 data class DockTab(
     val route: String,
@@ -173,7 +175,9 @@ fun PrankstarBottomDock(
                         Text(
                             text = tab.label,
                             color = if (isSelected) Color.White else Color(0xFF8EA0A9),
+                            fontFamily = OrbitronFamily,
                             fontSize = 10.sp,
+                            fontStyle = FontStyle.Italic,
                             fontWeight = if (isSelected) FontWeight.Black else FontWeight.Medium,
                             maxLines = 1,
                         )
