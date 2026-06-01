@@ -1,6 +1,7 @@
 package com.pranksterlab.screens.voice
 
 import android.media.MediaPlayer
+import android.media.MediaMetadataRetriever
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -27,6 +28,7 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -54,6 +56,7 @@ import com.pranksterlab.theme.LimeAccent
 import com.pranksterlab.theme.OrangeAccent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 
 @Composable
@@ -63,6 +66,8 @@ fun VoiceJokeGeneratorScreen(soundRepository: SoundRepository) {
     val tts = remember { AndroidTextToSpeechEngine(context) }
     val generatedRepo = remember { GeneratedVoiceRepository(soundRepository) }
     val allPresets = VoicePresetLibrary.presets
+    val isTtsReady by tts.isReady.collectAsState()
+    val ttsStatus by tts.status.collectAsState()
 
     var preset by remember { mutableStateOf(allPresets.first()) }
     var selectedCategory by remember { mutableStateOf<VoiceCategory?>(null) }
@@ -76,6 +81,19 @@ fun VoiceJokeGeneratorScreen(soundRepository: SoundRepository) {
     var echo by remember { mutableStateOf(false) }
     var status by remember { mutableStateOf("READY") }
     var generatedFile by remember { mutableStateOf<File?>(null) }
+    var previewPlayer by remember { mutableStateOf<MediaPlayer?>(null) }
+    var savedSoundId by remember { mutableStateOf<String?>(null) }
+
+    fun stopFilePreview() {
+        previewPlayer?.let { player ->
+            runCatching {
+                if (player.isPlaying) player.stop()
+            }
+            runCatching { player.reset() }
+            runCatching { player.release() }
+        }
+        previewPlayer = null
+    }
 
     fun applyPreset(selected: VoicePreset) {
         preset = selected
@@ -89,7 +107,12 @@ fun VoiceJokeGeneratorScreen(soundRepository: SoundRepository) {
             (searchQuery.isBlank() || it.displayName.contains(searchQuery, true) || it.description.contains(searchQuery, true))
     }
 
-    DisposableEffect(Unit) { onDispose { tts.release() } }
+    DisposableEffect(Unit) {
+        onDispose {
+            stopFilePreview()
+            tts.release()
+        }
+    }
 
     Box(Modifier.fillMaxSize().background(BackgroundDark)) {
         ScanlineOverlay()
@@ -98,7 +121,7 @@ fun VoiceJokeGeneratorScreen(soundRepository: SoundRepository) {
             verticalArrangement = Arrangement.spacedBy(12.dp),
             contentPadding = PaddingValues(bottom = 120.dp)
         ) {
-            item { PrankstarHeader("Voice Lab", "Joke / Comment Generator", R.drawable.header_joke_gen, statusLabel = status) }
+            item { PrankstarHeader("Jokes", "Voice Lab / Meme Clip Generator", R.drawable.header_joke_gen, statusLabel = if (isTtsReady) status else ttsStatus) }
             item { Text("Synthetic Presets", color = LimeAccent) }
             item { Text("Warning: All voices are synthetic styling presets, not real-person clones.", color = OrangeAccent) }
 
@@ -143,7 +166,7 @@ fun VoiceJokeGeneratorScreen(soundRepository: SoundRepository) {
                 }
             }
 
-            item { OutlinedTextField(text, { if (it.length <= 300) text = it }, modifier = Modifier.fillMaxWidth().height(140.dp), placeholder = { Text("Try: \"Warning, this fridge is now sentient\"") }, label = { Text("Joke / Comment") }) }
+            item { OutlinedTextField(text, { if (it.length <= 300) text = it }, modifier = Modifier.fillMaxWidth().height(140.dp), placeholder = { Text("Try: \"This fridge is now sentient\"") }, label = { Text("Type a joke") }) }
             item { Text("${text.length}/300", color = if (text.isBlank()) OrangeAccent else LimeAccent) }
             item {
                 Column(Modifier.fillMaxWidth().background(GlassBackground, RoundedCornerShape(14.dp)).padding(12.dp)) {
@@ -171,36 +194,99 @@ fun VoiceJokeGeneratorScreen(soundRepository: SoundRepository) {
                     Button(onClick = {
                         status = "PREVIEW"
                         tts.preview(VoiceGeneratorSettings(preset, preset.samplePhrase, pitch, speed, volume, preset.toneStyle, effect, echo, outputName))
-                    }) { Text("Preview Voice Style") }
+                    }, enabled = isTtsReady) { Text("Preview Voice Style") }
                 }
             }
             item {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Button(onClick = {
-                        if (text.isBlank() || text.contains("police", true) || text.contains("emergency", true)) { status = "ERROR"; return@Button }
-                        scope.launch(Dispatchers.IO) {
-                            status = "GENERATING"
-                            val file = File(context.filesDir, "voice_${System.currentTimeMillis()}.wav")
-                            tts.synthesizeToFile(VoiceGeneratorSettings(preset, text, pitch, speed, volume, preset.toneStyle, effect, echo, outputName), file)
-                            generatedFile = file
-                            status = "SAVED"
+                        if (text.isBlank() || containsRestrictedAlertTerm(text)) {
+                            status = "BLOCKED"
+                            return@Button
                         }
-                    }, enabled = text.isNotBlank()) { Text("Generate") }
+                        stopFilePreview()
+                        generatedFile = null
+                        savedSoundId = null
+                        scope.launch {
+                            status = "GENERATING"
+                            val result = withContext(Dispatchers.IO) {
+                                val file = File(context.filesDir, "voice_${System.currentTimeMillis()}.wav")
+                                tts.synthesizeToFile(VoiceGeneratorSettings(preset, text, pitch, speed, volume, preset.toneStyle, effect, echo, outputName), file)
+                            }
+                            val file = result.outputFile
+                            if (result.errorMessage != null || !file.exists() || file.length() <= 0L) {
+                                generatedFile = null
+                                status = "ERROR"
+                            } else {
+                                generatedFile = file
+                                status = "GENERATED"
+                            }
+                        }
+                    }, enabled = isTtsReady && text.isNotBlank() && status != "GENERATING") { Text("Generate Voice Clip") }
                     Button(onClick = {
                         generatedFile?.let {
-                            MediaPlayer().apply { setDataSource(it.absolutePath); prepare(); start() }
+                            stopFilePreview()
+                            status = "PREVIEW"
+                            previewPlayer = MediaPlayer().apply {
+                                setDataSource(it.absolutePath)
+                                setOnCompletionListener { completed ->
+                                    runCatching { completed.release() }
+                                    previewPlayer = null
+                                    status = "GENERATED"
+                                }
+                                setOnErrorListener { failed, _, _ ->
+                                    runCatching { failed.release() }
+                                    previewPlayer = null
+                                    status = "ERROR"
+                                    true
+                                }
+                                prepare()
+                                start()
+                            }
                         }
-                    }, enabled = generatedFile != null) { Text("Preview") }
-                    Button(onClick = { tts.stopPreview() }) { Text("Stop") }
+                    }, enabled = generatedFile != null) { Text("Preview Clip") }
+                    Button(onClick = {
+                        tts.stopPreview()
+                        stopFilePreview()
+                        if (generatedFile != null) status = "GENERATED"
+                    }) { Text("Stop Preview") }
                 }
             }
             item {
                 Button(onClick = {
                     val file = generatedFile ?: return@Button
-                    scope.launch { generatedRepo.saveGeneratedVoice(file, VoiceGeneratorSettings(preset, text, pitch, speed, volume, preset.toneStyle, effect, echo, outputName), null) }
-                }, enabled = generatedFile != null) { Text("Save to Library (WAV)") }
+                    scope.launch {
+                        status = "SAVING"
+                        try {
+                            val durationMs = withContext(Dispatchers.IO) { readDurationMs(file) }
+                            val sound = generatedRepo.saveGeneratedVoice(file, VoiceGeneratorSettings(preset, text, pitch, speed, volume, preset.toneStyle, effect, echo, outputName), durationMs)
+                            savedSoundId = sound.id
+                            status = "SAVED"
+                        } catch (_: Exception) {
+                            status = "ERROR"
+                        }
+                    }
+                }, enabled = generatedFile != null && savedSoundId == null && status != "SAVING") { Text("Save to Stash") }
             }
+            item { Text(if (isTtsReady) "Output: WAV/PCM generated locally on device." else "TTS unavailable: install or enable an Android text-to-speech engine.", color = CyanAccent) }
             item { Text("Safety: Keep pranks harmless. No real-person or official-alert impersonation.", color = OrangeAccent) }
         }
+    }
+}
+
+private fun containsRestrictedAlertTerm(value: String): Boolean {
+    val restricted = listOf("police", "emergency", "ambulance", "fire department", "evacuate", "siren", "official alert")
+    return restricted.any { value.contains(it, ignoreCase = true) }
+}
+
+private fun readDurationMs(file: File): Long? {
+    val retriever = MediaMetadataRetriever()
+    return try {
+        retriever.setDataSource(file.absolutePath)
+        retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLongOrNull()
+    } catch (_: Exception) {
+        null
+    } finally {
+        runCatching { retriever.release() }
     }
 }

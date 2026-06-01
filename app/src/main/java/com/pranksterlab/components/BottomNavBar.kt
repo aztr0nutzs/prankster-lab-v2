@@ -56,7 +56,7 @@ fun BottomNavBar(currentRoute: String, onNavigate: (String) -> Unit) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             NavItem(Icons.Default.Bolt, "CORE", currentRoute == "home", { onNavigate("home") }, LimeAccent)
-            NavItem(Icons.Default.LibraryMusic, "LIBRARY", currentRoute == "library", { onNavigate("library") }, LimeAccent)
+            NavItem(Icons.Default.LibraryMusic, "STASH", currentRoute == "library", { onNavigate("library") }, LimeAccent)
             NavItem(Icons.Default.Extension, "FORGE", currentRoute == "forge", { onNavigate("forge") }, LimeAccent)
             NavItem(Icons.Default.RecordVoiceOver, "JOKES", currentRoute == "voice_lab" || currentRoute == "messages", { onNavigate("voice_lab") }, LimeAccent)
             NavItem(Icons.Default.Settings, "SYSTEM", currentRoute == "system", { onNavigate("system") }, LimeAccent)

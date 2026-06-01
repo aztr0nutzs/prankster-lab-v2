@@ -17,12 +17,33 @@ find_sdk() {
     return 0
   fi
 
+  if [[ -f "$LOCAL_PROPERTIES" ]]; then
+    local configured
+    configured="$(grep -E '^sdk\.dir=' "$LOCAL_PROPERTIES" | tail -n 1 | cut -d= -f2- | sed 's/\\\\/\\/g')"
+    if [[ -n "$configured" ]]; then
+      if [[ -d "$configured" ]]; then
+        printf '%s' "$configured"
+        return 0
+      fi
+      if [[ "$configured" =~ ^([A-Za-z]):/(.*)$ ]]; then
+        local drive="${BASH_REMATCH[1],,}"
+        local rest="${BASH_REMATCH[2]}"
+        local translated="/mnt/$drive/$rest"
+        if [[ -d "$translated" ]]; then
+          printf '%s' "$translated"
+          return 0
+        fi
+      fi
+    fi
+  fi
+
   local candidates=(
     "$HOME/Android/Sdk"
     "$HOME/Library/Android/sdk"
     "/opt/android-sdk"
     "/usr/local/lib/android/sdk"
     "/usr/lib/android-sdk"
+    "/mnt/c/Users/${USER:-}/AppData/Local/Android/Sdk"
   )
 
   local path

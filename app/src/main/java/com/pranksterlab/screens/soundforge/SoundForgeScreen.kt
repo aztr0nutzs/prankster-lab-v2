@@ -85,7 +85,7 @@ fun SoundForgeScreen(viewModel: SoundForgeViewModel, audioPlayer: AudioPlayerCon
     if (showSaveDialog) {
         AlertDialog(
             onDismissRequest = { showSaveDialog = false },
-            title = { HeadlineText("SAVE TO LIBRARY", color = FuchsiaAccent) },
+            title = { HeadlineText("SAVE TO STASH", color = FuchsiaAccent) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                     OutlinedTextField(

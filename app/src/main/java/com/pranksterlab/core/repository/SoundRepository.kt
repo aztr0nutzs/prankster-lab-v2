@@ -326,6 +326,17 @@ class SoundRepository(private val context: Context) {
         val sounds = getCustomSoundsFlow().first()
         val toRemove = sounds.filter { it.tags.any { tag -> tag.equals("generated", true) } || it.createdByUser && it.generatedMetadata != null }
         if (toRemove.isEmpty()) return 0
+        toRemove.forEach { sound ->
+            val path = sound.localUri ?: sound.assetPath
+            if (path.isNotBlank() && !path.startsWith("content://") && !path.startsWith("file://")) {
+                runCatching {
+                    val file = File(path)
+                    if (file.exists() && file.absolutePath.startsWith(context.filesDir.absolutePath)) {
+                        file.delete()
+                    }
+                }
+            }
+        }
         context.dataStore.edit { preferences ->
             val remaining = sounds.filterNot { s -> toRemove.any { it.id == s.id } }
             preferences[CUSTOM_SOUNDS_KEY] = gson.toJson(remaining)

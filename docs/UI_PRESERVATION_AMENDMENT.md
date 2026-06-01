@@ -1,13 +1,13 @@
 # UI_PRESERVATION_AMENDMENT.md
 
-Last updated: 2026-05-07
+Last updated: 2026-06-01
 
 ## STRICT UI PRESERVATION AMENDMENT
 
 The Prankster Lab app must maintain a premium dark neon cyberpunk prank-lab identity.
 
-Final QA phase rule:
-Do not redesign UI, simplify UI, or remove visual systems. Only fix bugs, polish issues, accessibility, performance, validation, and documentation.
+Current product-correction rule:
+Do not redesign UI, flatten screens into plain Material, remove the reactor, remove Sound Stash, remove Sound Forge, remove Voice Lab, or replace custom navigation. Product naming and flow clarity may be improved while preserving the visual system.
 
 ## FORBIDDEN REGRESSIONS
 
@@ -18,6 +18,10 @@ Do not:
 - remove glow systems
 - remove reactor interactions
 - remove Sound Forge workstation visuals
+- remove the prankstar_core reactor image
+- remove interactive reactor behavior
+- remove Sound Stash / Library
+- remove generated clip management
 - replace custom dock navigation with default tabs
 - downgrade animated interfaces into plain columns
 - replace premium cards with plain lists
@@ -37,6 +41,19 @@ Preserve:
 - HUD-inspired composition
 - animated reactor core
 - rich interaction feedback
+- current launcher icon and package identity
+
+## CURRENT NAVIGATION PRESERVATION
+
+The premium dock remains the primary navigation surface:
+
+- Core
+- Stash
+- Forge
+- Jokes
+- System
+
+Sequencer is not a primary tab. Timer, Randomizer, Packs, and Prank Messages are secondary routes only when stable.
 
 ## REACTOR CORE PROTECTION
 
@@ -68,6 +85,4 @@ It must not become:
 
 ## CURRENT QA NOTES
 
-Automated build and validation passed after audio repair.
-
-Manual visual QA remains required on device because this environment does not expose `adb`.
+This pass preserves the custom headers, custom dock image, reactor image, neon panels, scanline overlays, and waveform systems. Build, validator, and runtime results for this pass are tracked in `REMAINING_BLOCKERS.md`.

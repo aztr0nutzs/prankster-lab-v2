@@ -211,7 +211,7 @@ fun SoundForgeWorkbench(
                         if (uri.isNotBlank()) onPreview(uri)
                     },
                     onStopPreview = onStopPreview,
-                    onSave = { viewModel.saveGeneratedSound(result?.name.orEmpty(), "CUSTOM") }
+                onSave = { viewModel.saveGeneratedSound(result?.name.orEmpty(), "FORGE_GENERATED") }
                 )
 
                 GeneratedSoundStatusPanel(

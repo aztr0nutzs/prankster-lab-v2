@@ -82,7 +82,7 @@ fun PranksterApp() {
                 LibraryScreen(
                     soundRepository = soundRepository,
                     audioPlayerController = audioPlayerController,
-                    onOpenSequence = { navController.navigate("voice_lab") },
+                    onCreateJoke = { navController.navigate("voice_lab") },
                     onOpenTimer = { navController.navigate("timer") }
                 )
             }

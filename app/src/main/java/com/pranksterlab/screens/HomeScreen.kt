@@ -134,8 +134,8 @@ fun HomeScreen(
         ) {
         item {
             PrankstarHeader(
-                title = "Prankster Reactor",
-                subtitle = "Command Console / Live Deploy",
+                title = "Core",
+                subtitle = "Quick Play Reactor / Stash + Joke Launch",
                 imageRes = R.drawable.prankstar_sn1,
                 statusLabel = if (playbackState.isPlaying) "LIVE" else "ARMED"
             )
@@ -307,17 +307,25 @@ fun LogItem(title: String, time: String) {
 @Composable
 fun ModeGridSection(soundsList: List<PrankSound>, onNavigate: (String) -> Unit) {
     val totalSamples = if (soundsList.isNotEmpty()) "${soundsList.size} SAMPLES" else "LOADING..."
+    val voiceClip = soundsList
+        .filter { it.category.equals("VOICE_GENERATED", true) || it.packId.equals("voice_lab", true) }
+        .maxByOrNull { it.createdAt }
     
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Row(modifier = Modifier.fillMaxWidth()) {
-            ModeCard("Library", totalSamples, Icons.Default.LibraryMusic, Modifier.weight(1f)) { onNavigate("library") }
+            ModeCard("Open Stash", totalSamples, Icons.Default.LibraryMusic, Modifier.weight(1f)) { onNavigate("library") }
             Spacer(modifier = Modifier.width(16.dp))
-            ModeCard("Sound Forge", "SYNTHESIS", Icons.Default.PrecisionManufacturing, Modifier.weight(1f)) { onNavigate("forge") }
+            ModeCard("Create Joke", voiceClip?.name ?: "VOICE LAB", Icons.Default.RecordVoiceOver, Modifier.weight(1f)) { onNavigate("voice_lab") }
         }
         Row(modifier = Modifier.fillMaxWidth()) {
-            ModeCard("Sequences", "MULTI_STAGE", Icons.Default.Reorder, Modifier.weight(1f)) { onNavigate("sequence") }
+            ModeCard("Sound Forge", "ADVANCED FX", Icons.Default.PrecisionManufacturing, Modifier.weight(1f)) { onNavigate("forge") }
             Spacer(modifier = Modifier.width(16.dp))
-            ModeCard("Randomizer", "CHAOS ALGO", Icons.Default.Shuffle, Modifier.weight(1f)) { onNavigate("randomizer") }
+            ModeCard("Randomizer", "SECONDARY", Icons.Default.Shuffle, Modifier.weight(1f)) { onNavigate("randomizer") }
+        }
+        Row(modifier = Modifier.fillMaxWidth()) {
+            ModeCard("Timer", "SECONDARY", Icons.Default.Timer, Modifier.weight(1f)) { onNavigate("timer") }
+            Spacer(modifier = Modifier.width(16.dp))
+            ModeCard("Packs", "STASH FILTERS", Icons.Default.Inventory2, Modifier.weight(1f)) { onNavigate("lab") }
         }
     }
 }

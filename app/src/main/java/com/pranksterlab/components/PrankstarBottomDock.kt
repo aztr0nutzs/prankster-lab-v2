@@ -46,7 +46,7 @@ data class DockTab(
 
 private val dockTabs = listOf(
     DockTab("home", "CORE", "Navigate to Core", Icons.Default.Bolt),
-    DockTab("library", "LIBRARY", "Navigate to Library", Icons.Default.LibraryMusic),
+    DockTab("library", "STASH", "Navigate to Sound Stash", Icons.Default.LibraryMusic),
     DockTab("forge", "FORGE", "Navigate to Forge", Icons.Default.Extension),
     DockTab("voice_lab", "JOKES", "Navigate to Jokes", Icons.Default.RecordVoiceOver),
     DockTab("system", "SYSTEM", "Navigate to System", Icons.Default.Settings),
@@ -92,9 +92,14 @@ fun PrankstarBottomDock(
                             if (isSelected) {
                                 Modifier
                                     .border(width = 2.dp, brush = glowBrush, shape = RoundedCornerShape(18.dp))
-                                    .background(Color(0xA02DE2E6), shape = RoundedCornerShape(18.dp))
+                                    .background(
+                                        Brush.verticalGradient(
+                                            listOf(Color(0xE02DE2E6), Color(0x993B0F5C), Color(0xAAFF8B2C))
+                                        ),
+                                        shape = RoundedCornerShape(18.dp)
+                                    )
                             } else {
-                                Modifier.background(Color(0x33000000), shape = RoundedCornerShape(18.dp))
+                                Modifier.background(Color(0x77000000), shape = RoundedCornerShape(18.dp))
                             }
                         )
                         .clickable { onNavigate(tab.route) }

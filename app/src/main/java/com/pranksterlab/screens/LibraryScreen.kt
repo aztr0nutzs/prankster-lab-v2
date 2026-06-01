@@ -28,6 +28,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Loop
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.RecordVoiceOver
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material.icons.filled.Timer
@@ -72,14 +73,16 @@ import kotlinx.coroutines.launch
 
 private const val FILTER_ALL = "ALL"
 private const val FILTER_FAVORITES = "FAVORITES"
-private const val FILTER_CUSTOM = "CUSTOM"
+private const val FILTER_BUNDLED = "BUNDLED"
 private const val FILTER_GENERATED = "GENERATED"
+private const val FILTER_VOICE_LAB = "VOICE LAB"
+private const val FILTER_FORGE = "FORGE"
 
 @Composable
 fun LibraryScreen(
     soundRepository: SoundRepository,
     audioPlayerController: AudioPlayerController,
-    onOpenSequence: () -> Unit = {},
+    onCreateJoke: () -> Unit = {},
     onOpenTimer: () -> Unit = {}
 ) {
     var bundledSounds by remember { mutableStateOf(emptyList<PrankSound>()) }
@@ -114,22 +117,26 @@ fun LibraryScreen(
 
     val categoryChips = buildList {
         add("$FILTER_ALL (${validSounds.size})")
+        add("$FILTER_BUNDLED (${validSounds.count { !it.isCustom }})")
+        add("$FILTER_GENERATED (${validSounds.count { it.isGeneratedSound() }})")
+        add("$FILTER_VOICE_LAB (${validSounds.count { it.isVoiceLabSound() }})")
+        add("$FILTER_FORGE (${validSounds.count { it.isForgeSound() }})")
         add("$FILTER_FAVORITES (${validSounds.count { favoriteIds.contains(it.id) }})")
         categoryCounts.toList().sortedBy { it.first }.forEach { (category, count) ->
-            add("$category ($count)")
+            add("${readableCategory(category)} ($count)")
         }
-        if (validSounds.any { it.isCustom }) add("$FILTER_CUSTOM (${validSounds.count { it.isCustom }})")
-        if (validSounds.any { it.isGeneratedSound() }) add("$FILTER_GENERATED (${validSounds.count { it.isGeneratedSound() }})")
     }
 
     val filteredSounds = validSounds.filter { sound ->
         val chipKey = selectedCategory.substringBefore(" (")
         val matchesCategory = when (chipKey) {
             FILTER_ALL -> true
+            FILTER_BUNDLED -> !sound.isCustom
             FILTER_FAVORITES -> favoriteIds.contains(sound.id)
-            FILTER_CUSTOM -> sound.isCustom
             FILTER_GENERATED -> sound.isGeneratedSound()
-            else -> sound.category == chipKey
+            FILTER_VOICE_LAB -> sound.isVoiceLabSound()
+            FILTER_FORGE -> sound.isForgeSound()
+            else -> readableCategory(sound.category) == chipKey
         }
         val matchesPack = selectedPack == null || sound.packId == selectedPack
         val matchesSearch = if (searchQuery.isBlank()) true else {
@@ -146,8 +153,8 @@ fun LibraryScreen(
 
         Column(modifier = Modifier.fillMaxSize()) {
             PrankstarHeader(
-                title = "Audio Arsenal",
-                subtitle = "Library / Catalog Browser",
+                title = "Sound Stash",
+                subtitle = "Bundled Pranks / Generated Clips / Favorites",
                 imageRes = R.drawable.header_sound_stash,
                 statusLabel = "${validSounds.size} ASSETS",
                 modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp)
@@ -231,10 +238,7 @@ fun LibraryScreen(
                         audioPlayerController = audioPlayerController,
                         isFavorite = favoriteIds.contains(sound.id),
                         onToggleFavorite = { scope.launch { soundRepository.toggleFavorite(sound.id) } },
-                        onAddToSequence = {
-                            soundRepository.queueSoundForSequence(sound.id)
-                            onOpenSequence()
-                        },
+                        onCreateJoke = onCreateJoke,
                         onTimerShortcut = {
                             soundRepository.queueSoundForTimer(sound.id)
                             onOpenTimer()
@@ -293,7 +297,7 @@ fun HUDSoundCard(
     audioPlayerController: AudioPlayerController,
     isFavorite: Boolean,
     onToggleFavorite: () -> Unit,
-    onAddToSequence: () -> Unit,
+    onCreateJoke: () -> Unit,
     onTimerShortcut: () -> Unit
 ) {
     val playbackState by audioPlayerController.playbackState.collectAsState()
@@ -311,7 +315,7 @@ fun HUDSoundCard(
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Top) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(sound.name.uppercase(), color = LimeAccent, style = MaterialTheme.typography.headlineSmall.copy(letterSpacing = 1.sp))
-                    Text("${sound.category} • ${sound.packId ?: "UNPACKED"}", color = Color.Gray)
+                    Text("${readableCategory(sound.category)} • ${sound.packId ?: "UNPACKED"}", color = Color.Gray)
                     if (sound.isGeneratedSound()) {
                         sound.generatedMetadata?.voicePresetName?.let { preset ->
                             Text("VOICE: $preset", color = CyanAccent, style = MaterialTheme.typography.bodySmall)
@@ -319,6 +323,7 @@ fun HUDSoundCard(
                         sound.generatedMetadata?.sourceText?.takeIf { it.isNotBlank() }?.let { source ->
                             Text("TEXT: ${source.take(64)}", color = Color.Gray, style = MaterialTheme.typography.bodySmall)
                         }
+                        Text("CREATED: ${java.text.DateFormat.getDateTimeInstance(java.text.DateFormat.SHORT, java.text.DateFormat.SHORT).format(java.util.Date(sound.createdAt))}", color = Color.Gray, style = MaterialTheme.typography.bodySmall)
                     }
                     Text(sound.tags.joinToString("  •  ").ifBlank { "NO TAGS" }, color = Color.Gray, style = MaterialTheme.typography.bodySmall)
                 }
@@ -350,8 +355,8 @@ fun HUDSoundCard(
                     Spacer(modifier = Modifier.size(6.dp))
                     Text(if (isPlaying) "STOP" else "PLAY", color = accentColor)
                 }
-                Button(onClick = onAddToSequence, colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent), border = androidx.compose.foundation.BorderStroke(1.dp, CyanAccent.copy(alpha = 0.4f))) {
-                    Icon(Icons.Default.Add, "Add to sequence", tint = CyanAccent)
+                Button(onClick = onCreateJoke, colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent), border = androidx.compose.foundation.BorderStroke(1.dp, CyanAccent.copy(alpha = 0.4f))) {
+                    Icon(Icons.Default.RecordVoiceOver, "Create joke", tint = CyanAccent)
                 }
                 Button(onClick = onTimerShortcut, colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent), border = androidx.compose.foundation.BorderStroke(1.dp, OrangeAccent.copy(alpha = 0.4f))) {
                     Icon(Icons.Default.Timer, "Timer shortcut", tint = OrangeAccent)
@@ -391,4 +396,20 @@ fun NeonWaveform(seed: String, color: Color, modifier: Modifier = Modifier) {
 
 private fun PrankSound.isGeneratedSound(): Boolean {
     return generatedMetadata != null || createdByUser && tags.any { it.equals("generated", true) }
+}
+
+private fun PrankSound.isVoiceLabSound(): Boolean {
+    return category.equals("VOICE_GENERATED", true) || packId.equals("voice_lab", true) || generatedMetadata?.generatorType.equals("VOICE_LAB", true)
+}
+
+private fun PrankSound.isForgeSound(): Boolean {
+    return tags.any { it.equals("forge", true) } || packId.equals("sound_forge", true) || generatedMetadata?.generatorType?.contains("VOICE_LAB", true) == false
+}
+
+private fun readableCategory(category: String): String {
+    return when {
+        category.equals("VOICE_GENERATED", true) -> "Voice Generated"
+        category.equals("FORGE_GENERATED", true) -> "Forge Generated"
+        else -> category.replace('_', ' ').lowercase().replaceFirstChar { it.titlecase() }
+    }
 }

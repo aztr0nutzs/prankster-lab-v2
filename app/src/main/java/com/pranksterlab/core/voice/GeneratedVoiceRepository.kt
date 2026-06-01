@@ -4,12 +4,21 @@ import com.pranksterlab.core.model.PrankSound
 import com.pranksterlab.core.model.GeneratedSoundMetadata
 import com.pranksterlab.core.model.SoundSourceType
 import com.pranksterlab.core.repository.SoundRepository
+import org.json.JSONObject
 import java.io.File
 import java.util.UUID
 
 class GeneratedVoiceRepository(private val soundRepository: SoundRepository) {
     suspend fun saveGeneratedVoice(file: File, settings: VoiceGeneratorSettings, durationMs: Long?): PrankSound {
+        require(file.exists() && file.length() > 0L) { "Generated voice file is missing or empty" }
         val id = "voice_${UUID.randomUUID().toString().take(8)}"
+        val parametersJson = JSONObject()
+            .put("voicePresetId", settings.preset.id)
+            .put("toneStyle", settings.toneStyle)
+            .put("effectStyle", settings.preset.effectStyle)
+            .put("effectAmount", settings.effectAmount)
+            .put("echoReverb", settings.enableEchoReverb)
+            .toString()
         val sound = PrankSound(
             id = id, name = settings.outputName.ifBlank { "Voice Clip" }, category = "VOICE_GENERATED", packId = "voice_lab",
             assetPath = file.absolutePath, durationMs = durationMs ?: 0L, tags = listOf("generated","voice","joke","custom"),
@@ -18,7 +27,7 @@ class GeneratedVoiceRepository(private val soundRepository: SoundRepository) {
             isSafeForRandomMode = settings.preset.isSafeForRandomMode, intensityLevel = settings.preset.intensityLevel,
             generatedMetadata = GeneratedSoundMetadata(
                 generatorType = "VOICE_LAB",
-                parametersJson = """{"voicePresetId":"${settings.preset.id}","toneStyle":"${settings.toneStyle}","effectStyle":"${settings.preset.effectStyle}","effectAmount":${settings.effectAmount}}""",
+                parametersJson = parametersJson,
                 sourceText = settings.text,
                 voicePresetId = settings.preset.id,
                 voicePresetName = settings.preset.displayName,
