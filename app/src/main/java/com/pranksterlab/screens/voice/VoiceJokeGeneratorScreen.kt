@@ -41,6 +41,8 @@ import androidx.compose.ui.unit.dp
 import com.pranksterlab.R
 import com.pranksterlab.components.PrankstarHeader
 import com.pranksterlab.components.ScanlineOverlay
+import com.pranksterlab.components.bot.PrankstarBotMood
+import com.pranksterlab.components.bot.PrankstarBotVideo
 import com.pranksterlab.core.repository.SoundRepository
 import com.pranksterlab.core.voice.AndroidTextToSpeechEngine
 import com.pranksterlab.core.voice.GeneratedVoiceRepository
@@ -194,6 +196,27 @@ fun VoiceJokeGeneratorScreen(soundRepository: SoundRepository) {
 
     val canGenerate = ttsReadiness is VoiceEngineReadiness.READY && text.isNotBlank() && status != "GENERATING"
     val canUseGeneratedFile = isValidGeneratedFile(generatedFile) && generatedResult?.success == true
+    val botMood = when (status) {
+        "INITIALIZING VOICE ENGINE" -> PrankstarBotMood.THINKING
+        "GENERATING" -> PrankstarBotMood.GENERATING
+        "SAVING" -> PrankstarBotMood.PROCESSING
+        "SAVED" -> PrankstarBotMood.SAVED
+        "GENERATED" -> PrankstarBotMood.CELEBRATING
+        "PREVIEWING" -> PrankstarBotMood.PLAYING
+        "ERROR" -> PrankstarBotMood.ERROR
+        else -> if (text.isNotBlank()) PrankstarBotMood.TYPING else PrankstarBotMood.HAPPY
+    }
+    val botMessage = when (botMood) {
+        PrankstarBotMood.HAPPY -> "Type a line. I’ll make it weird."
+        PrankstarBotMood.TYPING -> "Line loaded. Choose a voice."
+        PrankstarBotMood.THINKING -> "Voice engine handshake in progress."
+        PrankstarBotMood.GENERATING, PrankstarBotMood.PROCESSING -> "Cooking your clip."
+        PrankstarBotMood.PLAYING -> "Previewing the voice payload."
+        PrankstarBotMood.SAVED -> "Saved to Stash."
+        PrankstarBotMood.CELEBRATING -> "Clip generated. Stash it or preview it."
+        PrankstarBotMood.ERROR -> "Voice engine needs attention."
+        else -> statusDetail
+    }
 
     Box(Modifier.fillMaxSize().background(BackgroundDark)) {
         ScanlineOverlay()
@@ -209,6 +232,14 @@ fun VoiceJokeGeneratorScreen(soundRepository: SoundRepository) {
                     imageRes = R.drawable.header_joke_gen,
                     statusLabel = status,
                     showTextOverlay = false
+                )
+            }
+            item {
+                PrankstarBotVideo(
+                    mood = botMood,
+                    message = botMessage,
+                    compact = true,
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
             item { Text("Synthetic Presets", color = LimeAccent) }

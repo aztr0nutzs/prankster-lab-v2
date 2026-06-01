@@ -94,3 +94,27 @@ This prevents the baked Jokes artwork from reading as active on every route.
 - Runtime visual QA on device/emulator: BLOCKED, no attached device was available during the latest pass
 
 No audio assets or `sound_catalog.json` were changed for UI integration.
+
+## Robot MP4 Integration
+
+Prankstar Bot / NEO mascot MP4 source clips remain at the repository root. The app maps moods to these Android-safe raw resource names when clips are packaged under `app/src/main/res/raw/`, but duplicate raw MP4 binaries are intentionally not included in this follow-up commit:
+
+- `prankstar_bot_processing.mp4`
+- `prankstar_bot_celebrate.mp4`
+- `prankstar_bot_typing.mp4`
+- `prankstar_bot_warning.mp4`
+- `prankstar_bot_confused.mp4`
+- `prankstar_bot_happy.mp4`
+- `prankstar_bot_surprised.mp4`
+- `prankstar_bot_angry.mp4`
+- `prankstar_bot_wakeup.mp4`
+- `prankstar_bot_thinking.mp4`
+- `prankstar_bot_ecstatic.mp4`
+- `prankstar_bot_shutdown.mp4`
+
+The mascot is presented through a compact neon assistant card, not as a full-screen background. Current placements are:
+
+- Core/Home: below the waveform header and above the reactor, preserving reactor controls.
+- Voice Lab / Joke Gen: below the Joke Gen header and above the creation controls.
+
+The existing custom headers, bottom dock, reactor, Sound Stash, bundled prank sounds, Voice Lab, and Sound Forge remain intact. MP4 robot playback is muted by default, can be disabled with the Animated Bot setting, and falls back to the static Prankstar image when the raw MP4 resources are absent.

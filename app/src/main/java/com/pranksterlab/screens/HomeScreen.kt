@@ -30,6 +30,8 @@ import com.pranksterlab.components.HeadlineText
 import com.pranksterlab.components.LabelCaps
 import com.pranksterlab.components.PrankstarHeader
 import com.pranksterlab.components.ScanlineOverlay
+import com.pranksterlab.components.bot.PrankstarBotMood
+import com.pranksterlab.components.bot.PrankstarBotVideo
 import com.pranksterlab.R
 import com.pranksterlab.components.reactor.ReactorCorePanel
 import com.pranksterlab.components.reactor.StatusReadout
@@ -61,6 +63,7 @@ import com.pranksterlab.theme.OrangeAccent
 import com.pranksterlab.theme.OutlineDark
 import com.pranksterlab.theme.PrimaryContainer
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 
 @Composable
@@ -74,8 +77,28 @@ fun HomeScreen(
     var lastSoundName by remember { mutableStateOf<String?>(null) }
     var selectedCategory by remember { mutableStateOf("FUNNY") }
     var playbackError by remember { mutableStateOf<String?>(null) }
+    var showWakeup by remember { mutableStateOf(true) }
     
     val playbackState by audioPlayerController.playbackState.collectAsState()
+    val botMood = when {
+        showWakeup -> PrankstarBotMood.WAKEUP
+        playbackError != null || playbackState.lastError != null -> PrankstarBotMood.ERROR
+        playbackState.isPlaying -> PrankstarBotMood.PLAYING
+        soundsList.isEmpty() -> PrankstarBotMood.THINKING
+        else -> PrankstarBotMood.ARMED
+    }
+    val botMessage = when (botMood) {
+        PrankstarBotMood.WAKEUP -> "Booting NEO assistant."
+        PrankstarBotMood.PLAYING -> "Signal deployed: ${playbackState.currentSoundTitle ?: lastSoundName ?: "chaos sample"}."
+        PrankstarBotMood.ERROR -> "Playback needs attention. Check the trace log."
+        PrankstarBotMood.THINKING -> "Scanning the Sound Stash."
+        else -> "Ready to deploy chaos."
+    }
+
+    LaunchedEffect(Unit) {
+        delay(1600)
+        showWakeup = false
+    }
 
     LaunchedEffect(Unit) {
         val bundled = withContext(Dispatchers.IO) { soundRepository.getBundledSounds() }
@@ -147,6 +170,14 @@ fun HomeScreen(
             )
         }
         item { WaveformHeader() }
+        item {
+            PrankstarBotVideo(
+                mood = botMood,
+                message = botMessage,
+                compact = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
         item {
             val hasCustom = soundsList.any { it.isCustom }
             val safeCount = soundsList.count { it.isSafeForRandomMode }
