@@ -45,6 +45,7 @@ class SoundRepository(private val context: Context) {
     private val SAFE_RANDOM_MODE_KEY = booleanPreferencesKey("safe_random_mode_default")
     private val HAPTICS_ENABLED_KEY = booleanPreferencesKey("haptics_enabled")
     private val ANIMATION_INTENSITY_KEY = stringPreferencesKey("animation_intensity")
+    private val ANIMATED_BOT_ENABLED_KEY = booleanPreferencesKey("animated_bot_enabled")
     private val SAFETY_ACK_KEY = booleanPreferencesKey("safety_ack")
 
     /**
@@ -303,6 +304,11 @@ class SoundRepository(private val context: Context) {
     fun getAnimationIntensityFlow(): Flow<String> = context.dataStore.data.map { it[ANIMATION_INTENSITY_KEY] ?: "FULL" }
     suspend fun setAnimationIntensity(value: String) {
         context.dataStore.edit { it[ANIMATION_INTENSITY_KEY] = value }
+    }
+
+    fun getAnimatedBotEnabledFlow(): Flow<Boolean> = context.dataStore.data.map { it[ANIMATED_BOT_ENABLED_KEY] ?: true }
+    suspend fun setAnimatedBotEnabled(enabled: Boolean) {
+        context.dataStore.edit { it[ANIMATED_BOT_ENABLED_KEY] = enabled }
     }
 
     fun getSafetyAckFlow(): Flow<Boolean> = context.dataStore.data.map { it[SAFETY_ACK_KEY] ?: false }

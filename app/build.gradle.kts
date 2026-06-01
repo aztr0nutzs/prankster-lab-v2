@@ -47,5 +47,7 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.compose.ui:ui-text-google-fonts:1.6.2")
     implementation("androidx.datastore:datastore-preferences:1.0.0")
+    implementation("androidx.media3:media3-exoplayer:1.3.1")
+    implementation("androidx.media3:media3-ui:1.3.1")
     implementation("com.google.code.gson:gson:2.10.1")
 }

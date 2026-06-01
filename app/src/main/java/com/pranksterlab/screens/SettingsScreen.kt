@@ -74,6 +74,7 @@ fun SettingsScreen(soundRepository: SoundRepository, audioPlayerController: Audi
     val safeModeDefault by soundRepository.getSafeRandomModeDefaultFlow().collectAsState(initial = true)
     val hapticsEnabled by soundRepository.getHapticsEnabledFlow().collectAsState(initial = true)
     val animationIntensity by soundRepository.getAnimationIntensityFlow().collectAsState(initial = "FULL")
+    val animatedBotEnabled by soundRepository.getAnimatedBotEnabledFlow().collectAsState(initial = true)
     val safetyAck by soundRepository.getSafetyAckFlow().collectAsState(initial = false)
     val playbackState by audioPlayerController.playbackState.collectAsState()
 
@@ -135,6 +136,8 @@ fun SettingsScreen(soundRepository: SoundRepository, audioPlayerController: Audi
             HUDCard(modifier = Modifier.fillMaxWidth(), accentColor = LimeAccent) {
                 Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     LabelCaps("ANIMATION INTENSITY", color = LimeAccent)
+                    NeonSwitchRow("Animated Bot", animatedBotEnabled) { scope.launch { soundRepository.setAnimatedBotEnabled(it) } }
+                    Text("Off uses the static Prankstar fallback. Minimal animation also suppresses MP4 playback.", color = Color.Gray, style = MaterialTheme.typography.bodySmall)
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         listOf("FULL", "REDUCED", "MINIMAL").forEach { value ->
                             val selected = animationIntensity == value
