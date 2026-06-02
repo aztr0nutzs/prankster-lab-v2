@@ -13,6 +13,8 @@ Commands run:
 
 `assembleDebug` completed successfully in 51 seconds.
 
+Ultimate Reactor follow-up build also passed with `bash scripts/build-android-debug.sh`.
+
 Notes:
 
 - The shell scripts were normalized to LF line endings so Bash can execute them.
@@ -48,13 +50,31 @@ Validator results:
 
 ## Runtime QA Status
 
-Blocked. ADB exists in the Android SDK, but no device or emulator is attached.
+Partial PASS for the Ultimate Reactor follow-up. ADB was available through the Android SDK and device `RFCT70ET5TF` was attached.
 
-Blocked note: `qa/RUNTIME_QA_BLOCKED.md`
+Captured:
 
-Screens that still need runtime verification:
+- `qa/screenshots/ultimate_reactor_idle.png`
+- `qa/screenshots/ultimate_reactor_power_off.png`
+- `qa/screenshots/ultimate_reactor_playing.png`
+- `qa/screenshots/ultimate_reactor_tab_core.png`
+- `qa/screenshots/ultimate_reactor_tab_mode.png`
+- `qa/screenshots/ultimate_reactor_tab_sensor.png`
+- `qa/screenshots/ultimate_reactor_tab_log.png`
+- `qa/screenshots/ultimate_reactor_strip_actions.png`
+- `qa/ultimate_reactor_logcat.txt`
 
-- Core reactor and random safe playback
+Observed:
+
+- Core/Home launched after the existing boot video.
+- Ultimate Reactor rendered natively.
+- Power off updated topbar/offline state and dimmed reactor.
+- Reactor tap played real catalog sounds and updated current sound/readout.
+- Local tabs opened.
+- Side strip taps completed without crash.
+
+Screens that still need broader runtime verification:
+
 - Sound Stash load/search/filter/play/favorite/timer shortcut
 - Forge generate/preview/save-to-Stash
 - Jokes generate/preview/stop/save-to-Stash

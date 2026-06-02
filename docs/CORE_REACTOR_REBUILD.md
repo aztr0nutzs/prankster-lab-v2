@@ -2,6 +2,47 @@
 
 Last updated: 2026-06-01
 
+## 2026-06-01 Ultimate Reactor Follow-up
+
+The Core/Home route now uses `UltimateReactorScreen`, a native Compose recreation of `prankstar_reactor_ultimate.html`.
+
+New implementation files:
+
+- `screens/UltimateReactorScreen.kt`
+- `components/reactor/ultimate/UltimateReactorState.kt`
+- `components/reactor/ultimate/UltimateReactorCanvas.kt`
+- `components/reactor/ultimate/UltimateReactorControls.kt`
+- `components/reactor/ultimate/UltimateReactorTopBar.kt`
+- `components/reactor/ultimate/UltimateReactorSideStrip.kt`
+- `components/reactor/ultimate/UltimateReactorBottomPanel.kt`
+- `components/reactor/ultimate/UltimateReactorKnob.kt`
+- `components/reactor/ultimate/UltimateReactorRadar.kt`
+- `components/reactor/ultimate/UltimateReactorVuMeter.kt`
+
+`HomeScreen.kt` delegates to the new screen. The older Home implementation is retained privately as `LegacyHomeScreen`.
+
+Build/validation status for this follow-up:
+
+- `bash scripts/android-env-check.sh`: PASS
+- `bash scripts/build-android-debug.sh`: PASS
+- `python3 tools/validate_sound_catalog.py`: BLOCKED, `python3` not installed
+- `python tools/validate_sound_catalog.py`: PASS
+- `node tools/advanced_validate.cjs`: PASS
+
+Runtime QA on attached device `RFCT70ET5TF` captured:
+
+- `qa/screenshots/ultimate_reactor_idle.png`
+- `qa/screenshots/ultimate_reactor_power_off.png`
+- `qa/screenshots/ultimate_reactor_playing.png`
+- `qa/screenshots/ultimate_reactor_tab_core.png`
+- `qa/screenshots/ultimate_reactor_tab_mode.png`
+- `qa/screenshots/ultimate_reactor_tab_sensor.png`
+- `qa/screenshots/ultimate_reactor_tab_log.png`
+- `qa/screenshots/ultimate_reactor_strip_actions.png`
+- `qa/ultimate_reactor_logcat.txt`
+
+See `docs/ULTIMATE_REACTOR_IMPLEMENTATION.md` for the full mapping from HTML JS behavior to Compose state.
+
 ## Summary
 
 The Prankster Core Reactor has been rebuilt and greatly enhanced as a native

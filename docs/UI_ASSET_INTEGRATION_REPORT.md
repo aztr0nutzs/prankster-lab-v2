@@ -1,6 +1,6 @@
 # UI Asset Integration Report
 
-Last updated: 2026-05-11
+Last updated: 2026-06-01
 
 ## UI Preservation Rule
 
@@ -33,7 +33,7 @@ Current route map from `PranksterApp.kt`:
 
 | Route | Screen | Header |
 | --- | --- | --- |
-| `home` | Core / Reactor | `prankstar_sn1` through `PrankstarHeader` |
+| `home` | Core / Ultimate Reactor | Native `UltimateReactorScreen` topbar/reactor; global dock preserved |
 | `library` | Library / Sound Stash | `header_sound_stash`, text overlay disabled |
 | `lab` | Sound Packs | `header_sound_stash`, text overlay disabled |
 | `forge` | Sound Forge | `header_sound_gen`, text overlay disabled |
@@ -118,3 +118,23 @@ The mascot is presented through a compact neon assistant card, not as a full-scr
 - Voice Lab / Joke Gen: below the Joke Gen header and above the creation controls.
 
 The existing custom headers, bottom dock, reactor, Sound Stash, bundled prank sounds, Voice Lab, and Sound Forge remain intact. MP4 robot playback is muted by default, can be disabled with the Animated Bot setting, and falls back to the static Prankstar image when the raw MP4 resources are absent.
+
+## Ultimate Reactor Integration
+
+Core/Home now renders `UltimateReactorScreen`, a native Compose implementation based on `prankstar_reactor_ultimate.html`.
+
+Preserved global UI:
+
+- Custom bottom dock remains visible and routes Core, Stash, Forge, Jokes, and System.
+- Sound Stash, Voice Lab/Jokes, Forge, System, Timer, Randomizer, Packs, and Messages routes remain registered.
+- `sound_catalog.json` and audio assets were not modified.
+- NEO/Prankstar Bot is preserved as a compact tap-open overlay from the reactor readout.
+
+New Core visual assets are drawn natively:
+
+- Top reactor status bar
+- Canvas reactor rings, arcs, LEDs, cogs, face, console, VU, radar, and waveform motifs
+- Left/right side strips
+- Local CORE / MODE / SENSOR / LOG panel
+
+Runtime screenshots for the new Core screen are in `qa/screenshots/ultimate_reactor_*.png`.

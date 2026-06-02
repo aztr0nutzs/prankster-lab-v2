@@ -72,6 +72,19 @@ fun HomeScreen(
     soundRepository: SoundRepository,
     onNavigate: (String) -> Unit = {}
 ) {
+    UltimateReactorScreen(
+        audioPlayerController = audioPlayerController,
+        soundRepository = soundRepository,
+        onNavigate = onNavigate
+    )
+}
+
+@Composable
+private fun LegacyHomeScreen(
+    audioPlayerController: AudioPlayerController,
+    soundRepository: SoundRepository,
+    onNavigate: (String) -> Unit = {}
+) {
     var soundsList       by remember { mutableStateOf(emptyList<PrankSound>()) }
     var traceLog         by remember { mutableStateOf(contextualTraceLog()) }
     var lastSoundName    by remember { mutableStateOf<String?>(null) }
