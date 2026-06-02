@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>PrankStar Reactor Ultimate</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+:root{
+  --cyan:#00e8ff;--pink:#ff00cc;--green:#66ff00;--orange:#ff6600;--red:#ff2200;
+  --amber:#ffcc00;--bg:#060a10;--panel:#080f1a;--border:#1a3050;
+  --glow-cyan:0 0 12px rgba(0,232,255,0.8);--glow-green:0 0 12px rgba(102,255,0,0.8);
+  --glow-pink:0 0 12px rgba(255,0,204,0.8);--glow-orange:0 0 12px rgba(255,102,0,0.8);
+}
+html,body{width:100%;height:100%;background:#020408;overflow:hidden;font-family:'Share Tech Mono',monospace}
+#app{width:100vw;height:100vh;display:flex;flex-direction:column;background:#040810;position:relative;max-width:480px;margin:0 auto}
+
+/* TOP STATUS BAR */
+#topbar{height:40px;background:rgba(4,12,24,0.98);border-bottom:1px solid #102035;display:flex;align-items:center;justify-content:space-between;padding:0 10px;flex-shrink:0;z-index:20}
+.topbar-item{display:flex;align-items:center;gap:5px}
+.topbar-label{font-size:8px;color:#3a7aaa;letter-spacing:1.5px;text-transform:uppercase}
+.topbar-val{font-size:10px;font-family:'Orbitron',monospace;color:var(--cyan)}
+.pulse-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse-glow 1.2s ease-in-out infinite}
+@keyframes pulse-glow{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.7)}}
+
+/* REACTOR CORE AREA */
+#reactor-section{flex:1;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+#reactor-canvas-bg{position:absolute;inset:0;z-index:0}
+
+#reactor-wrap{position:relative;z-index:5;display:flex;align-items:center;justify-content:center}
+
+/* Charge bar above reactor */
+#charge-strip{position:absolute;top:6px;left:50%;transform:translateX(-50%);width:220px;z-index:10;text-align:center}
+#charge-bar-outer{height:8px;background:rgba(0,10,20,0.9);border:1px solid #1a3a5a;border-radius:4px;overflow:hidden;margin-bottom:2px}
+#charge-bar-fill{height:100%;width:0%;background:linear-gradient(90deg,#00cc00,#66ff00,#ffcc00,#ff6600,#ff2200);border-radius:4px;transition:width 0.1s;box-shadow:0 0 6px rgba(102,255,0,0.5)}
+#charge-label{font-size:7px;color:#4a8a4a;letter-spacing:2px}
+
+/* Alert */
+#alert-box{position:absolute;top:50px;left:50%;transform:translateX(-50%);z-index:30;background:rgba(20,0,0,0.97);border:1px solid var(--red);border-radius:5px;padding:5px 14px;font-size:9px;color:var(--red);letter-spacing:2px;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap;box-shadow:0 0 20px rgba(255,34,0,0.4)}
+
+/* SIDE STRIPS */
+.side-strip{position:absolute;top:50%;transform:translateY(-50%);width:38px;z-index:8;display:flex;flex-direction:column;gap:5px;align-items:center}
+#strip-left{left:3px}
+#strip-right{right:3px}
+.strip-btn{width:32px;height:28px;border-radius:5px;background:rgba(5,15,30,0.95);border:1px solid #1a3050;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;transition:all 0.2s;position:relative}
+.strip-btn:active{transform:scale(0.92);border-color:var(--cyan)}
+.strip-btn.active-btn{border-color:var(--green);box-shadow:0 0 8px rgba(102,255,0,0.4)}
+.strip-btn.danger-btn{border-color:#330000}
+.strip-btn.danger-btn:active{border-color:var(--red);box-shadow:0 0 10px rgba(255,34,0,0.5)}
+.mini-led-col{display:flex;flex-direction:column;gap:3px;padding:4px 0}
+.mled{width:6px;height:6px;border-radius:50%}
+.mled.r{background:var(--red);box-shadow:0 0 5px var(--red)}
+.mled.g{background:var(--green);box-shadow:0 0 5px var(--green)}
+.mled.b{background:var(--cyan);box-shadow:0 0 5px var(--cyan)}
+.mled.y{background:var(--amber);box-shadow:0 0 5px var(--amber)}
+.mled.p{background:var(--pink);box-shadow:0 0 5px var(--pink)}
+.mled.off{background:#111;box-shadow:none}
+.strip-vu{width:8px;height:55px;background:#040c18;border:1px solid #1a2a3a;border-radius:2px;overflow:hidden;position:relative}
+.strip-vu-fill{position:absolute;bottom:0;width:100%;border-radius:2px;transition:height 0.12s}
+
+/* BOTTOM CONTROL ZONE */
+#control-zone{flex-shrink:0;background:rgba(3,8,16,0.98);border-top:1px solid #102035;padding:6px 8px;z-index:15}
+
+/* Tab nav */
+#tab-nav{display:flex;gap:3px;margin-bottom:6px}
+.tab-btn{flex:1;padding:5px 2px;font-size:8px;font-family:'Share Tech Mono',monospace;letter-spacing:1px;border-radius:4px;cursor:pointer;border:1px solid #1a3050;background:transparent;color:#3a6a8a;transition:all 0.2s;text-transform:uppercase}
+.tab-btn.active{background:#071525;border-color:var(--cyan);color:var(--cyan);box-shadow:0 0 8px rgba(0,232,255,0.25)}
+.tab-btn:active{transform:scale(0.96)}
+
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+/* Prank Core tab */
+.ctrl-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:6px}
+.ctrl-card{background:rgba(5,12,25,0.9);border:1px solid #1a3050;border-radius:6px;padding:7px 6px;text-align:center}
+.ctrl-card-title{font-size:7px;color:#2a6a8a;letter-spacing:1.5px;margin-bottom:5px;text-transform:uppercase}
+
+/* Knob */
+.knob-outer{width:44px;height:44px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#1e3555,#0a1525);border:2px solid #253a5a;margin:0 auto;position:relative;cursor:pointer;transition:border-color 0.2s;touch-action:none}
+.knob-outer:active,.knob-outer.dragging{border-color:var(--cyan);box-shadow:0 0 12px rgba(0,232,255,0.4)}
+.knob-ring{position:absolute;inset:4px;border-radius:50%;border:1px solid #1a3a5a}
+.knob-marker{position:absolute;top:50%;left:50%;width:3px;height:14px;background:var(--cyan);border-radius:1.5px;transform-origin:50% 100%;box-shadow:0 0 5px var(--cyan)}
+.knob-val{font-size:7px;color:var(--cyan);margin-top:3px;font-family:'Orbitron',monospace}
+.knob-lbl{font-size:7px;color:#3a6a8a;letter-spacing:1px;margin-top:1px}
+
+/* Slider */
+.slider-row{display:flex;flex-direction:column;gap:1px;margin:3px 0}
+.slider-header{display:flex;justify-content:space-between;font-size:7px;color:#3a5a7a;letter-spacing:1px}
+.slider-header span{color:var(--cyan)}
+input[type=range]{width:100%;height:4px;accent-color:var(--cyan);cursor:pointer;margin:3px 0;border-radius:2px}
+
+/* Toggle */
+.toggle-row{display:flex;justify-content:space-between;align-items:center;margin:3px 0;padding:2px 0}
+.toggle-label{font-size:8px;color:#3a7a5a;letter-spacing:1px}
+.toggle-sw{width:34px;height:17px;border-radius:8.5px;background:#050f05;border:1px solid #1a3a1a;position:relative;cursor:pointer;transition:all 0.3s;flex-shrink:0}
+.toggle-sw.on{background:#082008;border-color:var(--green);box-shadow:0 0 6px rgba(102,255,0,0.3)}
+.toggle-sw::after{content:'';position:absolute;top:3px;left:3px;width:9px;height:9px;border-radius:50%;background:#224422;transition:all 0.3s}
+.toggle-sw.on::after{left:20px;background:var(--green);box-shadow:0 0 6px var(--green)}
+
+/* Mode buttons */
+.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:4px}
+.mode-btn{padding:6px 4px;font-size:8px;font-family:'Share Tech Mono',monospace;letter-spacing:1px;border-radius:5px;cursor:pointer;border:1px solid #1a3050;background:rgba(5,12,22,0.8);color:#3a6a8a;transition:all 0.2s;text-transform:uppercase}
+.mode-btn.active{border-color:var(--cyan);color:var(--cyan);background:rgba(0,40,70,0.5);box-shadow:0 0 10px rgba(0,232,255,0.25)}
+.mode-btn.chaos-active{border-color:var(--red);color:var(--red);background:rgba(40,0,0,0.5);box-shadow:0 0 10px rgba(255,34,0,0.3)}
+.mode-btn.mega-active{border-color:var(--orange);color:var(--orange);background:rgba(30,10,0,0.5);box-shadow:0 0 10px rgba(255,102,0,0.25)}
+.mode-btn.stealth-active{border-color:#00aaff;color:#00aaff;background:rgba(0,20,50,0.5);box-shadow:0 0 10px rgba(0,170,255,0.25)}
+.mode-btn:active{transform:scale(0.94)}
+
+/* Deploy button */
+#deploy-btn{width:100%;padding:10px;font-size:13px;font-family:'Orbitron',monospace;letter-spacing:3px;border-radius:7px;cursor:pointer;border:2px solid #330000;background:radial-gradient(circle at 40% 35%,#1a0000,#080000);color:var(--red);transition:all 0.2s;text-transform:uppercase;box-shadow:0 0 12px rgba(255,34,0,0.2);margin-top:4px}
+#deploy-btn:active{transform:scale(0.97);box-shadow:0 0 25px rgba(255,34,0,0.6);border-color:var(--red);color:#fff}
+#deploy-btn.powered{border-color:var(--red);box-shadow:0 0 16px rgba(255,34,0,0.4)}
+
+/* Prank counter */
+.counter-big{font-size:32px;color:var(--green);font-family:'Orbitron',monospace;letter-spacing:4px;text-align:center;text-shadow:0 0 15px var(--green);margin:4px 0}
+.counter-lbl{font-size:7px;color:#3a6a3a;letter-spacing:2px;text-align:center}
+
+/* Prank type row */
+.type-row{display:flex;gap:4px;margin:4px 0}
+.type-btn{flex:1;padding:6px 2px;font-size:9px;border-radius:5px;cursor:pointer;border:1px solid #1a2a3a;background:rgba(5,10,20,0.8);color:#3a6a8a;text-align:center;transition:all 0.2s;font-family:'Share Tech Mono',monospace}
+.type-btn.active{border-color:var(--pink);color:var(--pink);background:rgba(30,0,20,0.5);box-shadow:0 0 8px rgba(255,0,204,0.25)}
+.type-btn:active{transform:scale(0.93)}
+
+/* Radar */
+#radar-cv{border-radius:8px;display:block;border:1px solid #0a2a1a}
+
+/* Log scroll */
+.log-scroll{font-size:8px;color:var(--green);white-space:nowrap;overflow:hidden;margin-top:4px}
+.log-inner{display:inline-block;animation:scroll-left 16s linear infinite}
+@keyframes scroll-left{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* Status dots */
+.status-row{display:flex;align-items:center;gap:5px;margin:3px 0}
+.status-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.status-text{font-size:8px;color:#3a6a5a;letter-spacing:1px}
+
+/* VU meters */
+.vu-wrap{display:flex;gap:3px;align-items:flex-end;height:40px;margin:4px 0}
+.vu-bar{width:12px;background:#040c18;border:1px solid #1a2a3a;border-radius:2px;overflow:hidden;position:relative}
+.vu-fill{position:absolute;bottom:0;width:100%;border-radius:1px;transition:height 0.12s}
+
+/* Wave canvas */
+#wave-cv{width:100%;height:28px;display:block;border-radius:3px}
+
+/* Temp display */
+#temp-disp{font-size:22px;color:var(--amber);font-family:'Orbitron',monospace;letter-spacing:2px;text-align:center}
+
+/* Power bars */
+.pbar-row{display:flex;gap:4px;align-items:center;margin:2px 0}
+.pbar-lbl{font-size:7px;color:#3a5a7a;width:30px;flex-shrink:0}
+.pbar-track{flex:1;height:6px;background:#040c18;border-radius:3px;overflow:hidden}
+.pbar-fill{height:100%;border-radius:3px;transition:width 0.4s}
+
+/* POWER BUTTON */
+#power-btn{position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:20;width:42px;height:42px;border-radius:50%;background:radial-gradient(circle at 38% 30%,#2a0a0a,#080303);border:2px solid #440000;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;transition:all 0.3s;box-shadow:0 0 10px rgba(255,34,0,0.3);color:var(--red)}
+#power-btn.on{border-color:var(--red);box-shadow:0 0 22px rgba(255,68,0,0.8),0 0 5px rgba(255,68,0,0.4) inset}
+#power-btn:active{transform:translateX(-50%) scale(0.92)}
+
+/* Animations */
+@keyframes blink-dot{0%,100%{opacity:1}50%{opacity:0.15}}
+@keyframes flicker{0%,100%{opacity:1}45%{opacity:0.9}46%{opacity:0.6}47%{opacity:0.95}92%{opacity:0.95}93%{opacity:0.7}94%{opacity:1}}
+
+/* Scrollbar hide */
+::-webkit-scrollbar{display:none}
+
+/* REACTOR SVG */
+#reactor-area{cursor:crosshair;position:relative;z-index:5}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- TOP STATUS BAR -->
+<div id="topbar">
+  <div class="topbar-item">
+    <div class="pulse-dot"></div>
+    <div><div class="topbar-label">REACTOR</div><div class="topbar-val" id="tb-status">ONLINE</div></div>
+  </div>
+  <div class="topbar-item" style="flex-direction:column;align-items:center">
+    <div class="topbar-label" style="font-size:7px">PRANK★STAR</div>
+    <div class="topbar-label" style="color:var(--pink);font-size:7px;letter-spacing:1px">MISCHIEF AI v3.7</div>
+  </div>
+  <div class="topbar-item">
+    <div style="text-align:right"><div class="topbar-label">TEMP</div><div class="topbar-val" id="tb-temp" style="color:var(--amber)">847°C</div></div>
+    <div id="batt-icon" style="width:22px;height:11px;border:1.5px solid #3a6a3a;border-radius:2px;margin-left:6px;position:relative;overflow:hidden">
+      <div id="batt-fill" style="height:100%;width:72%;background:var(--green);border-radius:1px;transition:width 1s"></div>
+      <div style="position:absolute;right:-4px;top:2px;width:3px;height:5px;background:#2a4a2a;border-radius:0 1px 1px 0"></div>
+    </div>
+  </div>
+</div>
+
+<!-- REACTOR SECTION -->
+<div id="reactor-section">
+  <canvas id="reactor-canvas-bg"></canvas>
+
+  <!-- Charge strip -->
+  <div id="charge-strip">
+    <div id="charge-bar-outer"><div id="charge-bar-fill"></div></div>
+    <div id="charge-label">MISCHIEF CHARGE</div>
+  </div>
+
+  <div id="alert-box">⚠ PRANK OVERLOAD ⚠</div>
+  <button id="power-btn" onclick="togglePower()">⏻</button>
+
+  <!-- LEFT STRIP -->
+  <div class="side-strip" id="strip-left">
+    <div class="strip-btn active-btn" onclick="stripAction('audio')" title="Audio Mod">🔊</div>
+    <div class="mini-led-col" id="left-leds">
+      <div class="mled g"></div><div class="mled b"></div><div class="mled y"></div>
+      <div class="mled g"></div><div class="mled p"></div>
+    </div>
+    <div class="strip-vu" id="vu-left-1"><div class="strip-vu-fill" id="svuf1" style="background:var(--green)"></div></div>
+    <div class="strip-vu" id="vu-left-2"><div class="strip-vu-fill" id="svuf2" style="background:var(--cyan)"></div></div>
+    <div class="strip-btn" onclick="stripAction('gear')" title="Settings">⚙</div>
+    <div class="strip-btn" onclick="stripAction('spring')" title="Spring">🌀</div>
+  </div>
+
+  <!-- MAIN REACTOR SVG -->
+  <div id="reactor-area" ontouchstart="onReactorTouch(event)" ontouchmove="onReactorMove(event)" onclick="onReactorClick(event)">
+  <svg id="rsv" width="290" height="305" viewBox="0 0 580 610" xmlns="http://www.w3.org/2000/svg" style="overflow:visible;display:block">
+  <defs>
+    <!-- Outer body gradient - dark metallic -->
+    <radialGradient id="gOuter" cx="50%" cy="48%" r="52%">
+      <stop offset="0%" stop-color="#2a2a2a"/><stop offset="40%" stop-color="#1c1c1c"/>
+      <stop offset="70%" stop-color="#252525"/><stop offset="90%" stop-color="#181818"/><stop offset="100%" stop-color="#0e0e0e"/>
+    </radialGradient>
+    <!-- Inner disc -->
+    <radialGradient id="gInner" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#181818"/><stop offset="100%" stop-color="#040404"/>
+    </radialGradient>
+    <!-- Face green gradient -->
+    <radialGradient id="gFace" cx="50%" cy="38%" r="58%">
+      <stop offset="0%" stop-color="#99ff22"/><stop offset="55%" stop-color="#55cc00"/>
+      <stop offset="100%" stop-color="#1a6600"/>
+    </radialGradient>
+    <!-- Orange speaker ring -->
+    <radialGradient id="gOrangeRing" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ff8800" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#ff4400" stop-opacity="0"/>
+    </radialGradient>
+    <!-- Carbon fiber pattern -->
+    <pattern id="cfPat" patternUnits="userSpaceOnUse" width="8" height="8">
+      <rect width="8" height="8" fill="#0c0c0c"/>
+      <rect width="4" height="4" fill="#131313"/>
+      <rect x="4" y="4" width="4" height="4" fill="#131313"/>
+    </pattern>
+    <!-- Core glow -->
+    <radialGradient id="gCoreGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#00ffcc" stop-opacity="0.22"/>
+      <stop offset="70%" stop-color="#00aaff" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
+    <!-- Pink magenta glow ring -->
+    <radialGradient id="gPinkRing" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ff00cc" stop-opacity="0"/>
+      <stop offset="85%" stop-color="#ff00cc" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#cc0099" stop-opacity="0.5"/>
+    </radialGradient>
+    <!-- Blue ring -->
+    <radialGradient id="gBlueRing" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#00aaff" stop-opacity="0"/>
+      <stop offset="80%" stop-color="#00ccff" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#0088ff" stop-opacity="0.55"/>
+    </radialGradient>
+    <filter id="glow1"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="glow2"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="glow3"><feGaussianBlur stdDeviation="10" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <clipPath id="coreClip"><circle cx="290" cy="295" r="122"/></clipPath>
+    <!-- Speaker mesh pattern -->
+    <pattern id="meshPat" patternUnits="userSpaceOnUse" width="6" height="6">
+      <circle cx="3" cy="3" r="1.5" fill="none" stroke="#444" stroke-width="0.5"/>
+    </pattern>
+  </defs>
+
+  <!-- ====== OUTER METALLIC RING ====== -->
+  <circle cx="290" cy="295" r="270" fill="url(#gOuter)" stroke="#555" stroke-width="2"/>
+
+  <!-- Outer decorative bumps/ports on edge - like reference image yellow dashes on rim -->
+  <g id="rimDashes"></g>
+
+  <!-- Knurl teeth ring (rotating) -->
+  <g id="knurlRing"></g>
+
+  <!-- LED rim on outer edge -->
+  <g id="ledRim"></g>
+
+  <!-- ====== OUTER BLUE NEON ARC RING ====== -->
+  <!-- Thick blue animated arcs - cyan segments -->
+  <circle cx="290" cy="295" r="248" fill="none" stroke="#003355" stroke-width="8"/>
+  <circle cx="290" cy="295" r="248" fill="none" stroke="#00aaff" stroke-width="7" stroke-dasharray="120 30 60 40 90 50" stroke-linecap="round" id="arcBlue1">
+    <animateTransform attributeName="transform" type="rotate" from="0 290 295" to="-360 290 295" dur="6s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="290" cy="295" r="248" fill="none" stroke="#00e8ff" stroke-width="3" stroke-dasharray="60 120 40 80" stroke-linecap="round" opacity="0.7">
+    <animateTransform attributeName="transform" type="rotate" from="180 290 295" to="-180 290 295" dur="4s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Glow layer for blue ring -->
+  <circle cx="290" cy="295" r="248" fill="url(#gBlueRing)"/>
+
+  <!-- Top bracket/connector piece -->
+  <rect x="260" y="20" width="60" height="20" rx="4" fill="#2a2a2a" stroke="#606060" stroke-width="1.5"/>
+  <rect x="274" y="14" width="32" height="8" rx="3" fill="#333" stroke="#555" stroke-width="1"/>
+  <rect x="283" y="22" width="14" height="12" rx="2" fill="#3a3a3a"/>
+  <circle cx="268" cy="30" r="3" fill="#555" stroke="#777" stroke-width="0.8"/>
+  <circle cx="312" cy="30" r="3" fill="#555" stroke="#777" stroke-width="0.8"/>
+
+  <!-- Screws on outer ring -->
+  <g id="screwsG"></g>
+
+  <!-- ====== INTERMEDIATE RING AREA with gears/machinery ====== -->
+  <!-- The mechanical innards between outer and inner ring - matches reference image -->
+  <circle cx="290" cy="295" r="200" fill="#0c0c0c" stroke="#222" stroke-width="1"/>
+
+  <!-- Gear teeth decoration around the inner ring like reference -->
+  <g id="gearTeeth"></g>
+
+  <!-- Small speaker/bolt elements at key positions (like reference image) -->
+  <!-- Speaker grill top-left -->
+  <circle cx="185" cy="220" r="20" fill="#151515" stroke="#3a3a3a" stroke-width="2"/>
+  <circle cx="185" cy="220" r="15" fill="url(#meshPat)" opacity="0.8"/>
+  <circle cx="185" cy="220" r="7" fill="#0a0a0a" stroke="#2a2a2a" stroke-width="1"/>
+  <circle cx="183" cy="218" r="1.5" fill="#555"/>
+  <circle cx="187" cy="216" r="1.5" fill="#555"/>
+  <circle cx="182" cy="222" r="1.5" fill="#555"/>
+
+  <!-- Speaker grill bottom-left -->
+  <circle cx="175" cy="380" r="20" fill="#151515" stroke="#3a3a3a" stroke-width="2"/>
+  <circle cx="175" cy="380" r="15" fill="url(#meshPat)" opacity="0.8"/>
+  <circle cx="175" cy="380" r="7" fill="#0a0a0a" stroke="#2a2a2a" stroke-width="1"/>
+
+  <!-- Speaker grill top-right -->
+  <circle cx="395" cy="220" r="20" fill="#151515" stroke="#3a3a3a" stroke-width="2"/>
+  <circle cx="395" cy="220" r="15" fill="url(#meshPat)" opacity="0.8"/>
+  <circle cx="395" cy="220" r="7" fill="#0a0a0a" stroke="#2a2a2a" stroke-width="1"/>
+
+  <!-- Spring elements (right side) - like reference image green springs -->
+  <g transform="translate(452,250)">
+    <ellipse cx="0" cy="0" rx="8" ry="5" fill="none" stroke="#44aa00" stroke-width="2.5"/>
+    <ellipse cx="0" cy="11" rx="8" ry="5" fill="none" stroke="#44aa00" stroke-width="2.5"/>
+    <ellipse cx="0" cy="22" rx="8" ry="5" fill="none" stroke="#44aa00" stroke-width="2.5"/>
+    <ellipse cx="0" cy="33" rx="8" ry="5" fill="none" stroke="#55cc00" stroke-width="2"/>
+    <circle cx="0" cy="-8" r="5" fill="#225500" stroke="#44aa00" stroke-width="1.5"/>
+    <circle cx="0" cy="41" r="5" fill="#225500" stroke="#44aa00" stroke-width="1.5"/>
+  </g>
+
+  <!-- Spring left side -->
+  <g transform="translate(118,260)">
+    <ellipse cx="0" cy="0" rx="7" ry="4" fill="none" stroke="#336600" stroke-width="2"/>
+    <ellipse cx="0" cy="10" rx="7" ry="4" fill="none" stroke="#336600" stroke-width="2"/>
+    <ellipse cx="0" cy="20" rx="7" ry="4" fill="none" stroke="#336600" stroke-width="2"/>
+  </g>
+
+  <!-- Cogs/gears decorative bottom -->
+  <g id="cogLeft" transform="translate(145,400)"><circle r="16" fill="#1a1a1a" stroke="#3a3a3a" stroke-width="1.5"/></g>
+  <g id="cogRight" transform="translate(430,400)"><circle r="16" fill="#1a1a1a" stroke="#3a3a3a" stroke-width="1.5"/></g>
+
+  <!-- ====== PINK/MAGENTA GLOWING RING ====== -->
+  <!-- This is the bright magenta ring from the reference image -->
+  <circle cx="290" cy="295" r="174" fill="none" stroke="#220011" stroke-width="9"/>
+  <circle cx="290" cy="295" r="174" fill="none" stroke="#ff00cc" stroke-width="6" stroke-dasharray="200 50 100 60" stroke-linecap="round" id="arcPink1" opacity="0.9" filter="url(#glow1)">
+    <animateTransform attributeName="transform" type="rotate" from="0 290 295" to="360 290 295" dur="5s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="290" cy="295" r="174" fill="none" stroke="#cc0088" stroke-width="3" stroke-dasharray="80 150 40 90" stroke-linecap="round" opacity="0.5">
+    <animateTransform attributeName="transform" type="rotate" from="90 290 295" to="-270 290 295" dur="8s" repeatCount="indefinite"/>
+  </circle>
+  <!-- Pink glow fill -->
+  <circle cx="290" cy="295" r="174" fill="url(#gPinkRing)" opacity="0.7"/>
+
+  <!-- ====== CYAN/BLUE INNER RING ====== -->
+  <circle cx="290" cy="295" r="155" fill="none" stroke="#002244" stroke-width="8"/>
+  <circle cx="290" cy="295" r="155" fill="none" stroke="#00aaff" stroke-width="5" stroke-dasharray="160 40 80 30" stroke-linecap="round" id="arcBlue2" filter="url(#glow1)" opacity="0.9">
+    <animateTransform attributeName="transform" type="rotate" from="0 290 295" to="-360 290 295" dur="4s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="290" cy="295" r="155" fill="none" stroke="#0066cc" stroke-width="2" stroke-dasharray="50 80" opacity="0.4">
+    <animateTransform attributeName="transform" type="rotate" from="180 290 295" to="540 290 295" dur="7s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Tick marks on inner blue ring -->
+  <g id="innerTicks"></g>
+
+  <!-- ====== CARBON FIBER DISC (inside rings) ====== -->
+  <circle cx="290" cy="295" r="133" fill="url(#cfPat)" clip-path="url(#coreClip)"/>
+  <circle cx="290" cy="295" r="133" fill="none" stroke="#222" stroke-width="1"/>
+  <circle cx="290" cy="295" r="133" fill="url(#gCoreGlow)"/>
+
+  <!-- Waveform lines across the core background -->
+  <path id="waveform1" fill="none" stroke="#ff8800" stroke-width="1.5" opacity="0.6"/>
+  <path id="waveform2" fill="none" stroke="#ff6600" stroke-width="1" opacity="0.4"/>
+
+  <!-- ====== THE FACE - GREEN SMILEY (center, like reference) ====== -->
+  <!-- Big green circle - the main face -->
+  <circle cx="290" cy="278" r="55" fill="url(#gFace)" stroke="#55bb00" stroke-width="2.5">
+    <animate attributeName="r" values="55;57;55" dur="2.5s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Face highlight -->
+  <ellipse cx="278" cy="258" rx="16" ry="5" fill="white" opacity="0.12" transform="rotate(-25,278,258)"/>
+
+  <!-- Eyes - white part -->
+  <ellipse cx="272" cy="268" rx="12" ry="13" fill="white"/>
+  <ellipse cx="308" cy="268" rx="12" ry="13" fill="white"/>
+
+  <!-- Pupil blacks (interactive) -->
+  <circle cx="273" cy="269" r="7" fill="#0a0a0a" id="eyeL"/>
+  <circle cx="309" cy="269" r="7" fill="#0a0a0a" id="eyeR"/>
+  <!-- Eye shine -->
+  <circle cx="271" cy="266" r="2.8" fill="white"/>
+  <circle cx="307" cy="266" r="2.8" fill="white"/>
+  <circle cx="269" cy="264" r="1.2" fill="white" opacity="0.7"/>
+  <circle cx="305" cy="264" r="1.2" fill="white" opacity="0.7"/>
+
+  <!-- Grin - big white teeth bar -->
+  <path d="M262,284 L318,284" fill="none" stroke="white" stroke-width="9"/>
+  <!-- Teeth divisions -->
+  <rect x="264" y="284" width="8" height="11" rx="2" fill="white" stroke="#ccc" stroke-width="0.5"/>
+  <rect x="274" y="284" width="8" height="11" rx="2" fill="white" stroke="#ccc" stroke-width="0.5"/>
+  <rect x="284" y="284" width="8" height="11" rx="2" fill="white" stroke="#ccc" stroke-width="0.5"/>
+  <rect x="294" y="284" width="8" height="11" rx="2" fill="white" stroke="#ccc" stroke-width="0.5"/>
+  <rect x="304" y="284" width="8" height="11" rx="2" fill="white" stroke="#ccc" stroke-width="0.5"/>
+  <!-- Smile curve over teeth -->
+  <path d="M262,284 Q275,306 308,304 Q322,300 318,284" fill="none" stroke="#0a0a0a" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Red star tongue/bottom point -->
+  <polygon points="290,298 285,310 297,310" fill="#ff2200"/>
+
+  <!-- PRANK★STAR text on face - orange/green style like reference -->
+  <text x="268" y="322" font-family="Arial Black,Arial" font-size="11" font-weight="900" fill="#99ff00" letter-spacing="0">Prank</text>
+  <text x="310" y="322" font-family="Arial Black,Arial" font-size="11" font-weight="900" fill="#ff6600" letter-spacing="0">st</text>
+  <text x="326" y="322" font-family="serif" font-size="11" fill="#ff2200">★</text>
+  <text x="334" y="322" font-family="Arial Black,Arial" font-size="11" font-weight="900" fill="#ff6600">r</text>
+
+  <!-- Big PRANK★STAR title at top like reference -->
+  <text x="175" y="70" font-family="Arial Black,Arial" font-size="28" font-weight="900" fill="#00e8ff" filter="url(#glow1)">Prank</text>
+  <!-- Red spinning star -->
+  <polygon id="topStar" points="248,42 253,56 268,56 257,64 261,79 248,70 235,79 239,64 228,56 243,56" fill="#ff2200" filter="url(#glow1)">
+    <animateTransform attributeName="transform" type="rotate" from="0 248 60" to="360 248 60" dur="3s" repeatCount="indefinite"/>
+  </polygon>
+  <text x="268" y="70" font-family="Arial Black,Arial" font-size="28" font-weight="900" fill="#88ff00" filter="url(#glow1)">St</text>
+  <text x="318" y="70" font-family="serif" font-size="26" fill="#ff4400" filter="url(#glow1)">★</text>
+  <text x="338" y="70" font-family="Arial Black,Arial" font-size="28" font-weight="900" fill="#88ff00" filter="url(#glow1)">r</text>
+
+  <!-- ====== NERD CONSOLE PANEL (bottom of core) ====== -->
+  <rect x="210" y="450" width="162" height="90" rx="8" fill="#050e1c" stroke="#00aaff" stroke-width="1.5"/>
+  <rect x="213" y="452" width="156" height="86" rx="6" fill="none" stroke="#003355" stroke-width="0.5"/>
+  <!-- NERD label -->
+  <text x="291" y="468" font-family="'Share Tech Mono',monospace" font-size="12" font-weight="bold" fill="#00aaff" text-anchor="middle" filter="url(#glow1)">NERD</text>
+  <!-- EQ bars animated -->
+  <g transform="translate(218,473)">
+    <rect x="0"   y="0" width="10" height="18" rx="1" fill="#ff3300"><animate attributeName="height" values="18;6;22;9;18" dur="0.65s" repeatCount="indefinite"/><animate attributeName="y" values="0;12;-4;9;0" dur="0.65s" repeatCount="indefinite"/></rect>
+    <rect x="13" y="0" width="10" height="18" rx="1" fill="#ff8800"><animate attributeName="height" values="10;24;7;19;10" dur="0.88s" repeatCount="indefinite" begin=".1s"/><animate attributeName="y" values="8;-6;11;-1;8" dur="0.88s" repeatCount="indefinite" begin=".1s"/></rect>
+    <rect x="26" y="0" width="10" height="18" rx="1" fill="#ffcc00"><animate attributeName="height" values="22;5;15;11;22" dur="0.58s" repeatCount="indefinite" begin=".2s"/><animate attributeName="y" values="-4;13;3;7;-4" dur="0.58s" repeatCount="indefinite" begin=".2s"/></rect>
+    <rect x="39" y="0" width="10" height="18" rx="1" fill="#88ff00"><animate attributeName="height" values="9;20;13;24;9" dur="1.05s" repeatCount="indefinite" begin=".05s"/><animate attributeName="y" values="9;-2;5;-6;9" dur="1.05s" repeatCount="indefinite" begin=".05s"/></rect>
+    <rect x="52" y="0" width="10" height="18" rx="1" fill="#00ff88"><animate attributeName="height" values="15;7;21;5;15" dur="0.78s" repeatCount="indefinite" begin=".3s"/><animate attributeName="y" values="3;11;-3;13;3" dur="0.78s" repeatCount="indefinite" begin=".3s"/></rect>
+    <rect x="65" y="0" width="10" height="18" rx="1" fill="#00ffcc"><animate attributeName="height" values="24;11;7;20;24" dur="0.95s" repeatCount="indefinite" begin=".15s"/><animate attributeName="y" values="-6;7;11;-2;-6" dur="0.95s" repeatCount="indefinite" begin=".15s"/></rect>
+  </g>
+  <!-- Mini radar in NERD console -->
+  <circle cx="345" cy="492" r="26" fill="#020a02" stroke="#00ff00" stroke-width="1" opacity="0.9"/>
+  <circle cx="345" cy="492" r="17" fill="none" stroke="#00cc00" stroke-width="0.5" opacity="0.3"/>
+  <circle cx="345" cy="492" r="8" fill="none" stroke="#00cc00" stroke-width="0.5" opacity="0.25"/>
+  <line cx="345" cy="492" x1="327" y1="492" x2="363" y2="492" stroke="#00aa00" stroke-width="0.5" opacity="0.3"/>
+  <line cx="345" cy="492" x1="345" y1="466" x2="345" y2="518" stroke="#00aa00" stroke-width="0.5" opacity="0.3"/>
+  <line id="radarSvgLine" x1="345" y1="492" x2="345" y2="466" stroke="#00ff44" stroke-width="1.5"/>
+  <circle cx="355" cy="484" r="2.5" fill="#00ff44" opacity="0.8"><animate attributeName="opacity" values="0.8;0;0.8" dur="2.1s" repeatCount="indefinite"/></circle>
+  <circle cx="334" cy="500" r="1.8" fill="#00ff44" opacity="0.6"><animate attributeName="opacity" values="0.6;0;0.6" dur="3.3s" repeatCount="indefinite" begin="1s"/></circle>
+  <!-- EQ level bar -->
+  <rect x="214" y="514" width="98" height="11" rx="3" fill="#060f06" stroke="#00aa00" stroke-width="0.8"/>
+  <rect x="217" y="516" width="15" height="7" rx="1" fill="#ff0000"/>
+  <rect x="234" y="516" width="15" height="7" rx="1" fill="#ff8800"/>
+  <rect x="251" y="516" width="15" height="7" rx="1" fill="#ffff00"/>
+  <rect x="268" y="516" width="15" height="7" rx="1" fill="#00ff00"/>
+  <rect x="285" y="516" width="9"  height="7" rx="1" fill="#003300"/>
+  <!-- Battery indicator right -->
+  <rect x="358" y="456" width="54" height="22" rx="4" fill="#060f06" stroke="#00aaff" stroke-width="1.5"/>
+  <rect x="412" y="461" width="4" height="12" rx="2" fill="#00aaff"/>
+  <rect x="361" y="459" width="11" height="16" rx="2" fill="#ff2200"/>
+  <rect x="374" y="459" width="11" height="16" rx="2" fill="#ff8800"/>
+  <rect x="387" y="459" width="11" height="16" rx="2" fill="#ffff00"/>
+  <rect x="400" y="459" width="9"  height="16" rx="2" fill="#00ff88"><animate attributeName="opacity" values="1;0.3;1" dur="1.5s" repeatCount="indefinite"/></rect>
+
+  <!-- ====== MISCHIEF AI badge (right side of outer ring) ====== -->
+  <circle cx="492" cy="295" r="26" fill="#031003" stroke="#00ff00" stroke-width="2">
+    <animate attributeName="stroke-width" values="2;3.5;2" dur="1.8s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="492" cy="295" r="33" fill="none" stroke="#00ff00" stroke-width="1" opacity="0.25">
+    <animate attributeName="opacity" values=".25;.7;.25" dur="1.8s" repeatCount="indefinite"/>
+  </circle>
+  <text x="492" y="288" font-family="serif" font-size="20" text-anchor="middle" fill="#55ff22" filter="url(#glow1)">😈</text>
+  <text x="492" y="312" font-family="'Share Tech Mono',monospace" font-size="7" font-weight="bold" text-anchor="middle" fill="#00ff44">MISCHIEF</text>
+  <text x="492" y="322" font-family="'Share Tech Mono',monospace" font-size="7" font-weight="bold" text-anchor="middle" fill="#00ff44">AI</text>
+
+  <!-- ====== Settings gear (left outer) ====== -->
+  <circle cx="90" cy="295" r="22" fill="#030f03" stroke="#00cc00" stroke-width="1.5"/>
+  <text x="90" y="302" font-family="serif" font-size="20" text-anchor="middle" fill="#66ff22" filter="url(#glow1)">⚙</text>
+  <circle cx="90" cy="295" r="28" fill="none" stroke="#00ff00" stroke-width="0.8" opacity="0.2">
+    <animate attributeName="opacity" values=".2;.7;.2" dur="2.5s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- ====== Speaker cone bottom left ====== -->
+  <g transform="translate(68,455)">
+    <ellipse cx="8" cy="0" rx="10" ry="6" fill="none" stroke="#cc8800" stroke-width="2"/>
+    <ellipse cx="8" cy="12" rx="10" ry="6" fill="none" stroke="#cc8800" stroke-width="2"/>
+    <ellipse cx="8" cy="24" rx="10" ry="6" fill="none" stroke="#aa6600" stroke-width="1.5"/>
+    <circle cx="8" cy="32" r="9" fill="#996600" opacity="0.5"/>
+  </g>
+  <text x="73" y="502" font-family="serif" font-size="26" text-anchor="middle" fill="#ff8800" filter="url(#glow1)">🔊</text>
+
+  <!-- Prank fish (bottom right playful) -->
+  <text x="514" y="504" font-family="serif" font-size="24" text-anchor="middle" fill="#cc4400" filter="url(#glow1)">🐿</text>
+
+  <!-- ====== RIPPLE CIRCLES ====== -->
+  <circle id="rpl1" cx="290" cy="295" r="0" fill="none" stroke="#00ffff" stroke-width="3" opacity="0"/>
+  <circle id="rpl2" cx="290" cy="295" r="0" fill="none" stroke="#ff00cc" stroke-width="2.5" opacity="0"/>
+  <circle id="rpl3" cx="290" cy="295" r="0" fill="none" stroke="#ffcc00" stroke-width="2" opacity="0"/>
+  <circle id="rpl4" cx="290" cy="295" r="0" fill="none" stroke="#66ff00" stroke-width="1.5" opacity="0"/>
+
+  <!-- Touch indicator rings -->
+  <circle id="touchRing1" cx="290" cy="295" r="0" fill="none" stroke="#ffffff" stroke-width="1.5" opacity="0"/>
+  </svg>
+  </div>
+
+  <!-- RIGHT STRIP -->
+  <div class="side-strip" id="strip-right">
+    <div class="strip-btn active-btn" onclick="stripAction('holo')" title="Holo">🎯</div>
+    <div class="mini-led-col" id="right-leds">
+      <div class="mled r"></div><div class="mled g"></div><div class="mled b"></div>
+      <div class="mled y"></div><div class="mled p"></div>
+    </div>
+    <div class="strip-vu" id="vu-right-1"><div class="strip-vu-fill" id="svuf3" style="background:var(--pink)"></div></div>
+    <div class="strip-vu" id="vu-right-2"><div class="strip-vu-fill" id="svuf4" style="background:var(--amber)"></div></div>
+    <div class="strip-btn danger-btn" onclick="stripAction('zap')" title="ZAP">⚡</div>
+    <div class="strip-btn" onclick="stripAction('ai')" title="AI Mode">🤖</div>
+  </div>
+</div>
+
+<!-- BOTTOM CONTROL ZONE -->
+<div id="control-zone">
+  <!-- Tab navigation -->
+  <div id="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('core',this)">⚡ CORE</button>
+    <button class="tab-btn" onclick="switchTab('mode',this)">🛸 MODE</button>
+    <button class="tab-btn" onclick="switchTab('sensor',this)">📡 SENSOR</button>
+    <button class="tab-btn" onclick="switchTab('log',this)">📋 LOG</button>
+  </div>
+
+  <!-- CORE TAB -->
+  <div class="tab-panel active" id="tab-core">
+    <div class="ctrl-grid">
+      <!-- Knob: CHAOS -->
+      <div class="ctrl-card">
+        <div class="ctrl-card-title">CHAOS</div>
+        <div class="knob-outer" id="kChaos" data-val="72" ontouchstart="knobTouchStart(event,'kChaos')" ontouchmove="knobTouchMove(event,'kChaos')">
+          <div class="knob-ring"></div>
+          <div class="knob-marker" id="kChaos-m" style="transform:translate(-50%,-100%) rotate(72deg)"></div>
+        </div>
+        <div class="knob-val" id="kChaos-v">72</div>
+        <div class="knob-lbl">INTENSITY</div>
+      </div>
+      <!-- Knob: SNEAK -->
+      <div class="ctrl-card">
+        <div class="ctrl-card-title">SNEAK</div>
+        <div class="knob-outer" id="kSneak" data-val="45" ontouchstart="knobTouchStart(event,'kSneak')" ontouchmove="knobTouchMove(event,'kSneak')">
+          <div class="knob-ring"></div>
+          <div class="knob-marker" id="kSneak-m" style="transform:translate(-50%,-100%) rotate(45deg)"></div>
+        </div>
+        <div class="knob-val" id="kSneak-v">45</div>
+        <div class="knob-lbl">STEALTH</div>
+      </div>
+      <!-- Knob: BOOM -->
+      <div class="ctrl-card">
+        <div class="ctrl-card-title">BOOM</div>
+        <div class="knob-outer" id="kBoom" data-val="88" ontouchstart="knobTouchStart(event,'kBoom')" ontouchmove="knobTouchMove(event,'kBoom')">
+          <div class="knob-ring"></div>
+          <div class="knob-marker" id="kBoom-m" style="transform:translate(-50%,-100%) rotate(88deg)"></div>
+        </div>
+        <div class="knob-val" id="kBoom-v">88</div>
+        <div class="knob-lbl">PAYLOAD</div>
+      </div>
+    </div>
+    <!-- Sliders -->
+    <div style="padding:0 2px">
+      <div class="slider-row">
+        <div class="slider-header">INTENSITY <span id="intVal">72</span>%</div>
+        <input type="range" min="0" max="100" value="72" oninput="setIntensity(this.value)">
+      </div>
+      <div class="slider-row">
+        <div class="slider-header">SYNC FREQ <span id="syncVal">88</span>%</div>
+        <input type="range" min="0" max="100" value="88" oninput="document.getElementById('syncVal').textContent=this.value">
+      </div>
+    </div>
+  </div>
+
+  <!-- MODE TAB -->
+  <div class="tab-panel" id="tab-mode">
+    <div class="mode-grid">
+      <button class="mode-btn active" id="mb-classic" onclick="setMode(this,'CLASSIC')">🎯 CLASSIC</button>
+      <button class="mode-btn" id="mb-stealth" onclick="setMode(this,'STEALTH')">👻 STEALTH</button>
+      <button class="mode-btn" id="mb-mega" onclick="setMode(this,'MEGA')">🔥 MEGA</button>
+      <button class="mode-btn" id="mb-chaos" onclick="setMode(this,'CHAOS')">💥 CHAOS</button>
+    </div>
+    <div class="type-row">
+      <div class="type-btn active" id="pt-splash" onclick="setPrankType(this,'SPLASH')">💦 SPLASH</div>
+      <div class="type-btn" id="pt-sound" onclick="setPrankType(this,'SOUND')">🔊 SOUND</div>
+      <div class="type-btn" id="pt-smoke" onclick="setPrankType(this,'SMOKE')">💨 SMOKE</div>
+      <div class="type-btn" id="pt-zap" onclick="setPrankType(this,'ZAP')">⚡ ZAP</div>
+    </div>
+    <button id="deploy-btn" class="powered" onclick="deployPrank()">🔥 DEPLOY PRANK 🔥</button>
+  </div>
+
+  <!-- SENSOR TAB -->
+  <div class="tab-panel" id="tab-sensor">
+    <div class="ctrl-grid">
+      <div class="ctrl-card" style="grid-column:1/3">
+        <div class="ctrl-card-title">SYSTEMS</div>
+        <div class="toggle-row"><span class="toggle-label">AUDIO MOD</span><div class="toggle-sw on" onclick="toggleSw(this)"></div></div>
+        <div class="toggle-row"><span class="toggle-label">HOLO PROJ</span><div class="toggle-sw on" onclick="toggleSw(this)"></div></div>
+        <div class="toggle-row"><span class="toggle-label">MISCHIEF AI</span><div class="toggle-sw on" onclick="toggleSw(this)"></div></div>
+        <div class="toggle-row"><span class="toggle-label">NERD MODE</span><div class="toggle-sw on" onclick="toggleSw(this)"></div></div>
+        <div class="toggle-row"><span class="toggle-label">REMOTE ARM</span><div class="toggle-sw" onclick="toggleSw(this)"></div></div>
+      </div>
+      <div class="ctrl-card">
+        <div class="ctrl-card-title">RADAR</div>
+        <canvas id="radar-cv" width="80" height="80"></canvas>
+      </div>
+    </div>
+    <div class="vu-wrap" id="vuWrap"></div>
+    <canvas id="wave-cv" width="300" height="28"></canvas>
+  </div>
+
+  <!-- LOG TAB -->
+  <div class="tab-panel" id="tab-log">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+      <div style="display:flex;gap:10px">
+        <div><div class="ctrl-card-title" style="color:#3a5a7a;font-size:7px;letter-spacing:1.5px;text-transform:uppercase">PRANKS</div><div class="counter-big" id="prank-counter" style="font-size:28px">0047</div></div>
+        <div><div class="ctrl-card-title" style="color:#3a5a7a;font-size:7px;letter-spacing:1.5px;text-transform:uppercase;margin-top:4px">TEMP</div><div id="temp-disp" style="font-size:20px;color:var(--amber);font-family:'Orbitron',monospace;letter-spacing:2px;margin-top:2px">847°C</div></div>
+      </div>
+      <button id="deploy-btn2" class="mode-btn active" style="padding:8px 12px;font-size:10px;border-color:var(--red);color:var(--red)" onclick="deployPrank()">🔥 DEPLOY</button>
+    </div>
+    <div class="pbar-row"><div class="pbar-lbl">MAIN</div><div class="pbar-track"><div class="pbar-fill" id="pg1" style="background:var(--green);width:82%"></div></div></div>
+    <div class="pbar-row"><div class="pbar-lbl">AUX</div><div class="pbar-track"><div class="pbar-fill" id="pg2" style="background:var(--cyan);width:65%"></div></div></div>
+    <div class="pbar-row"><div class="pbar-lbl">EMRG</div><div class="pbar-track"><div class="pbar-fill" id="pg3" style="background:var(--orange);width:40%"></div></div></div>
+    <div class="status-row" style="margin-top:4px"><div class="status-dot" style="background:var(--green)"></div><span class="status-text">REACTOR: ONLINE</span></div>
+    <div class="status-row"><div class="status-dot" style="background:var(--cyan);animation:blink-dot 1s infinite"></div><span class="status-text">AI CORE: ACTIVE</span></div>
+    <div class="log-scroll"><div class="log-inner" id="log-scroll">PRANK #047 DEPLOYED ✓ &nbsp;&nbsp; TARGET ACQUIRED &nbsp;&nbsp; CHAOS: 72% &nbsp;&nbsp; STEALTH ARMED &nbsp;&nbsp; AI CORE: OPTIMAL &nbsp;&nbsp; NERD SUBSYSTEM: ACTIVE &nbsp;&nbsp; ALL SYSTEMS GO &nbsp;&nbsp; PRANK #047 DEPLOYED ✓ &nbsp;&nbsp; TARGET ACQUIRED &nbsp;&nbsp; CHAOS: 72% &nbsp;&nbsp; STEALTH ARMED &nbsp;&nbsp; AI CORE: OPTIMAL &nbsp;&nbsp; NERD SUBSYSTEM: ACTIVE &nbsp;&nbsp; ALL SYSTEMS GO &nbsp;&nbsp;</div></div>
+  </div>
+</div>
+
+</div>
+
+<script>
+// ============= STATE =============
+var powered=true, prankCount=47, chargeLevel=0, currentMode='CLASSIC', currentType='SPLASH';
+var intensity=72, ripActive=false, radarAngle=0;
+var knobState={kChaos:72, kSneak:45, kBoom:88};
+var knobTouchY={};
+
+// ============= BUILD SVG ELEMENTS =============
+(function buildSVG(){
+  var svg=document.getElementById('rsv');
+  var ns='http://www.w3.org/2000/svg';
+
+  // Knurl ring
+  var kg=document.getElementById('knurlRing');
+  for(var i=0;i<80;i++){
+    var a=i/80*Math.PI*2;
+    var x1=290+Math.cos(a)*255,y1=295+Math.sin(a)*255;
+    var x2=290+Math.cos(a)*268,y2=295+Math.sin(a)*268;
+    var ln=document.createElementNS(ns,'line');
+    ln.setAttribute('x1',x1);ln.setAttribute('y1',y1);ln.setAttribute('x2',x2);ln.setAttribute('y2',y2);
+    ln.setAttribute('stroke',i%4===0?'#666':i%2===0?'#444':'#2a2a2a');ln.setAttribute('stroke-width','2');
+    kg.appendChild(ln);
+  }
+  // Animate knurl rotation
+  var kt=document.createElementNS(ns,'animateTransform');
+  kt.setAttribute('attributeName','transform');kt.setAttribute('type','rotate');
+  kt.setAttribute('from','0 290 295');kt.setAttribute('to','360 290 295');
+  kt.setAttribute('dur','30s');kt.setAttribute('repeatCount','indefinite');
+  kg.appendChild(kt);
+
+  // Rim dashes (yellow segments on outer rim like reference)
+  var rd=document.getElementById('rimDashes');
+  var dashColors=['#ffcc00','#ff8800','#ffcc00','#ff6600'];
+  for(var i=0;i<16;i++){
+    var a=i/16*Math.PI*2;
+    var x1=290+Math.cos(a)*260,y1=295+Math.sin(a)*260;
+    var x2=290+Math.cos(a)*268,y2=295+Math.sin(a)*268;
+    var ln2=document.createElementNS(ns,'line');
+    ln2.setAttribute('x1',x1);ln2.setAttribute('y1',y1);ln2.setAttribute('x2',x2);ln2.setAttribute('y2',y2);
+    ln2.setAttribute('stroke',dashColors[i%dashColors.length]);ln2.setAttribute('stroke-width','5');ln2.setAttribute('stroke-linecap','round');
+    var anim=document.createElementNS(ns,'animate');
+    anim.setAttribute('attributeName','opacity');anim.setAttribute('values','0.9;0.3;0.9');
+    anim.setAttribute('dur',(0.8+Math.random()*1.2)+'s');anim.setAttribute('begin',(Math.random()*1)+'s');
+    anim.setAttribute('repeatCount','indefinite');ln2.appendChild(anim);
+    rd.appendChild(ln2);
+  }
+
+  // LED rim (colored LEDs on outer ring)
+  var lr=document.getElementById('ledRim');
+  var lc=['#ff0000','#ff8800','#ffcc00','#00ff88','#00ccff','#aa00ff','#ff00aa'];
+  for(var i=0;i<40;i++){
+    var a=i/40*Math.PI*2;
+    var rx=290+Math.cos(a)*270,ry=295+Math.sin(a)*270;
+    var rc=document.createElementNS(ns,'rect');
+    rc.setAttribute('x',rx-3);rc.setAttribute('y',ry-6);rc.setAttribute('width','6');rc.setAttribute('height','12');rc.setAttribute('rx','2');
+    rc.setAttribute('fill',i%2===0?lc[i%lc.length]:'#111');
+    rc.setAttribute('transform','rotate('+(i/40*360)+' '+rx+' '+ry+')');
+    rc.setAttribute('opacity',i%2===0?'0.8':'0.1');
+    if(i%2===0){var ani=document.createElementNS(ns,'animate');ani.setAttribute('attributeName','opacity');
+      ani.setAttribute('values','0.8;0.15;0.8');ani.setAttribute('dur',(0.8+Math.random()*2)+'s');
+      ani.setAttribute('begin',(Math.random()*1.5)+'s');ani.setAttribute('repeatCount','indefinite');rc.appendChild(ani);}
+    lr.appendChild(rc);
+  }
+
+  // Inner tick marks on blue ring
+  var it=document.getElementById('innerTicks');
+  for(var i=0;i<60;i++){
+    var a=i/60*Math.PI*2;
+    var big=i%5===0;
+    var x1=290+Math.cos(a)*148,y1=295+Math.sin(a)*148;
+    var x2=290+Math.cos(a)*(big?140:144),y2=295+Math.sin(a)*(big?140:144);
+    var tk=document.createElementNS(ns,'line');
+    tk.setAttribute('x1',x1);tk.setAttribute('y1',y1);tk.setAttribute('x2',x2);tk.setAttribute('y2',y2);
+    tk.setAttribute('stroke',big?'#00aaff':'#003355');tk.setAttribute('stroke-width',big?'2':'1');
+    it.appendChild(tk);
+  }
+
+  // Screws
+  var sg=document.getElementById('screwsG');
+  var sa=[0.18,-0.18,Math.PI-0.18,Math.PI+0.18,-Math.PI/2+0.14,-Math.PI/2-0.14,Math.PI/2+0.12,Math.PI/2-0.12];
+  sa.forEach(function(a){
+    var x=290+Math.cos(a)*233,y=295+Math.sin(a)*233;
+    var c=document.createElementNS(ns,'circle');c.setAttribute('cx',x);c.setAttribute('cy',y);c.setAttribute('r','7');
+    c.setAttribute('fill','#3a3a3a');c.setAttribute('stroke','#777');c.setAttribute('stroke-width','1.2');sg.appendChild(c);
+    var c2=document.createElementNS(ns,'circle');c2.setAttribute('cx',x);c2.setAttribute('cy',y);c2.setAttribute('r','4');
+    c2.setAttribute('fill','#2a2a2a');sg.appendChild(c2);
+    [[x-4,y-4,x+4,y+4],[x+4,y-4,x-4,y+4]].forEach(function(pts){
+      var l=document.createElementNS(ns,'line');l.setAttribute('x1',pts[0]);l.setAttribute('y1',pts[1]);l.setAttribute('x2',pts[2]);l.setAttribute('y2',pts[3]);
+      l.setAttribute('stroke','#888');l.setAttribute('stroke-width','1.3');sg.appendChild(l);
+    });
+  });
+
+  // Gear teeth on cogs
+  ['cogLeft','cogRight'].forEach(function(id,idx){
+    var cg=document.getElementById(id);
+    for(var t=0;t<12;t++){
+      var ta=t/12*Math.PI*2;
+      var tx=Math.cos(ta)*16,ty=Math.sin(ta)*16;
+      var rect=document.createElementNS(ns,'rect');
+      rect.setAttribute('x',tx-2.5);rect.setAttribute('y',ty-4);
+      rect.setAttribute('width','5');rect.setAttribute('height','8');rect.setAttribute('rx','1');
+      rect.setAttribute('fill','#2a2a2a');rect.setAttribute('stroke','#3a3a3a');rect.setAttribute('stroke-width','0.8');
+      rect.setAttribute('transform','rotate('+(t/12*360)+' '+tx+' '+ty+')');
+      cg.appendChild(rect);
+    }
+    // Spin
+    var spin=document.createElementNS(ns,'animateTransform');
+    spin.setAttribute('attributeName','transform');spin.setAttribute('type','rotate');
+    spin.setAttribute('from','0');spin.setAttribute('to',(idx===0?'360':'-360'));
+    spin.setAttribute('dur','8s');spin.setAttribute('repeatCount','indefinite');
+    cg.appendChild(spin);
+  });
+
+  // VU meters in sensor tab
+  var vw=document.getElementById('vuWrap');
+  var vc=['#66ff00','#aaff00','#ffcc00','#ffaa00','#ff6600','#ff2200','#ff00cc','#00e8ff'];
+  for(var i=0;i<8;i++){
+    var bar=document.createElement('div');bar.className='vu-bar';bar.style.height='40px';bar.style.flex='1';
+    var fill=document.createElement('div');fill.className='vu-fill';fill.style.background=vc[i];fill.style.height=(30+Math.random()*60)+'%';
+    fill.id='vuf'+i;bar.appendChild(fill);vw.appendChild(bar);
+  }
+})();
+
+// ============= BG CANVAS =============
+var bgC=document.getElementById('reactor-canvas-bg');
+function resizeBg(){bgC.width=bgC.offsetWidth;bgC.height=bgC.offsetHeight;}
+resizeBg();
+var bgCtx=bgC.getContext('2d');
+var stars=[];
+for(var i=0;i<150;i++) stars.push({x:Math.random(),y:Math.random(),r:0.3+Math.random()*1.2,b:Math.random()*10});
+function drawBg(){
+  var W=bgC.width,H=bgC.height;
+  bgCtx.fillStyle='#04080f';bgCtx.fillRect(0,0,W,H);
+  bgCtx.save();
+  var grd=bgCtx.createRadialGradient(W/2,H/2,10,W/2,H/2,Math.max(W,H)*0.55);
+  grd.addColorStop(0,'rgba(0,30,60,0.4)');grd.addColorStop(1,'rgba(0,0,0,0)');
+  bgCtx.fillStyle=grd;bgCtx.fillRect(0,0,W,H);bgCtx.restore();
+  stars.forEach(function(s){
+    var op=0.15+0.5*Math.abs(Math.sin(Date.now()/900+s.b));
+    bgCtx.beginPath();bgCtx.arc(s.x*W,s.y*H,s.r,0,Math.PI*2);
+    bgCtx.fillStyle='rgba(100,200,255,'+op+')';bgCtx.fill();
+  });
+  requestAnimationFrame(drawBg);
+}
+drawBg();
+
+// ============= WAVEFORM =============
+var wvC=document.getElementById('wave-cv');
+var wvCtx=wvC.getContext('2d');
+var wvPhase=0;
+function drawWave(){
+  var W=wvC.offsetWidth||280;wvC.width=W;
+  wvCtx.clearRect(0,0,W,28);
+  if(!powered){wvCtx.strokeStyle='#1a3a2a';wvCtx.lineWidth=1;wvCtx.beginPath();wvCtx.moveTo(0,14);wvCtx.lineTo(W,14);wvCtx.stroke();return;}
+  var grad=wvCtx.createLinearGradient(0,0,W,0);
+  grad.addColorStop(0,'#00ff88');grad.addColorStop(0.5,'#00ffcc');grad.addColorStop(1,'#00ff88');
+  wvCtx.strokeStyle=grad;wvCtx.lineWidth=1.5;wvCtx.shadowBlur=4;wvCtx.shadowColor='#00ff88';
+  wvCtx.beginPath();
+  for(var x=0;x<W;x++){
+    var y=14+Math.sin((x/22+wvPhase)*Math.PI*2)*(6+intensity*0.04)+Math.sin((x/9+wvPhase*1.7)*Math.PI*2)*2.5;
+    x===0?wvCtx.moveTo(x,y):wvCtx.lineTo(x,y);
+  }
+  wvCtx.stroke();wvCtx.shadowBlur=0;
+  wvPhase+=0.045;
+  setTimeout(drawWave,30);
+}
+drawWave();
+
+// ============= RADAR =============
+var rdC=document.getElementById('radar-cv');
+var rdCtx=rdC.getContext('2d');
+var radarBlips=[{a:0.8,r:0.65,alive:1},{a:2.2,r:0.5,alive:1},{a:4.6,r:0.8,alive:0}];
+function drawRadar(){
+  rdCtx.clearRect(0,0,80,80);
+  rdCtx.fillStyle='rgba(2,10,2,0.96)';rdCtx.fillRect(0,0,80,80);
+  var cx=40,cy=40,maxR=34;
+  [maxR*0.33,maxR*0.67,maxR].forEach(function(r){
+    rdCtx.beginPath();rdCtx.arc(cx,cy,r,0,Math.PI*2);rdCtx.strokeStyle='rgba(0,180,0,0.2)';rdCtx.lineWidth=0.5;rdCtx.stroke();
+  });
+  rdCtx.strokeStyle='rgba(0,180,0,0.2)';rdCtx.lineWidth=0.4;
+  rdCtx.beginPath();rdCtx.moveTo(cx-maxR,cy);rdCtx.lineTo(cx+maxR,cy);rdCtx.stroke();
+  rdCtx.beginPath();rdCtx.moveTo(cx,cy-maxR);rdCtx.lineTo(cx,cy+maxR);rdCtx.stroke();
+  rdCtx.save();rdCtx.translate(cx,cy);rdCtx.rotate(radarAngle);
+  var g=rdCtx.createLinearGradient(0,-maxR,maxR*0.7,0);
+  g.addColorStop(0,'rgba(0,255,60,0.35)');g.addColorStop(1,'rgba(0,255,60,0)');
+  rdCtx.beginPath();rdCtx.moveTo(0,0);rdCtx.arc(0,0,maxR,-0.4,0);rdCtx.closePath();
+  rdCtx.fillStyle=g;rdCtx.fill();
+  rdCtx.beginPath();rdCtx.moveTo(0,0);rdCtx.lineTo(0,-maxR);
+  rdCtx.strokeStyle='rgba(0,255,90,0.9)';rdCtx.lineWidth=1.5;rdCtx.stroke();
+  rdCtx.restore();
+  radarBlips.forEach(function(b){
+    var bx=cx+Math.cos(b.a)*b.r*maxR,by=cy+Math.sin(b.a)*b.r*maxR;
+    var da=Math.abs((b.a-radarAngle)%(Math.PI*2));
+    if(da<0.3||Math.abs(da-Math.PI*2)<0.3) b.alive=1.2;
+    var op=Math.max(0,b.alive);
+    if(op>0){rdCtx.beginPath();rdCtx.arc(bx,by,3,0,Math.PI*2);rdCtx.fillStyle='rgba(0,255,100,'+op+')';rdCtx.fill();}
+    b.alive-=0.006;
+  });
+  radarAngle+=0.045;
+  // Sync SVG radar line
+  var rl=document.getElementById('radarSvgLine');
+  if(rl){rl.setAttribute('x2',345+Math.cos(radarAngle-Math.PI/2)*26);rl.setAttribute('y2',492+Math.sin(radarAngle-Math.PI/2)*26);}
+  requestAnimationFrame(drawRadar);
+}
+drawRadar();
+
+// ============= VU METERS =============
+function animateVU(){
+  for(var i=0;i<8;i++){
+    var f=document.getElementById('vuf'+i);
+    if(f){var h=powered?(20+Math.random()*75):(Math.random()*4);f.style.height=h+'%';}
+  }
+  // Side strip VUs
+  ['svuf1','svuf2','svuf3','svuf4'].forEach(function(id,i){
+    var el=document.getElementById(id);
+    if(el) el.style.height=(powered?(25+Math.random()*65):(Math.random()*5))+'%';
+  });
+  setTimeout(animateVU,140);
+}
+animateVU();
+
+// ============= CHARGE BAR =============
+function animateCharge(){
+  chargeLevel+=powered?0.5:(-chargeLevel*0.04);
+  if(chargeLevel>100) chargeLevel=0;
+  var pct=Math.max(0,chargeLevel);
+  document.getElementById('charge-bar-fill').style.width=pct+'%';
+  if(chargeLevel>88){
+    var al=document.getElementById('alert-box');al.style.opacity='1';
+    setTimeout(function(){al.style.opacity='0';},900);
+  }
+  setTimeout(animateCharge,55);
+}
+animateCharge();
+
+// ============= TEMPERATURE =============
+function animateTemp(){
+  var t=800+Math.round(intensity*1.8+Math.random()*intensity*0.4-(Math.random()*20));
+  var col=t>950?'#ff2200':t>880?'#ff6600':'#ffcc00';
+  document.getElementById('temp-disp').textContent=t+'°C';
+  document.getElementById('temp-disp').style.color=col;
+  document.getElementById('tb-temp').textContent=t+'°C';
+  document.getElementById('tb-temp').style.color=col;
+  setTimeout(animateTemp,900);
+}
+animateTemp();
+
+// ============= POWER BARS =============
+function animatePG(){
+  document.getElementById('pg1').style.width=(powered?(68+Math.random()*22):Math.random()*4)+'%';
+  document.getElementById('pg2').style.width=(powered?(48+Math.random()*26):Math.random()*3)+'%';
+  document.getElementById('pg3').style.width=(powered?(28+Math.random()*32):Math.random()*2)+'%';
+  setTimeout(animatePG,450);
+}
+animatePG();
+
+// ============= SENSOR LEDs =============
+var allLedClasses=['r','g','b','y','p','off'];
+function animateLEDs(){
+  ['left-leds','right-leds'].forEach(function(id){
+    var leds=document.querySelectorAll('#'+id+' .mled');
+    leds.forEach(function(led){
+      if(Math.random()>0.65) led.className='mled '+(powered?allLedClasses[Math.floor(Math.random()*allLedClasses.length)]:'off');
+    });
+  });
+  setTimeout(animateLEDs,550);
+}
+animateLEDs();
+
+// ============= WAVEFORM PATH in SVG =============
+var svgWavePhase=0;
+function animateSvgWave(){
+  var path1='',path2='';
+  for(var x=160;x<=420;x+=3){
+    var relX=x-290;
+    var y1=278+Math.sin((relX/18+svgWavePhase)*Math.PI*2)*(powered?7:1)+Math.sin((relX/8+svgWavePhase*2)*Math.PI*2)*(powered?2.5:0.3);
+    var y2=282+Math.sin((relX/14+svgWavePhase*1.3)*Math.PI*2)*(powered?5:0.5);
+    if(x===160){path1='M'+x+','+y1;path2='M'+x+','+y2;}
+    else{path1+=' L'+x+','+y1;path2+=' L'+x+','+y2;}
+  }
+  document.getElementById('waveform1').setAttribute('d',path1);
+  document.getElementById('waveform2').setAttribute('d',path2);
+  svgWavePhase+=0.06;
+  requestAnimationFrame(animateSvgWave);
+}
+animateSvgWave();
+
+// ============= RIPPLE =============
+function triggerRipple(){
+  if(ripActive) return;ripActive=true;
+  var ids=['rpl1','rpl2','rpl3','rpl4'];
+  var cols=['#00ffff','#ff00cc','#ffcc00','#66ff00'];
+  var start=null;
+  function animate(ts){
+    if(!start) start=ts;
+    var p=Math.min((ts-start)/700,1);
+    ids.forEach(function(id,i){
+      var el=document.getElementById(id);
+      var delay=i*0.12;var pp=Math.max(0,Math.min((p-delay)/(1-delay),1));
+      el.setAttribute('r',70+pp*150);el.setAttribute('opacity',(1-pp)*0.85);el.setAttribute('stroke-width',3+pp*5);
+    });
+    if(p<1) requestAnimationFrame(animate);
+    else{ids.forEach(function(id){var el=document.getElementById(id);el.setAttribute('r',0);el.setAttribute('opacity',0);});ripActive=false;}
+  }
+  requestAnimationFrame(animate);
+}
+
+// ============= REACTOR TOUCH/CLICK =============
+function onReactorClick(e){
+  if(!powered) return;
+  triggerRipple();
+  chargeLevel=Math.min(100,chargeLevel+18);
+  var rect=e.currentTarget.getBoundingClientRect();
+  var mx=(e.clientX-rect.left)/rect.width*580;
+  var my=(e.clientY-rect.top)/rect.height*610;
+  moveEyes(mx,my);
+  rippleTouch(mx,my);
+}
+function onReactorTouch(e){
+  e.preventDefault();
+  if(!powered) return;
+  var rect=e.currentTarget.getBoundingClientRect();
+  var t=e.touches[0];
+  var mx=(t.clientX-rect.left)/rect.width*580;
+  var my=(t.clientY-rect.top)/rect.height*610;
+  triggerRipple();
+  chargeLevel=Math.min(100,chargeLevel+18);
+  moveEyes(mx,my);rippleTouch(mx,my);
+}
+function onReactorMove(e){
+  e.preventDefault();
+  if(!powered) return;
+  var rect=e.currentTarget.getBoundingClientRect();
+  var t=e.touches[0];
+  var mx=(t.clientX-rect.left)/rect.width*580;
+  var my=(t.clientY-rect.top)/rect.height*610;
+  moveEyes(mx,my);
+}
+function moveEyes(mx,my){
+  var dx=mx-290,dy=my-295,len=Math.sqrt(dx*dx+dy*dy);
+  if(len>0){dx/=len;dy/=len;}
+  document.getElementById('eyeL').setAttribute('cx',273+dx*4);
+  document.getElementById('eyeL').setAttribute('cy',269+dy*4);
+  document.getElementById('eyeR').setAttribute('cx',309+dx*4);
+  document.getElementById('eyeR').setAttribute('cy',269+dy*4);
+}
+function rippleTouch(mx,my){
+  var tr=document.getElementById('touchRing1');
+  tr.setAttribute('cx',mx);tr.setAttribute('cy',my);tr.setAttribute('r',0);tr.setAttribute('opacity','1');
+  var start=null;
+  function anim(ts){if(!start)start=ts;var p=Math.min((ts-start)/400,1);
+    tr.setAttribute('r',p*35);tr.setAttribute('opacity',(1-p)*0.8);
+    if(p<1)requestAnimationFrame(anim);}
+  requestAnimationFrame(anim);
+}
+
+// ============= KNOB TOUCH =============
+function knobTouchStart(e,id){e.preventDefault();knobTouchY[id]=e.touches[0].clientY;}
+function knobTouchMove(e,id){
+  e.preventDefault();
+  var dy=knobTouchY[id]-e.touches[0].clientY;
+  knobTouchY[id]=e.touches[0].clientY;
+  var v=Math.max(0,Math.min(100,(knobState[id]||50)+dy));
+  knobState[id]=v;
+  updateKnob(id,v);
+}
+function updateKnob(id,val){
+  var deg=-135+val*2.7;
+  var m=document.getElementById(id+'-m');
+  if(m) m.style.transform='translate(-50%,-100%) rotate('+deg+'deg)';
+  var vEl=document.getElementById(id+'-v');
+  if(vEl) vEl.textContent=Math.round(val);
+  if(id==='kChaos'){intensity=val;document.getElementById('intVal').textContent=Math.round(val);}
+}
+
+// ============= TOGGLE =============
+function toggleSw(el){el.classList.toggle('on');}
+
+// ============= MODE =============
+function setMode(el,mode){
+  document.querySelectorAll('.mode-btn').forEach(function(b){b.classList.remove('active','chaos-active','mega-active','stealth-active');});
+  currentMode=mode;
+  var cls={CLASSIC:'active',STEALTH:'stealth-active',MEGA:'mega-active',CHAOS:'chaos-active'};
+  el.classList.add(cls[mode]||'active');
+}
+
+// ============= PRANK TYPE =============
+function setPrankType(el,type){
+  document.querySelectorAll('.type-btn').forEach(function(b){b.classList.remove('active');});
+  el.classList.add('active');currentType=type;
+}
+
+// ============= DEPLOY =============
+function deployPrank(){
+  if(!powered) return;
+  prankCount++;
+  var d=document.getElementById('prank-counter');
+  d.textContent=String(prankCount).padStart(4,'0');
+  d.style.color='#ff2200';d.style.textShadow='0 0 20px #ff2200';
+  setTimeout(function(){d.style.color='var(--green)';d.style.textShadow='0 0 15px var(--green)';},600);
+  triggerRipple();chargeLevel=Math.min(100,chargeLevel+30);
+  var msg='PRANK #'+String(prankCount).padStart(3,'0')+' ['+currentType+'] DEPLOYED ✓ &nbsp;&nbsp; '+currentMode+' MODE &nbsp;&nbsp; CHAOS:'+Math.round(intensity)+'% &nbsp;&nbsp; TARGET LOCKED &nbsp;&nbsp; ';
+  var inner=document.getElementById('log-scroll');
+  inner.innerHTML=msg+msg;
+  // Flash reactor
+  var eye=document.getElementById('rsv');
+  eye.style.filter='drop-shadow(0 0 20px rgba(255,0,200,0.8)) drop-shadow(0 0 40px rgba(0,255,200,0.4))';
+  setTimeout(function(){eye.style.filter='';},400);
+}
+
+// ============= POWER =============
+function togglePower(){
+  powered=!powered;
+  document.getElementById('power-btn').classList.toggle('on',powered);
+  document.getElementById('tb-status').textContent=powered?'ONLINE':'OFFLINE';
+  document.getElementById('tb-status').style.color=powered?'var(--cyan)':'#444';
+  document.getElementById('arcBlue1').style.opacity=powered?'1':'0.1';
+  document.getElementById('arcPink1').style.opacity=powered?'0.9':'0.05';
+}
+
+// ============= INTENSITY =============
+function setIntensity(v){intensity=parseInt(v);document.getElementById('intVal').textContent=v;knobState['kChaos']=parseInt(v);updateKnob('kChaos',parseInt(v));}
+
+// ============= TAB SWITCH =============
+function switchTab(id,el){
+  document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
+  document.getElementById('tab-'+id).classList.add('active');
+  el.classList.add('active');
+  if(id==='sensor'){setTimeout(function(){var W=wvC.offsetWidth||280;wvC.width=W;drawWave();},50);}
+}
+
+// ============= STRIP ACTIONS =============
+function stripAction(type){
+  triggerRipple();
+  var msgs={audio:'🔊 AUDIO MOD TOGGLED',gear:'⚙ SETTINGS OPENED',holo:'🎯 HOLO TARGET ACQUIRED',zap:'⚡ ZAP ARMED!',ai:'🤖 MISCHIEF AI ONLINE',spring:'🌀 SPRING LOADED'};
+  var al=document.getElementById('alert-box');
+  al.textContent=msgs[type]||'SYSTEM OK';
+  al.style.borderColor=type==='zap'?'var(--red)':'var(--cyan)';
+  al.style.color=type==='zap'?'var(--red)':'var(--cyan)';
+  al.style.opacity='1';
+  setTimeout(function(){al.style.opacity='0';al.style.borderColor='var(--red)';al.style.color='var(--red)';},1200);
+}
+
+// ============= BATTERY ANIMATION =============
+(function animBatt(){
+  var pct=powered?(55+Math.random()*40):Math.random()*15;
+  document.getElementById('batt-fill').style.width=pct+'%';
+  document.getElementById('batt-fill').style.background=pct>60?'var(--green)':pct>30?'var(--amber)':'var(--red)';
+  setTimeout(animBatt,2500);
+})();
+
+// ============= BOTTOM NERD CONSOLE ============= 
+// Animate mini display labels
+(function animNerd(){
+  // Randomly flicker the NERD text filter
+  setTimeout(animNerd, 3000+Math.random()*5000);
+})();
+
+// Init knobs visual
+updateKnob('kChaos',72);updateKnob('kSneak',45);updateKnob('kBoom',88);
+</script>
+</body>
+</html>
