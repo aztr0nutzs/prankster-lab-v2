@@ -113,3 +113,12 @@ Screen headers are preserved. Visual QA should confirm baked text and overlay te
 - `.\gradlew.bat assembleDebug --stacktrace --console=plain` passed and produced a debug APK.
 - Audio validators passed for all 369 catalog entries/files.
 - Remaining runtime blocker: ADB is available, but no device/emulator was attached, so visual QA and screenshots for the new Home/Core MP4 background/header were not captured.
+
+## Home/Core runtime wiring follow-up blockers (2026-06-05)
+
+- Upstream sync could not be performed in this environment because no `origin` remote is configured.
+- Android SDK validation failed in this Linux container: `local.properties` points to a Windows SDK path and `ANDROID_HOME` / `ANDROID_SDK_ROOT` are unset.
+- Because the SDK check failed, Gradle `assembleDebug` was not run here.
+- No ADB device/emulator is attached, so Home/Core screenshots and logcat runtime QA were not captured.
+- Reactor mode selection is currently `rememberSaveable` session/activity state; DataStore persistence can be added in a separate focused change if required.
+- This PR no longer adds `prankstar_bot_*.mp4` binaries; animated bot video depends on those raw resources already existing in the packaged app, otherwise the static bot fallback is used.
