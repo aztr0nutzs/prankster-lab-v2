@@ -26,13 +26,14 @@ import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
+import com.pranksterlab.R
 import com.pranksterlab.core.repository.dataStore
 import kotlinx.coroutines.flow.map
 
 @Composable
 fun PrankstarVideoBackground(
     modifier: Modifier = Modifier,
-    resourceName: String = "prankstar_bg",
+    rawResId: Int = R.raw.prankstar_bg,
 ) {
     val context = LocalContext.current
     val animationIntensity by remember {
@@ -40,10 +41,7 @@ fun PrankstarVideoBackground(
             preferences[androidx.datastore.preferences.core.stringPreferencesKey("animation_intensity")] ?: "FULL"
         }
     }.collectAsState(initial = "FULL")
-    val videoResId = remember(context, resourceName) {
-        context.resources.getIdentifier(resourceName, "raw", context.packageName)
-    }
-    val showVideo = animationIntensity != "MINIMAL" && videoResId != 0
+    val showVideo = animationIntensity != "MINIMAL"
 
     Box(
         modifier = modifier
@@ -56,7 +54,7 @@ fun PrankstarVideoBackground(
     ) {
         if (showVideo) {
             MutedLoopingRawVideo(
-                rawResId = videoResId,
+                rawResId = rawResId,
                 modifier = Modifier.fillMaxSize(),
                 resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM,
             )

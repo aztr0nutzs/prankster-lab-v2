@@ -105,9 +105,11 @@ Screen headers are preserved. Visual QA should confirm baked text and overlay te
 - Screenshot capture for Core, Stash, Forge, Jokes, and System
 ## Home/Core Asset Pass - 2026-06-05
 
-- The expected uploaded files `prankstar_bg.mp4`, `1000056777.mp4`, and `prankstar_home.html` were not present in the attachment directory or project workspace.
-- Because the files were absent, `R.raw.prankstar_bg` and `R.raw.prankstar_header` cannot be generated yet.
-- The Home/Core implementation is ready to consume those resource names once the files are added at:
+- Root asset search found `prankstar_bg.mp4`, `prankstar_header.mp4`, and `prankstar_home.html` at the project root.
+- Assets were copied to:
   - `app/src/main/res/raw/prankstar_bg.mp4`
   - `app/src/main/res/raw/prankstar_header.mp4`
   - `docs/reference/prankstar_home.html`
+- `.\gradlew.bat assembleDebug --stacktrace --console=plain` passed and produced a debug APK.
+- Audio validators passed for all 369 catalog entries/files.
+- Remaining runtime blocker: ADB is available, but no device/emulator was attached, so visual QA and screenshots for the new Home/Core MP4 background/header were not captured.

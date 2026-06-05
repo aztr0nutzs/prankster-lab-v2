@@ -33,7 +33,7 @@ import kotlinx.coroutines.flow.map
 @Composable
 fun PrankstarHeaderVideo(
     modifier: Modifier = Modifier,
-    resourceName: String = "prankstar_header",
+    rawResId: Int = R.raw.prankstar_header,
     height: Dp = 88.dp,
 ) {
     val context = LocalContext.current
@@ -42,10 +42,7 @@ fun PrankstarHeaderVideo(
             preferences[androidx.datastore.preferences.core.stringPreferencesKey("animation_intensity")] ?: "FULL"
         }
     }.collectAsState(initial = "FULL")
-    val videoResId = remember(context, resourceName) {
-        context.resources.getIdentifier(resourceName, "raw", context.packageName)
-    }
-    val showVideo = animationIntensity != "MINIMAL" && videoResId != 0
+    val showVideo = animationIntensity != "MINIMAL"
     val shape = RoundedCornerShape(14.dp)
 
     Box(
@@ -66,7 +63,7 @@ fun PrankstarHeaderVideo(
     ) {
         if (showVideo) {
             MutedLoopingRawVideo(
-                rawResId = videoResId,
+                rawResId = rawResId,
                 modifier = Modifier.matchParentSize(),
                 resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM,
             )

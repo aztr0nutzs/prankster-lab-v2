@@ -90,8 +90,9 @@ This prevents the baked Jokes artwork from reading as active on every route.
 ## Current Verification
 
 - Static route audit: PASS
-- Debug build through PowerShell wrapper: PASS
-- Runtime visual QA on device/emulator: BLOCKED, no attached device was available during the latest pass
+- Debug build through `.\gradlew.bat assembleDebug --stacktrace --console=plain`: PASS
+- Clean build through `.\scripts\build-android-debug.ps1`: BLOCKED by locked Windows `app/build` files before compilation
+- Runtime visual QA on device/emulator: BLOCKED, ADB was available but no device/emulator was attached
 
 No audio assets or `sound_catalog.json` were changed for UI integration.
 
@@ -156,8 +157,17 @@ Implemented:
 
 Not implemented because source assets were missing:
 
-- `app/src/main/res/raw/prankstar_bg.mp4`
-- `app/src/main/res/raw/prankstar_header.mp4`
-- `docs/reference/prankstar_home.html`
+- None for asset import. Project-root sources were found and copied.
+
+Imported paths:
+
+- `./prankstar_bg.mp4` -> `app/src/main/res/raw/prankstar_bg.mp4`
+- `./prankstar_header.mp4` -> `app/src/main/res/raw/prankstar_header.mp4`
+- `./prankstar_home.html` -> `docs/reference/prankstar_home.html`
+
+Validation:
+
+- `python tools\validate_sound_catalog.py`: PASS, 369 entries, 0 missing files.
+- `node tools\advanced_validate.cjs`: PASS, checked 369 files.
 
 No placeholder MP4 or fake HTML was created.

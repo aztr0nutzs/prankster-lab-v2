@@ -2,4 +2,4 @@
 
 This folder stores design-only reference files.
 
-`prankstar_home.html` is expected here when the uploaded HTML reference is available. It was not present in the received attachment set for this pass.
+`prankstar_home.html` is copied here from the project root for design reference only. The Android app recreates the screen natively and does not load this file in a WebView.
