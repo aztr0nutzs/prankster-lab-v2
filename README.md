@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="./prankstar_sn3.png" alt="Prankster Lab v2 banner" width="100%" />
+  <img src="./prankstar_teaser.png" alt="Prankster Lab v2 banner" width="100%" />
 </div>
 
 <div align="center">
