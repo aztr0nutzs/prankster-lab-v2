@@ -1,0 +1,240 @@
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:23:06-04 23:03:24.248  8446  8555 E Qdio::ParseQdio: File Search Error
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:25:06-04 23:03:24.252  8446  8555 W ExifInterface: java.io.EOFException
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:68:06-04 23:03:24.804  1495  4969 D SGM:GameManager: identifyForegroundApp. com.pranksterlab, mCurrentUserId: 0, callerUserId: 0
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:69:06-04 23:03:24.804  1495  4969 D SGM:PkgDataHelper: getGamePkgData(). com.pranksterlab
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:362:06-04 23:03:28.849  1495  4969 D SGM:GameManager: identifyForegroundApp. com.pranksterlab, mCurrentUserId: 0, callerUserId: 0
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:363:06-04 23:03:28.849  1495  4969 D SGM:PkgDataHelper: getGamePkgData(). com.pranksterlab
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:476:06-04 23:03:31.184 20613 24288 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:498:06-04 23:03:31.396 20613 24287 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:587:06-04 23:03:33.544  1495  2960 D SGM:GameManager: identifyForegroundApp. com.pranksterlab, mCurrentUserId: 0, callerUserId: 0
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:588:06-04 23:03:33.545  1495  2960 D SGM:PkgDataHelper: getGamePkgData(). com.pranksterlab
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:1145:06-04 23:03:39.823 20613 24287 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:1229:06-04 23:03:41.285 20613 24288 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:1412:06-04 23:03:46.207  1495  3018 D SGM:GameManager: identifyForegroundApp. com.pranksterlab, mCurrentUserId: 0, callerUserId: 0
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:1414:06-04 23:03:46.207  1495  3018 D SGM:PkgDataHelper: getGamePkgData(). com.pranksterlab
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:1583:06-04 23:03:48.254 20613 24287 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:1694:06-04 23:03:50.103 10578 10699 I NullBinder: NullBinder for android.net.action.RECOMMEND_NETWORKS triggering remote TransactionTooLargeException due to Service without Chimera impl, calling uid: 1000, calling pid: 0
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:1751:06-04 23:03:51.383 20613 24288 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:1868:06-04 23:03:53.109 10578 18412 I NullBinder: NullBinder for android.net.action.RECOMMEND_NETWORKS triggering remote TransactionTooLargeException due to Service without Chimera impl, calling uid: 1000, calling pid: 0
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:1918:06-04 23:03:53.642  1561  4014 V MediaPlayerService: Create new client(38) from AttributionSourceState{pid: 20613, uid: 10378, packageName: com.pranksterlab, attributionTag: (null), token: {no toString() implemented}, renouncedPermissions: [], next: []}, 
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:1996:06-04 23:03:53.738  1561 26363 V NuPlayer: checkOffloadExceptions is true, call canOffloadStream
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:2008:06-04 23:03:53.746  1561 26363 V NuPlayer: checkOffloadExceptions is true, call canOffloadStream
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:2045:06-04 23:03:53.793  1561 26368 D MediaCodec: flushMediametrics
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:2071:06-04 23:03:53.797  1561 26368 I MediaCodec: MediaCodec will operate in async mode
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:2072:06-04 23:03:53.797  1561 26367 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:2146:06-04 23:03:53.853  1357  1665 I AudioPolicyEffectException: MySpaceHandler::checkDetachCondition media 1, ring 0, mp 1
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:2147:06-04 23:03:53.853  1357  1665 I AudioPolicyEffectException: MySpace detach short duration
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:2148:06-04 23:03:53.853  1357  1665 I AudioPolicyEffectException: MySpace detach value 1
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:2419:06-04 23:03:55.168  1561 26368 I MediaCodec: Codec shutdown complete
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:2420:06-04 23:03:55.168  1561 26367 D MediaCodec: flushMediametrics
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:2428:06-04 23:03:55.173  1561 32181 V MediaPlayerService: disconnect(38) from AttributionSource AttributionSourceState{pid: 20613, uid: 10378, packageName: com.pranksterlab, attributionTag: (null), token: {no toString() implemented}, renouncedPermissions: [], next: []}
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:2445:06-04 23:03:55.174  1561 32181 V MediaPlayerService: Client(38) destructor AttributionSource = AttributionSourceState{pid: 20613, uid: 10378, packageName: com.pranksterlab, attributionTag: (null), token: {no toString() implemented}, renouncedPermissions: [], next: []}
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:2461:06-04 23:03:55.178  1561 32181 V MediaPlayerService: disconnect(38) from AttributionSource AttributionSourceState{pid: 20613, uid: 10378, packageName: com.pranksterlab, attributionTag: (null), token: {no toString() implemented}, renouncedPermissions: [], next: []}
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:2529:06-04 23:03:55.988  8446  8555 W ExifInterface: java.io.IOException: Encountered corrupt PNG file.
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:2583:06-04 23:03:56.672 20613 24287 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:2664:06-04 23:03:56.956  1561 32181 V MediaPlayerService: Create new client(39) from AttributionSourceState{pid: 20613, uid: 10378, packageName: com.pranksterlab, attributionTag: (null), token: {no toString() implemented}, renouncedPermissions: [], next: []}, 
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:2738:06-04 23:03:56.980  1561 26398 V NuPlayer: checkOffloadExceptions is true, call canOffloadStream
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:2750:06-04 23:03:56.981  1561 26398 V NuPlayer: checkOffloadExceptions is true, call canOffloadStream
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:2781:06-04 23:03:56.995  1561 26403 D MediaCodec: flushMediametrics
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:2808:06-04 23:03:56.997  1561 26403 I MediaCodec: MediaCodec will operate in async mode
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:2809:06-04 23:03:56.997  1561 26402 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:2876:06-04 23:03:57.018  1357  1665 I AudioPolicyEffectException: MySpaceHandler::checkDetachCondition media 1, ring 0, mp 1
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:2877:06-04 23:03:57.018  1357  1665 I AudioPolicyEffectException: MySpace detach short duration
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:2878:06-04 23:03:57.018  1357  1665 I AudioPolicyEffectException: MySpace detach value 1
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:3023:06-04 23:03:58.240  8446  8555 E Qdio::ParseQdio: File Search Error
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:3025:06-04 23:03:58.244  8446  8555 W ExifInterface: java.io.EOFException
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:3424:06-04 23:04:01.050  1561 26403 I MediaCodec: Codec shutdown complete
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:3425:06-04 23:04:01.051  1561 26402 D MediaCodec: flushMediametrics
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:3437:06-04 23:04:01.055  1561  4014 V MediaPlayerService: disconnect(39) from AttributionSource AttributionSourceState{pid: 20613, uid: 10378, packageName: com.pranksterlab, attributionTag: (null), token: {no toString() implemented}, renouncedPermissions: [], next: []}
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:3456:06-04 23:04:01.057  1561  4014 V MediaPlayerService: Client(39) destructor AttributionSource = AttributionSourceState{pid: 20613, uid: 10378, packageName: com.pranksterlab, attributionTag: (null), token: {no toString() implemented}, renouncedPermissions: [], next: []}
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:3466:06-04 23:04:01.058  1561  4014 V MediaPlayerService: disconnect(39) from AttributionSource AttributionSourceState{pid: 20613, uid: 10378, packageName: com.pranksterlab, attributionTag: (null), token: {no toString() implemented}, renouncedPermissions: [], next: []}
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:3504:06-04 23:04:01.484 20613 24288 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:3664:06-04 23:04:05.100 20613 24287 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:3685:06-04 23:04:05.207  1495  3018 D SGM:GameManager: identifyForegroundApp. com.pranksterlab, mCurrentUserId: 0, callerUserId: 0
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:3686:06-04 23:04:05.207  1495  3018 D SGM:PkgDataHelper: getGamePkgData(). com.pranksterlab
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:3896:06-04 23:04:11.574 20613 24288 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:3947:06-04 23:04:13.529 20613 24287 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:4156:06-04 23:04:21.677 20613 24288 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:4190:06-04 23:04:21.943 20613 24287 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:4336:06-04 23:04:28.603  8446  8555 W ExifInterface: java.io.IOException: Encountered corrupt PNG file.
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:4453:06-04 23:04:30.375 20613 24287 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:4583:06-04 23:04:31.771 20613 24288 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:4605:06-04 23:04:31.820  8446  8555 W ExifInterface: java.io.IOException: Encountered corrupt PNG file.
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:4830:06-04 23:04:35.028  8446  8555 W ExifInterface: java.io.IOException: Encountered corrupt PNG file.
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:5042:06-04 23:04:38.240  8446  8555 W ExifInterface: java.io.IOException: Encountered corrupt PNG file.
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:5078:06-04 23:04:38.797 20613 24287 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:5296:06-04 23:04:41.452  8446  8555 W ExifInterface: java.io.IOException: Encountered corrupt PNG file.
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:5318:06-04 23:04:41.868 20613 24288 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:5512:06-04 23:04:45.926  1495  3018 D SGM:GameManager: identifyForegroundApp. com.pranksterlab, mCurrentUserId: 0, callerUserId: 0
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:5513:06-04 23:04:45.926  1495  3018 D SGM:PkgDataHelper: getGamePkgData(). com.pranksterlab
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:5547:06-04 23:04:47.237 20613 24287 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:5616:06-04 23:04:50.638  1495  2889 D SGM:GameManager: identifyForegroundApp. com.pranksterlab, mCurrentUserId: 0, callerUserId: 0
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:5617:06-04 23:04:50.638  1495  2889 D SGM:PkgDataHelper: getGamePkgData(). com.pranksterlab
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:5632:06-04 23:04:51.976 20613 24288 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:5716:06-04 23:04:55.662 20613 24287 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:5887:06-04 23:05:02.064 20613 24288 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:5963:06-04 23:05:04.088 20613 24287 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:6149:06-04 23:05:12.167 20613 24288 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:6169:06-04 23:05:12.520 20613 24287 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:6300:06-04 23:05:20.942 20613 24287 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:6319:06-04 23:05:22.275 20613 24288 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:6494:06-04 23:05:29.360 20613 24287 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:6557:06-04 23:05:32.362 20613 24288 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:6674:06-04 23:05:37.788 20613 24287 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:6796:06-04 23:05:42.464 20613 24288 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:6872:06-04 23:05:46.223 20613 24287 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:6961:06-04 23:05:52.568 20613 24288 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7001:06-04 23:05:54.652 20613 24287 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7291:06-04 23:06:02.656 20613 24288 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7325:06-04 23:06:03.068 20613 24287 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7381:06-04 23:06:04.598  1371  1371 I SurfaceFlinger: [SurfaceView[com.pranksterlab/com.pranksterlab.MainActivity]@0(BLAST)#13424] setFrameRate: 0.000000, Compatibility: 0, Strategy: 0
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7382:06-04 23:06:04.598  1371  1371 I SurfaceFlinger: [SurfaceView[com.pranksterlab/com.pranksterlab.MainActivity]@0(BLAST)#13421] setFrameRate: 0.000000, Compatibility: 0, Strategy: 0
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7453:06-04 23:06:05.552 20613 24295 I MediaCodec: [OMX.qcom.video.decoder.avc] setting surface generation to 21107731
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7479:06-04 23:06:05.559 20613 24297 I MediaCodec: [OMX.qcom.video.decoder.avc] setting surface generation to 21107732
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7497:06-04 23:06:05.581 20613 20613 I ExoPlayerImpl: Release c98afd3 [AndroidXMedia3/1.3.1] [r8q, SM-G781V, samsung, 33] [media3.common, media3.exoplayer, media3.decoder, media3.ui, media3.datasource, media3.extractor]
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7504:06-04 23:06:05.586 20613 24288 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7510:06-04 23:06:05.590 20613 24288 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7522:06-04 23:06:05.595 20613 24297 I MediaCodec: [OMX.qcom.video.decoder.avc] setting surface generation to 21107733
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7532:06-04 23:06:05.600 20613 24315 D CCodecBufferChannel: [c2.android.aac.decoder#637] MediaCodec discarded an unknown buffer
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7533:06-04 23:06:05.600 20613 24315 D CCodecBufferChannel: [c2.android.aac.decoder#637] MediaCodec discarded an unknown buffer
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7534:06-04 23:06:05.600 20613 24315 D CCodecBufferChannel: [c2.android.aac.decoder#637] MediaCodec discarded an unknown buffer
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7535:06-04 23:06:05.600 20613 24315 D CCodecBufferChannel: [c2.android.aac.decoder#637] MediaCodec discarded an unknown buffer
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7539:06-04 23:06:05.606 20613 24315 I MediaCodec: Codec shutdown complete
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7540:06-04 23:06:05.606 20613 24315 D MediaCodec: flushMediametrics
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7541:06-04 23:06:05.606 20613 24315 D MediaCodec: flushMediametrics
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7544:06-04 23:06:05.608 20613 20613 I ExoPlayerImpl: Release 5d9e099 [AndroidXMedia3/1.3.1] [r8q, SM-G781V, samsung, 33] [media3.common, media3.exoplayer, media3.decoder, media3.ui, media3.datasource, media3.extractor]
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7551:06-04 23:06:05.610 20613 24287 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7556:06-04 23:06:05.612 20613 24287 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7566:06-04 23:06:05.614 20613 24295 I MediaCodec: [OMX.qcom.video.decoder.avc] setting surface generation to 21107734
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7581:06-04 23:06:05.616 20613 24313 D CCodecBufferChannel: [c2.android.aac.decoder#718] MediaCodec discarded an unknown buffer
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7582:06-04 23:06:05.616 20613 24313 D CCodecBufferChannel: [c2.android.aac.decoder#718] MediaCodec discarded an unknown buffer
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7583:06-04 23:06:05.616 20613 24313 D CCodecBufferChannel: [c2.android.aac.decoder#718] MediaCodec discarded an unknown buffer
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7585:06-04 23:06:05.616 20613 24313 D CCodecBufferChannel: [c2.android.aac.decoder#718] MediaCodec discarded an unknown buffer
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7590:06-04 23:06:05.618 20613 24313 I MediaCodec: Codec shutdown complete
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7591:06-04 23:06:05.618 20613 24313 D MediaCodec: flushMediametrics
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7593:06-04 23:06:05.618 20613 24313 D MediaCodec: flushMediametrics
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7600:06-04 23:06:05.622 20613 24297 I MediaCodec: Codec shutdown complete
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7606:06-04 23:06:05.623 20613 24297 D MediaCodec: flushMediametrics
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7612:06-04 23:06:05.623 20613 24297 D MediaCodec: flushMediametrics
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7625:06-04 23:06:05.628 20912 20927 I DrmManagerClient: DRM_DISPLAYPORT_DISABLE failed. Error can be ignored
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7633:06-04 23:06:05.635  1371  1371 I Layer   : id=13424 removedFromDrawingState SurfaceView[com.pranksterlab/com.pranksterlab.MainActivity]@0(BLAST)#13424 (159)
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7634:06-04 23:06:05.635  1371  1371 I Layer   : id=13421 removedFromDrawingState SurfaceView[com.pranksterlab/com.pranksterlab.MainActivity]@0(BLAST)#13421 (159)
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7635:06-04 23:06:05.635  1371  1371 I Layer   : id=13425 removedFromDrawingState Background for SurfaceView[com.pranksterlab/com.pranksterlab.MainActivity]@0#13425 (159)
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7636:06-04 23:06:05.635  1371  1371 I Layer   : id=13420 removedFromDrawingState SurfaceView[com.pranksterlab/com.pranksterlab.MainActivity]@0#13420 (159)
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7637:06-04 23:06:05.635  1371  1371 I Layer   : id=13422 removedFromDrawingState Background for SurfaceView[com.pranksterlab/com.pranksterlab.MainActivity]@0#13422 (159)
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7638:06-04 23:06:05.635  1371  1371 I Layer   : id=13422 removedFromDrawingState Background for SurfaceView[com.pranksterlab/com.pranksterlab.MainActivity]@0#13422 (159)
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7639:06-04 23:06:05.635  1371  1371 I Layer   : id=13423 removedFromDrawingState SurfaceView[com.pranksterlab/com.pranksterlab.MainActivity]@0#13423 (159)
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7640:06-04 23:06:05.637 20613 24295 I MediaCodec: Codec shutdown complete
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7647:06-04 23:06:05.637 20613 24295 D MediaCodec: flushMediametrics
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7648:06-04 23:06:05.638 20613 24295 D MediaCodec: flushMediametrics
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7656:06-04 23:06:05.639 20912 20927 I DrmManagerClient: DRM_DISPLAYPORT_DISABLE failed. Error can be ignored
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7660:06-04 23:06:05.647  1371  1371 D SurfaceFlinger:      DEVICE | 0xb4000078c0a19a80 | 0100 | RGBA_8888    |    0.0    0.0 1080.0 2400.0 |    0    0 1080 2400 | com.pranksterlab/com.pranksterlab.MainActivity$_20613#13416
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7667:06-04 23:06:05.648  1371  1447 I SurfaceFlinger: id=13425 Removed Background for SurfaceView[com.pranksterlab/com.pranksterlab.MainActivity]@0#13425 (159)
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7668:06-04 23:06:05.648  1371  1447 I SurfaceFlinger: id=13420 Removed SurfaceView[com.pranksterlab/com.pranksterlab.MainActivity]@0#13420 (159)
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7669:06-04 23:06:05.648  1371  1447 I SurfaceFlinger: id=13422 Removed Background for SurfaceView[com.pranksterlab/com.pranksterlab.MainActivity]@0#13422 (159)
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7670:06-04 23:06:05.649  1371  1447 I SurfaceFlinger: id=13423 Removed SurfaceView[com.pranksterlab/com.pranksterlab.MainActivity]@0#13423 (159)
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7671:06-04 23:06:05.649  1371  1447 I SurfaceFlinger: id=13421 Removed SurfaceView[com.pranksterlab/com.pranksterlab.MainActivity]@0(BLAST)#13421 (159)
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7672:06-04 23:06:05.649  1371  1446 I SurfaceFlinger: id=13424 Removed SurfaceView[com.pranksterlab/com.pranksterlab.MainActivity]@0(BLAST)#13424 (159)
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7673:06-04 23:06:05.651  1371  1371 I Layer   : id=13425 Destroyed Background for SurfaceView[com.pranksterlab/com.pranksterlab.MainActivity]@0#13425
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7674:06-04 23:06:05.651  1371  1371 I Layer   : id=13421 Destroyed SurfaceView[com.pranksterlab/com.pranksterlab.MainActivity]@0(BLAST)#13421
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7675:06-04 23:06:05.652  1371  1371 I Layer   : id=13424 Destroyed SurfaceView[com.pranksterlab/com.pranksterlab.MainActivity]@0(BLAST)#13424
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7676:06-04 23:06:05.652  1371  1371 I Layer   : id=13420 Destroyed SurfaceView[com.pranksterlab/com.pranksterlab.MainActivity]@0#13420
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7677:06-04 23:06:05.652  1371  1371 I Layer   : id=13422 Destroyed Background for SurfaceView[com.pranksterlab/com.pranksterlab.MainActivity]@0#13422
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7678:06-04 23:06:05.652  1371  1371 I Layer   : id=13423 Destroyed SurfaceView[com.pranksterlab/com.pranksterlab.MainActivity]@0#13423
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:7831:06-04 23:06:07.806 10578 26372 E juur    : java.lang.RuntimeException: ManagedChannel allocation site
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:8285:06-04 23:06:16.637 20613 20613 I ExoPlayerImpl: Init 1cb13cc [AndroidXMedia3/1.3.1] [r8q, SM-G781V, samsung, 33]
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:8287:06-04 23:06:16.648 20613 20613 I ExoPlayerImpl: Init 62709ce [AndroidXMedia3/1.3.1] [r8q, SM-G781V, samsung, 33]
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:8299:06-04 23:06:16.789  1371  1446 I SurfaceFlinger: id=13428 createSurf, flag=80004, SurfaceView[com.pranksterlab/com.pranksterlab.MainActivity]@0#13428
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:8300:06-04 23:06:16.789  1371  1446 I SurfaceFlinger: id=13429 createSurf, flag=40400, SurfaceView[com.pranksterlab/com.pranksterlab.MainActivity]@0(BLAST)#13429
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:8301:06-04 23:06:16.790  1371  1446 I SurfaceFlinger: id=13430 createSurf, flag=20404, Background for SurfaceView[com.pranksterlab/com.pranksterlab.MainActivity]@0#13430
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:8317:06-04 23:06:16.792  1371  1447 I SurfaceFlinger: id=13431 createSurf, flag=80004, SurfaceView[com.pranksterlab/com.pranksterlab.MainActivity]@0#13431
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:8318:06-04 23:06:16.792  1371  1447 I SurfaceFlinger: id=13432 createSurf, flag=40400, SurfaceView[com.pranksterlab/com.pranksterlab.MainActivity]@0(BLAST)#13432
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:8319:06-04 23:06:16.792  1371  1447 I SurfaceFlinger: id=13433 createSurf, flag=20404, Background for SurfaceView[com.pranksterlab/com.pranksterlab.MainActivity]@0#13433
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:8352:06-04 23:06:16.830  1371  1371 D SurfaceFlinger:      DEVICE | 0xb4000078ae484d40 | 0100 | RGBA_8888    |    0.0    0.0 1080.0 2400.0 |    0    0 1080 2400 | com.pranksterlab/com.pranksterlab.MainActivity$_20613#13416
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:8390:06-04 23:06:16.844 20613 26685 I DMCodecAdapterFactory: Creating an asynchronous MediaCodec adapter for track type video
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:8392:06-04 23:06:16.846 20613 26686 I DMCodecAdapterFactory: Creating an asynchronous MediaCodec adapter for track type video
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:8450:06-04 23:06:16.864 20613 26690 I MediaCodec: MediaCodec will operate in async mode
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:8459:06-04 23:06:16.865 20613 26690 D MediaCodec: flushMediametrics
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:8461:06-04 23:06:16.865 20613 26690 I MediaCodec: [OMX.qcom.video.decoder.avc] setting surface generation to 21107735
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:8464:06-04 23:06:16.866 20613 26692 I MediaCodec: MediaCodec will operate in async mode
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:8465:06-04 23:06:16.866 20613 26692 D MediaCodec: flushMediametrics
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:8467:06-04 23:06:16.866 20613 26692 I MediaCodec: [OMX.qcom.video.decoder.avc] setting surface generation to 21107736
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:8472:06-04 23:06:16.867  1578 31446 E OMX-VDEC-1080P: set_parameter: Error: 0x80001019, setting param 0x7f00005d
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:8473:06-04 23:06:16.867  1578 22883 E OMX-VDEC-1080P: set_parameter: Error: 0x80001019, setting param 0x7f00005d
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:8491:06-04 23:06:16.868  1578 31446 E OMX-VDEC-1080P: set_parameter: Error: 0x8000101a, setting param 0x7f000002
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:8494:06-04 23:06:16.868  1578  4059 E OMX-VDEC-1080P: set_parameter: Error: 0x8000101a, setting param 0x7f000002
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:8503:06-04 23:06:16.873 20613 26685 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:8504:06-04 23:06:16.873 20613 26686 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:8553:06-04 23:06:16.895 20613 26690 I MediaCodec: setCodecState state(0), called in 5
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:8554:06-04 23:06:16.895 20613 26692 I MediaCodec: setCodecState state(0), called in 6
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:8567:06-04 23:06:16.897 20613 26686 I DMCodecAdapterFactory: Creating an asynchronous MediaCodec adapter for track type audio
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:8612:06-04 23:06:16.905 20613 26685 I DMCodecAdapterFactory: Creating an asynchronous MediaCodec adapter for track type audio
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:8675:06-04 23:06:16.920 20613 26705 I MediaCodec: MediaCodec will operate in async mode
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:8676:06-04 23:06:16.921 20613 26705 D MediaCodec: flushMediametrics
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:8745:06-04 23:06:16.923 20613 26707 I MediaCodec: MediaCodec will operate in async mode
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:8747:06-04 23:06:16.923 20613 26707 D MediaCodec: flushMediametrics
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:8753:06-04 23:06:16.924 20613 26686 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:8804:06-04 23:06:16.925 20613 26685 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:8957:06-04 23:06:16.982 20613 26690 I MediaCodec: setCodecState state(1), called in 6
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:8964:06-04 23:06:16.983 20613 26691 I BLASTBufferQueue: [SurfaceView[com.pranksterlab/com.pranksterlab.MainActivity]@0#13](f:0,a:0) onFrameAvailable the first frame is available
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:8976:06-04 23:06:16.988  1357 22423 I AudioPolicyEffectException: MySpaceHandler::checkDetachCondition media 1, ring 0, mp 0
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:8977:06-04 23:06:16.988  1357 22423 I AudioPolicyEffectException: MySpace detach value 1
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:8991:06-04 23:06:16.990  1371  1371 I SurfaceFlinger: [SurfaceView[com.pranksterlab/com.pranksterlab.MainActivity]@0(BLAST)#13429] setFrameRate: 30.165731, Compatibility: 1, Strategy: 0
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:8992:06-04 23:06:16.993 20613 26692 I MediaCodec: setCodecState state(1), called in 6
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:8993:06-04 23:06:16.993 20613 26693 I BLASTBufferQueue: [SurfaceView[com.pranksterlab/com.pranksterlab.MainActivity]@0#14](f:0,a:0) onFrameAvailable the first frame is available
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:9003:06-04 23:06:16.995  1371  1371 D SurfaceFlinger:      DEVICE | 0xb4000078c0a19070 | 0102 | 0x7fa30c06   |    0.0    0.0 1080.0 1880.0 |    0   88 1080 1986 | SurfaceView[com.pranksterlab/com.pranksterlab.MainActivity]@0(BLAST)#13429
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:9004:06-04 23:06:16.995  1371  1371 D SurfaceFlinger:      DEVICE | 0xb4000078ae484d40 | 0100 | RGBA_8888    |    0.0    0.0 1080.0 2400.0 |    0    0 1080 2400 | com.pranksterlab/com.pranksterlab.MainActivity$_20613#13416
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:9025:06-04 23:06:16.998  1371  1371 I SurfaceFlinger: [SurfaceView[com.pranksterlab/com.pranksterlab.MainActivity]@0(BLAST)#13432] setFrameRate: 30.107313, Compatibility: 1, Strategy: 0
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:9059:06-04 23:06:16.999  1357  2147 I AudioPolicyEffectException: MySpaceHandler::checkDetachCondition media 1, ring 0, mp 0
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:9060:06-04 23:06:16.999  1357  2147 I AudioPolicyEffectException: MySpace detach value 1
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:9079:06-04 23:06:17.000  1261 20534 D ACDB-LOADER: Error: ACDB_CMD_GET_PERSISTENT_AUDPROC_INSTANCE_COMMON_TABLE_SIZE returned -18
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:9081:06-04 23:06:17.000  1261 20534 D ACDB-LOADER: Error: Invalid Audproc persist size = -18
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:9092:06-04 23:06:17.000  1261 20534 D ACDB-LOADER: Error: ACDB_CMD_GET_AFE_INSTANCE_COMMON_TABLE_SIZE Returned = -19
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:9095:06-04 23:06:17.000  1261 20534 D ACDB-LOADER: Error: ACDB AFE returned = -19
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:9107:06-04 23:06:17.010  1371  1371 D SurfaceFlinger:      CLIENT | 0xb4000078c0a19070 | 0102 | 0x7fa30c06   |    0.0    0.0 1080.0 1880.0 |    0   88 1080 1986 | SurfaceView[com.pranksterlab/com.pranksterlab.MainActivity]@0(BLAST)#13429
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:9108:06-04 23:06:17.010  1371  1371 D SurfaceFlinger:      CLIENT | 0xb4000078ae481c40 | 0102 | 0x7fa30c06   |    0.0    0.0 1920.0 1038.0 |   36  226 1044  454 | SurfaceView[com.pranksterlab/com.pranksterlab.MainActivity]@0(BLAST)#13432
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:9109:06-04 23:06:17.010  1371  1371 D SurfaceFlinger:      DEVICE | 0xb4000078ae484d40 | 0100 | RGBA_8888    |    0.0    0.0 1080.0 2400.0 |    0    0 1080 2400 | com.pranksterlab/com.pranksterlab.MainActivity$_20613#13416
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:9160:06-04 23:06:17.032  1261 20534 D ACDB-LOADER: Error: ACDB_CMD_GET_AUDPROC_INSTANCE_GAIN_DEP_STEP_TABLE_SIZE Returned = -19
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:9163:06-04 23:06:17.032  1261 20534 D ACDB-LOADER: Error: ACDB AudProc vol returned = -19
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:9175:06-04 23:06:17.032  1261 20534 D ACDB-LOADER: Error: ACDB_CMD_GET_AFE_INSTANCE_COMMON_TABLE_SIZE Returned = -19
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:9178:06-04 23:06:17.032  1261 20534 D ACDB-LOADER: Error: ACDB AFE returned = -19
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:9583:06-04 23:06:22.125  1371  1371 I SurfaceFlinger: [SurfaceView[com.pranksterlab/com.pranksterlab.MainActivity]@0(BLAST)#13429] setFrameRate: 30.000307, Compatibility: 1, Strategy: 0
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:9584:06-04 23:06:22.133  1371  1371 I SurfaceFlinger: [SurfaceView[com.pranksterlab/com.pranksterlab.MainActivity]@0(BLAST)#13432] setFrameRate: 30.000307, Compatibility: 1, Strategy: 0
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:9599:06-04 23:06:23.413  1495  4969 D SGM:GameManager: identifyForegroundApp. com.pranksterlab, mCurrentUserId: 0, callerUserId: 0
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:9600:06-04 23:06:23.413  1495  4969 D SGM:PkgDataHelper: getGamePkgData(). com.pranksterlab
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:9645:06-04 23:06:25.209 20613 26685 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:9690:06-04 23:06:26.900 20613 26686 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:9747:06-04 23:06:28.084  1495  3018 D SGM:GameManager: identifyForegroundApp. com.pranksterlab, mCurrentUserId: 0, callerUserId: 0
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:9748:06-04 23:06:28.084  1495  3018 D SGM:PkgDataHelper: getGamePkgData(). com.pranksterlab
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:9861:06-04 23:06:33.664 20613 26685 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:9911:06-04 23:06:36.999 20613 26686 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:10053:06-04 23:06:42.091 20613 26685 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:10139:06-04 23:06:47.094 20613 26686 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:10208:06-04 23:06:50.505 20613 26685 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:10369:06-04 23:06:57.201 20613 26686 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:10451:06-04 23:06:58.933 20613 26685 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:10610:06-04 23:07:07.294 20613 26686 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:10630:06-04 23:07:07.366 20613 26685 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:10781:06-04 23:07:15.789 20613 26685 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:10814:06-04 23:07:16.343 25564 25728 W FeatureFlagsImplExport: java.lang.NoClassDefFoundError: Class not found using the boot class loader; no stack trace available
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:10847:06-04 23:07:17.393 20613 26686 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:10912:06-04 23:07:18.250 10578 10782 I NullBinder: NullBinder for android.net.action.RECOMMEND_NETWORKS triggering remote TransactionTooLargeException due to Service without Chimera impl, calling uid: 1000, calling pid: 0
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:11021:06-04 23:07:21.271 10578 10600 I NullBinder: NullBinder for android.net.action.RECOMMEND_NETWORKS triggering remote TransactionTooLargeException due to Service without Chimera impl, calling uid: 1000, calling pid: 0
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:11096:06-04 23:07:24.226 20613 26685 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:11176:06-04 23:07:27.497 20613 26686 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:11288:06-04 23:07:30.345 10578 10699 I NullBinder: NullBinder for android.net.action.RECOMMEND_NETWORKS triggering remote TransactionTooLargeException due to Service without Chimera impl, calling uid: 1000, calling pid: 0
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:11357:06-04 23:07:32.648 20613 26685 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:11416:06-04 23:07:33.365 10578 10699 I NullBinder: NullBinder for android.net.action.RECOMMEND_NETWORKS triggering remote TransactionTooLargeException due to Service without Chimera impl, calling uid: 1000, calling pid: 0
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:11492:06-04 23:07:37.591 20613 26686 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:11584:06-04 23:07:39.411 10578 10699 I NullBinder: NullBinder for android.net.action.RECOMMEND_NETWORKS triggering remote TransactionTooLargeException due to Service without Chimera impl, calling uid: 1000, calling pid: 0
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:11621:06-04 23:07:41.077 20613 26685 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:11667:06-04 23:07:42.423 10578 10784 I NullBinder: NullBinder for android.net.action.RECOMMEND_NETWORKS triggering remote TransactionTooLargeException due to Service without Chimera impl, calling uid: 1000, calling pid: 0
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:11704:06-04 23:07:42.435 25983 26126 I MediaCodec: setCodecState state(0), called in 2
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:11728:06-04 23:07:43.437 25983 26126 I MediaCodec: setCodecState state(0), called in 2
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:11805:06-04 23:07:47.687 20613 26686 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:11839:06-04 23:07:49.495 20613 26685 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:11953:06-04 23:07:57.783 20613 26686 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:11974:06-04 23:07:57.927 20613 26685 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:12212:06-04 23:08:06.352 20613 26685 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:12250:06-04 23:08:07.891 20613 26686 D MediaCodec: keep callback message for reclaim
+C:\Users\Aztr0nutZs\Desktop\prankster-lab\qa\home_video_runtime_logcat.txt:12318:06-04 23:08:10.603  8446  8555 W ExifInterface: java.io.IOException: Encountered corrupt PNG file.
