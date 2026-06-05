@@ -1,6 +1,6 @@
 # UI Asset Integration Report
 
-Last updated: 2026-06-01
+Last updated: 2026-06-05
 
 ## UI Preservation Rule
 
@@ -33,7 +33,7 @@ Current route map from `PranksterApp.kt`:
 
 | Route | Screen | Header |
 | --- | --- | --- |
-| `home` | Core / Ultimate Reactor | Native `UltimateReactorScreen` topbar/reactor; global dock preserved |
+| `home` | Core / Ultimate Reactor | Native `UltimateReactorScreen` with `PrankstarHeaderVideo` fallback; global dock preserved |
 | `library` | Library / Sound Stash | `header_sound_stash`, text overlay disabled |
 | `lab` | Sound Packs | `header_sound_stash`, text overlay disabled |
 | `forge` | Sound Forge | `header_sound_gen`, text overlay disabled |
@@ -114,14 +114,14 @@ Prankstar Bot / NEO mascot MP4 source clips remain at the repository root. The a
 
 The mascot is presented through a compact neon assistant card, not as a full-screen background. Current placements are:
 
-- Core/Home: below the waveform header and above the reactor, preserving reactor controls.
+- Core/Home: tap-open overlay from the reactor readout, preserving reactor controls.
 - Voice Lab / Joke Gen: below the Joke Gen header and above the creation controls.
 
 The existing custom headers, bottom dock, reactor, Sound Stash, bundled prank sounds, Voice Lab, and Sound Forge remain intact. MP4 robot playback is muted by default, can be disabled with the Animated Bot setting, and falls back to the static Prankstar image when the raw MP4 resources are absent.
 
 ## Ultimate Reactor Integration
 
-Core/Home now renders `UltimateReactorScreen`, a native Compose implementation based on `prankstar_reactor_ultimate.html`.
+Core/Home renders `UltimateReactorScreen`, a native Compose implementation based on `prankstar_reactor_ultimate.html` and now prepared for the new Home/Core MP4 direction.
 
 Preserved global UI:
 
@@ -136,5 +136,28 @@ New Core visual assets are drawn natively:
 - Canvas reactor rings, arcs, LEDs, cogs, face, console, VU, radar, and waveform motifs
 - Left/right side strips
 - Local CORE / MODE / SENSOR / LOG panel
+- MP4-ready Home/Core background layer through `PrankstarVideoBackground`
+- MP4-ready top Home/Core banner through `PrankstarHeaderVideo`
+- Native FX/ripple overlay through `PrankstarFxOverlay`
+- Floating action controls through `PrankstarFloatingControls`
 
-Runtime screenshots for the new Core screen are in `qa/screenshots/ultimate_reactor_*.png`.
+Runtime screenshots for the previous Core screen are in `qa/screenshots/ultimate_reactor_*.png`.
+
+## Home/Core MP4 Asset Pass
+
+Implemented:
+
+- Added Media3-based raw video playback components for Home/Core background and header banner.
+- Wired Home/Core to use the requested raw resource names `prankstar_bg` and `prankstar_header` when those resources exist.
+- Preserved the existing ultimate reactor, real sound deployment, global Stop All, Library, Voice Lab, Forge, System, global dock, and NEO bot panel.
+- Added an explicit floating action strip with real callbacks for Stash, Jokes, Deploy, Stop All, and Forge.
+- Added a Compose FX overlay for native ripple behavior over the video/scrim background.
+- Added `mp4` to Android no-compress resource handling.
+
+Not implemented because source assets were missing:
+
+- `app/src/main/res/raw/prankstar_bg.mp4`
+- `app/src/main/res/raw/prankstar_header.mp4`
+- `docs/reference/prankstar_home.html`
+
+No placeholder MP4 or fake HTML was created.

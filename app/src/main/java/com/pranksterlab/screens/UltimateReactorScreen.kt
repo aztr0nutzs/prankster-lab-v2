@@ -46,6 +46,8 @@ import androidx.compose.ui.unit.sp
 import com.pranksterlab.components.ScanlineOverlay
 import com.pranksterlab.components.bot.PrankstarBotMood
 import com.pranksterlab.components.bot.PrankstarBotVideo
+import com.pranksterlab.components.home.PrankstarFxOverlay
+import com.pranksterlab.components.home.PrankstarFloatingControls
 import com.pranksterlab.components.reactor.ultimate.UltimatePrankType
 import com.pranksterlab.components.reactor.ultimate.UltimateReactorBottomPanel
 import com.pranksterlab.components.reactor.ultimate.UltimateReactorCanvas
@@ -55,6 +57,8 @@ import com.pranksterlab.components.reactor.ultimate.UltimateReactorState
 import com.pranksterlab.components.reactor.ultimate.UltimateReactorTopBar
 import com.pranksterlab.components.reactor.ultimate.UltimateStripAction
 import com.pranksterlab.components.reactor.ultimate.accentColor
+import com.pranksterlab.components.video.PrankstarHeaderVideo
+import com.pranksterlab.components.video.PrankstarVideoBackground
 import com.pranksterlab.core.audio.AudioPlayerController
 import com.pranksterlab.core.model.PrankSound
 import com.pranksterlab.core.repository.SoundRepository
@@ -184,14 +188,26 @@ fun UltimateReactorScreen(
         else -> PrankstarBotMood.ARMED
     }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Brush.radialGradient(listOf(Color(0xFF08203A), Color(0xFF040810), Color.Black)))
-    ) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        PrankstarVideoBackground()
+        Box(
+            Modifier
+                .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        listOf(
+                            Color.Black.copy(alpha = 0.72f),
+                            Color(0xFF041326).copy(alpha = 0.55f),
+                            Color.Black.copy(alpha = 0.76f)
+                        )
+                    )
+                )
+        )
         ScanlineOverlay()
+        PrankstarFxOverlay(active = reactorState.isPlaying || reactorState.chargeLevel > 0.05f || reactorState.isOverloaded)
         Column(Modifier.fillMaxSize()) {
             UltimateReactorTopBar(reactorState)
+            PrankstarHeaderVideo()
             Box(
                 modifier = Modifier
                     .weight(1f)
@@ -300,6 +316,18 @@ fun UltimateReactorScreen(
                     sampleCount = soundsList.size,
                     modifier = Modifier.align(Alignment.BottomCenter).padding(start = 48.dp, end = 48.dp, bottom = 4.dp),
                     onBotToggle = { showBot = !showBot }
+                )
+                PrankstarFloatingControls(
+                    isPlaying = playbackState.isPlaying,
+                    onOpenStash = { onNavigate("library") },
+                    onOpenJokes = { onNavigate("voice_lab") },
+                    onOpenForge = { onNavigate("forge") },
+                    onStopAll = {
+                        audioPlayerController.stopAll()
+                        log("KILLSWITCH ACTIVATED", "AUDIO STOPPED")
+                    },
+                    onDeploy = ::triggerDeploy,
+                    modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 46.dp)
                 )
             }
             UltimateReactorBottomPanel(
