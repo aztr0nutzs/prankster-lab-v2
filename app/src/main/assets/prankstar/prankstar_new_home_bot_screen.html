@@ -384,6 +384,33 @@ input[type=range]{width:100%;height:3px;accent-color:var(--g);cursor:pointer;bor
 .reactor-slot.reactor-armed video{
   filter:drop-shadow(0 0 24px currentColor) drop-shadow(0 0 18px rgba(0,232,255,.14)) saturate(1.22) contrast(1.12) !important;
 }
+.zone-btn{
+  filter:drop-shadow(0 0 4px rgba(0,0,0,.72)) !important;
+}
+.zone-btn .zone-inner{
+  opacity:.08 !important;
+  color:var(--b) !important;
+  border-color:rgba(0,232,255,.20) !important;
+  background:radial-gradient(circle at 50% 45%,rgba(0,232,255,.055),rgba(0,0,0,.08) 62%,transparent 74%) !important;
+  box-shadow:inset 0 0 12px rgba(0,232,255,.05),0 0 6px rgba(0,232,255,.12) !important;
+}
+.zone-btn:hover .zone-inner,.zone-btn:focus-visible .zone-inner{
+  opacity:.32 !important;
+  box-shadow:inset 0 0 16px rgba(0,232,255,.08),0 0 12px rgba(0,232,255,.16) !important;
+}
+.zone-btn:active .zone-inner,.zone-btn.hot-active .zone-inner{
+  opacity:.82 !important;
+  color:currentColor !important;
+  box-shadow:inset 0 0 20px currentColor,0 0 16px currentColor !important;
+}
+.ring-touch{
+  opacity:.24 !important;
+  box-shadow:inset 0 0 14px rgba(0,232,255,.06) !important;
+}
+.ring-touch.hot-active{
+  opacity:.82 !important;
+  box-shadow:inset 0 0 28px currentColor,0 0 18px currentColor !important;
+}
 #ch-outer{border-color:rgba(0,232,255,.30) !important}
 #ch-fill{
   background:linear-gradient(90deg,var(--b),var(--pk),var(--o),var(--r)) !important;
