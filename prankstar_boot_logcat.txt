@@ -1,0 +1,13 @@
+--------- beginning of main
+06-06 00:15:12.437 I/PrankstarBoot( 4242): Boot video prepared from prankstar/assets/prankstar_boot.mp4 durationMs=8011
+06-06 00:15:20.777 I/PrankstarBoot( 4242): Boot sequence finished: video completed
+06-06 00:15:22.993 E/chromium( 4242): [ERROR:gpu/command_buffer/service/image_reader_gl_owner.cc:301] no buffers currently available in the reader queue
+06-06 00:15:23.001 E/chromium( 4242): [ERROR:gpu/command_buffer/service/image_reader_gl_owner.cc:301] no buffers currently available in the reader queue
+06-06 00:15:23.007 E/chromium( 4242): [ERROR:gpu/command_buffer/service/image_reader_gl_owner.cc:301] no buffers currently available in the reader queue
+06-06 00:15:23.014 E/chromium( 4242): [ERROR:gpu/command_buffer/service/image_reader_gl_owner.cc:301] no buffers currently available in the reader queue
+06-06 00:15:23.020 E/chromium( 4242): [ERROR:gpu/command_buffer/service/image_reader_gl_owner.cc:301] no buffers currently available in the reader queue
+06-06 00:15:23.026 E/chromium( 4242): [ERROR:gpu/command_buffer/service/image_reader_gl_owner.cc:301] no buffers currently available in the reader queue
+06-06 00:15:23.038 E/chromium( 4242): [ERROR:gpu/command_buffer/service/image_reader_gl_owner.cc:301] no buffers currently available in the reader queue
+06-06 00:15:23.043 E/chromium( 4242): [ERROR:gpu/command_buffer/service/image_reader_gl_owner.cc:301] no buffers currently available in the reader queue
+06-06 00:15:23.049 E/chromium( 4242): [ERROR:gpu/command_buffer/service/image_reader_gl_owner.cc:301] no buffers currently available in the reader queue
+06-06 00:15:23.054 E/chromium( 4242): [ERROR:gpu/command_buffer/service/image_reader_gl_owner.cc:301] no buffers currently available in the reader queue
