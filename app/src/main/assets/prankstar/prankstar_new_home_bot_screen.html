@@ -13,8 +13,8 @@ html,body{width:100%;height:100%;background:#000;overflow:hidden;font-family:'Sh
 #app{width:100vw;height:100dvh;display:flex;flex-direction:column;background:#000;max-width:430px;margin:0 auto;position:relative;overflow:hidden}
 
 /* TOPBAR - PRANKSTAR HEADER VIDEO */
-#video-header{height:82px;background:#000;border-bottom:1px solid rgba(255,102,0,0.38);display:block;position:relative;flex-shrink:0;z-index:50;overflow:hidden;box-shadow:0 0 18px rgba(255,102,0,.22)}
-#header-video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center;z-index:0;filter:saturate(1.24) contrast(1.12) brightness(.95)}
+#video-header{width:100%;height:clamp(96px,24vw,150px);min-height:96px;max-height:150px;background:#000;border-bottom:1px solid rgba(255,102,0,0.38);overflow:hidden;flex-shrink:0;position:relative;z-index:100;display:flex;align-items:center;justify-content:center;box-shadow:0 0 18px rgba(255,102,0,.22)}
+#header-video{width:100%;height:100%;object-fit:contain;object-position:center;display:block;background:#000;z-index:0;filter:saturate(1.24) contrast(1.12) brightness(.95)}
 #video-header::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.78),rgba(0,0,0,.10),rgba(0,0,0,.78)),linear-gradient(180deg,rgba(0,0,0,.18),rgba(0,0,0,.45));z-index:1;pointer-events:none}
 #video-header::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.025),rgba(255,255,255,.025) 1px,transparent 1px,transparent 4px);mix-blend-mode:screen;z-index:2;pointer-events:none}
 #header-overlay{position:absolute;inset:0;z-index:3;display:flex;align-items:center;justify-content:space-between;padding:7px 10px 6px 10px;pointer-events:none}
@@ -255,7 +255,7 @@ input[type=range]{width:100%;height:3px;accent-color:var(--g);cursor:pointer;bor
 .rsel.on-r{border-color:var(--r);background:rgba(255,34,0,.07);box-shadow:0 0 8px rgba(255,34,0,.22)}.rsel.on-r .rsel-lbl{color:var(--r)}
 .rsel.on-teal{border-color:var(--teal);background:rgba(0,255,204,.07);box-shadow:0 0 8px rgba(0,255,204,.22)}.rsel.on-teal .rsel-lbl{color:var(--teal)}
 .zone-btn .zone-inner{font-family:'Black Ops One',cursive;font-style:italic;text-shadow:0 0 7px currentColor}.ring-touch:active{box-shadow:inset 0 0 28px currentColor}.dtab-lbl,.rsel-lbl,.cc-title,.knob-lbl,.si-name,.fi-name,.joke-btn{transform:skew(-6deg)}
-@media(max-height:720px){#video-header{height:72px}.reactor-slot{width:min(270px,73vw);height:min(270px,73vw)}#ch-strip{top:38px}.crystal-pad{height:28px}.dtab-lbl{font-size:7px}.ctrl-grid{gap:3px}.knob-w{width:31px;height:31px}}
+@media(max-height:720px){#video-header{height:clamp(96px,24vw,150px);min-height:96px}.reactor-slot{width:min(270px,73vw);height:min(270px,73vw)}#ch-strip{top:38px}.crystal-pad{height:28px}.dtab-lbl{font-size:7px}.ctrl-grid{gap:3px}.knob-w{width:31px;height:31px}}
 
 
 
@@ -587,9 +587,9 @@ html,body,button,input,select,textarea,
 #app{background:#000 !important}
 #video-header{
   width:100%;
-  height:clamp(72px,18vw,112px);
-  min-height:72px;
-  max-height:112px;
+  height:clamp(96px,24vw,150px);
+  min-height:96px;
+  max-height:150px;
   background:#000;
   overflow:hidden;
   flex-shrink:0;
@@ -771,7 +771,7 @@ button,.dtab,.rsel,.mode-btn,.joke-btn,.forge-item,.stash-item,.zone-btn,.sb,.bo
   background:linear-gradient(90deg,var(--b),var(--pk),var(--o),var(--r)) !important;
 }
 @media(max-height:720px){
-  #video-header{height:72px;min-height:72px}
+  #video-header{height:clamp(96px,24vw,150px);min-height:96px}
   .dtab{min-height:62px !important}
   .crystal-pad{height:38px !important;min-height:38px !important}
   .dtab-lbl{font-size:10px !important}
@@ -1076,8 +1076,8 @@ button,.dtab,.rsel,.mode-btn,.joke-btn,.forge-item,.stash-item,.zone-btn,.sb,.bo
 
     <div class="bot-hud-ring"></div>
     <div class="bot-hud-ring r2"></div>
-    <button class="bot-touch-zone" id="bot-zone-head" onclick="event.stopPropagation();botPulse('VISION SCAN','scan')" aria-label="PrankStar vision scan"></button>
-    <button class="bot-touch-zone" id="bot-zone-chest" onclick="event.stopPropagation();botPulse('CORE POWER','power')" aria-label="PrankStar core power"></button>
+    <button class="bot-touch-zone" id="bot-zone-head" onclick="event.stopPropagation();botPulse('VISION JOKE','head')" aria-label="PrankStar head joke"></button>
+    <button class="bot-touch-zone" id="bot-zone-chest" onclick="event.stopPropagation();botPulse('CORE RANDOM','chest')" aria-label="PrankStar chest random sound"></button>
     <button class="bot-touch-zone" id="bot-zone-left" onclick="event.stopPropagation();botPulse('DANCE MODE','dance')" aria-label="PrankStar dance mode"></button>
     <button class="bot-touch-zone" id="bot-zone-right" onclick="event.stopPropagation();botPulse('CELEBRATE','celebrate')" aria-label="PrankStar celebrate"></button>
     <button class="bot-touch-zone" id="bot-zone-feet" onclick="event.stopPropagation();botPulse('HIGH IDLE','idle')" aria-label="PrankStar idle loop"></button>
@@ -1283,6 +1283,36 @@ button,.dtab,.rsel,.mode-btn,.joke-btn,.forge-item,.stash-item,.zone-btn,.sb,.bo
 </div><!-- end app -->
 
 <script>
+function psBridge() {
+  return window.PrankstarAndroid || null;
+}
+function callAndroid(method) {
+  var args=Array.prototype.slice.call(arguments,1);
+  var bridge=psBridge();
+  console.log('[PrankStar] bridge call',method,args);
+  if(!bridge||typeof bridge[method]!=="function"){
+    console.warn('[PrankStar] Android bridge missing method:',method);
+    return false;
+  }
+  try{bridge[method].apply(bridge,args);return true;}
+  catch(e){console.error('[PrankStar] Android bridge call failed:',method,e);return false;}
+}
+function bridgeCategoryFor(label){
+  var l=String(label||'').toLowerCase();
+  if(l.indexOf('left')>=0||l.indexOf('audio')>=0||l.indexOf('scan')>=0)return 'effects';
+  if(l.indexOf('forge')>=0||l.indexOf('air horn')>=0||l.indexOf('trap kit')>=0||l.indexOf('smoke')>=0||l.indexOf('zap')>=0)return 'forge';
+  if(l.indexOf('stash')>=0||l.indexOf('splash')>=0||l.indexOf('stink')>=0||l.indexOf('glitter')>=0)return 'stash';
+  if(l.indexOf('power')>=0||l.indexOf('charge')>=0)return 'power';
+  return 'funny';
+}
+function bridgeZoneAction(label){
+  var l=String(label||'').toLowerCase();
+  if(l.indexOf('right')>=0){return callAndroid('playRandomJoke');}
+  if(l.indexOf('left')>=0){return callAndroid('playSoundByCategory','effects');}
+  if(l.indexOf('bottom')>=0||l.indexOf('release')>=0||l.indexOf('core')>=0||l.indexOf('deploy')>=0){return callAndroid('playRandomSound');}
+  return callAndroid('playSoundByCategory',bridgeCategoryFor(label));
+}
+
 var powered=true,prankCnt=47,charge=0,curR='r1',curDock='core',intensity=72,ripBusy=false,kTY={};
 
 // Reactor display config
@@ -1319,6 +1349,8 @@ function reactorClick(e,rid){
   var rc=e.currentTarget.getBoundingClientRect();
   touchFlash(rid,e.clientX-rc.left,e.clientY-rc.top);
   vidFlash(rid);
+  var z=inferZone((e.clientX-rc.left)/rc.width*100,(e.clientY-rc.top)/rc.height*100);
+  bridgeZoneAction(z[0]);
 }
 function reactorTouch(e,rid){
   e.preventDefault();
@@ -1329,6 +1361,8 @@ function reactorTouch(e,rid){
   var t=e.touches[0];
   touchFlash(rid,t.clientX-rc.left,t.clientY-rc.top);
   vidFlash(rid);
+  var z=inferZone((t.clientX-rc.left)/rc.width*100,(t.clientY-rc.top)/rc.height*100);
+  bridgeZoneAction(z[0]);
 }
 
 // Zone action - tapping specific areas
@@ -1340,6 +1374,7 @@ function zoneAction(rid,label,icon){
   showAlert(icon+' '+label+' ACTIVATED!',false);
   updateLog('ZONE: '+label+' ['+rid.toUpperCase()+']');
   vidFlash(rid);
+  bridgeZoneAction(label);
 }
 
 // Video flash on interaction
@@ -1448,6 +1483,7 @@ function togglePwr(){
 // Deploy
 function mainDeploy(){
   if(!powered)return;
+  callAndroid('playRandomSound');
   prankCnt++;updatePrankCnt();
   doRipple(curR);charge=Math.min(100,charge+30);
   document.getElementById('slot-'+curR).style.filter='brightness(1.8) saturate(1.6)';
@@ -1457,12 +1493,13 @@ function mainDeploy(){
 }
 
 // Stash / Forge / Jokes
-function stashDeploy(name){prankCnt++;updatePrankCnt();doRipple(curR);charge=Math.min(100,charge+20);showAlert('◈ '+name+' ARMED! ◈',false);}
-function forgeAction(name){showAlert('⚙ FORGING: '+name,false);doRipple(curR);}
-function jokeAction(type){prankCnt++;updatePrankCnt();doRipple(curR);charge=Math.min(100,charge+25);showAlert('🎯 '+type+' SEQUENCE FIRED!',false);}
+function stashDeploy(name){callAndroid('playSoundByCategory','stash');prankCnt++;updatePrankCnt();doRipple(curR);charge=Math.min(100,charge+20);showAlert('◈ '+name+' ARMED! ◈',false);}
+function forgeAction(name){callAndroid('playSoundByCategory','forge');showAlert('⚙ FORGING: '+name,false);doRipple(curR);}
+function jokeAction(type){callAndroid('playJokeByType',type);prankCnt++;updatePrankCnt();doRipple(curR);charge=Math.min(100,charge+25);showAlert('🎯 '+type+' SEQUENCE FIRED!',false);}
 
 // Side actions
 function sAct(t){
+  if(t==='audio')callAndroid('stopPlayback');else if(t==='zap')callAndroid('playSoundByCategory','effects');
   doRipple(curR);
   var m={audio:'◈ AUDIO MOD TOGGLED',gear:'⚙ SETTINGS ACTIVE',holo:'◈ HOLO TARGET LOCKED',zap:'⚡ ZAP ARMED',ai:'◈ AI ONLINE',spring:'◈ SPRING LOADED'};
   showAlert(m[t]||'SYSTEM OK',t==='zap');
@@ -1588,12 +1625,19 @@ function setBotMode(mode,soft){
 }
 function botPulse(label,mode){
   showScreen('bot');
+  if(mode==='scan')callAndroid('playSoundByCategory','scan');
+  else if(mode==='power')callAndroid('playSoundByCategory','power');
+  else if(mode==='dance')callAndroid('playSoundByCategory','funny');
+  else if(mode==='celebrate')callAndroid('playRandomJoke');
+  else if(mode==='chest')callAndroid('playRandomSound');
+  else if(mode==='head')callAndroid('playRandomJoke');
   prankCnt++;updatePrankCnt();charge=Math.min(100,charge+18);
   var shell=document.getElementById('bot-video-shell');if(shell){shell.classList.add('touched');setTimeout(function(){shell.classList.remove('touched');},340);}
   botNotice('🤖 '+label+' ONLINE');
   updateLog('PRANKSTAR BOT: '+label+' ['+mode.toUpperCase()+']');
   if(mode==='idle'){botBusy=false;setBotMode('idle',true);return;}
-  botBusy=true;setBotMode(mode,false);
+  var visualMode=(mode==='head')?'scan':((mode==='chest')?'power':mode);
+  botBusy=true;setBotMode(visualMode,false);
 }
 function botTouch(e,label,mode){
   if(e&&e.touches&&e.touches.length){botPulse(label,mode);}
@@ -1731,7 +1775,7 @@ document.addEventListener('touchstart',function(){
         if(!window.powered)return;e.preventDefault();holdRid=rid;holdStart=Date.now();lastMove=0;tactileReact(e,rid,'tap');setMeter(8);
         clearInterval(holdTimer);holdTimer=setInterval(function(){
           if(!holdRid)return;var p=Math.min(100,(Date.now()-holdStart)/8);setMeter(p);
-          if(p>=100){clearInterval(holdTimer);holdTimer=null;var fake={clientX:e.clientX,clientY:e.clientY};tactileReact(fake,rid,'hold');bumpCharge(35);safeAlert('🔥 FULL REACTOR CHARGE RELEASED!',false);setMeter(0);holdRid=null;}
+          if(p>=100){clearInterval(holdTimer);holdTimer=null;var fake={clientX:e.clientX,clientY:e.clientY};tactileReact(fake,rid,'hold');callAndroid('playRandomSound');bumpCharge(35);safeAlert('🔥 FULL REACTOR CHARGE RELEASED!',false);setMeter(0);holdRid=null;}
         },45);
       },{passive:false});
       ovl.addEventListener('pointermove',function(e){
