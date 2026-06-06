@@ -73,7 +73,7 @@ fun HomeScreen(
     soundRepository: SoundRepository,
     onNavigate: (String) -> Unit = {}
 ) {
-    PrankstarHomeWebViewScreen()
+    PrankstarHomeWebViewScreen(audioPlayerController, soundRepository)
 }
 
 @Composable
