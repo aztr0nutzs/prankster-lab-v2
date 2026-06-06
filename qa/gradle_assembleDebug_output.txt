@@ -1,0 +1,88 @@
+
+C:\Users\Aztr0nutZs\Desktop\prankster-lab>if "Windows_NT" == "Windows_NT" setlocal
+
+C:\Users\Aztr0nutZs\Desktop\prankster-lab>set DIRNAME=C:\Users\Aztr0nutZs\Desktop\prankster-lab\ 
+
+C:\Users\Aztr0nutZs\Desktop\prankster-lab>if "C:\Users\Aztr0nutZs\Desktop\prankster-lab\" == "" set DIRNAME=. 
+
+C:\Users\Aztr0nutZs\Desktop\prankster-lab>set APP_BASE_NAME=gradlew 
+
+C:\Users\Aztr0nutZs\Desktop\prankster-lab>set APP_HOME=C:\Users\Aztr0nutZs\Desktop\prankster-lab\ 
+
+C:\Users\Aztr0nutZs\Desktop\prankster-lab>for %i in ("C:\Users\Aztr0nutZs\Desktop\prankster-lab\") do set APP_HOME=%~fi 
+
+C:\Users\Aztr0nutZs\Desktop\prankster-lab>set APP_HOME=C:\Users\Aztr0nutZs\Desktop\prankster-lab\ 
+
+C:\Users\Aztr0nutZs\Desktop\prankster-lab>set DEFAULT_JVM_OPTS="-Xmx64m" "-Xms64m" 
+
+C:\Users\Aztr0nutZs\Desktop\prankster-lab>if defined JAVA_HOME goto findJavaFromJavaHome 
+
+C:\Users\Aztr0nutZs\Desktop\prankster-lab>set JAVA_HOME=C:\Program Files\Eclipse Adoptium\jdk-21.0.10.7-hotspot\ 
+
+C:\Users\Aztr0nutZs\Desktop\prankster-lab>set JAVA_EXE=C:\Program Files\Eclipse Adoptium\jdk-21.0.10.7-hotspot\/bin/java.exe 
+
+C:\Users\Aztr0nutZs\Desktop\prankster-lab>if exist "C:\Program Files\Eclipse Adoptium\jdk-21.0.10.7-hotspot\/bin/java.exe" goto execute 
+
+C:\Users\Aztr0nutZs\Desktop\prankster-lab>set CLASSPATH=C:\Users\Aztr0nutZs\Desktop\prankster-lab\\gradle\wrapper\gradle-wrapper.jar 
+
+C:\Users\Aztr0nutZs\Desktop\prankster-lab>"C:\Program Files\Eclipse Adoptium\jdk-21.0.10.7-hotspot\/bin/java.exe" "-Xmx64m" "-Xms64m"   "-Dorg.gradle.appname=gradlew" -classpath "C:\Users\Aztr0nutZs\Desktop\prankster-lab\\gradle\wrapper\gradle-wrapper.jar" org.gradle.wrapper.GradleWrapperMain assembleDebug 
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :app:checkKotlinGradlePluginConfigurationErrors
+> Task :app:generateDebugBuildConfig UP-TO-DATE
+> Task :app:checkDebugAarMetadata UP-TO-DATE
+> Task :app:generateDebugResValues UP-TO-DATE
+> Task :app:mapDebugSourceSetPaths UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
+> Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:packageDebugResources UP-TO-DATE
+> Task :app:parseDebugLocalResources UP-TO-DATE
+> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+> Task :app:processDebugMainManifest UP-TO-DATE
+> Task :app:processDebugManifest UP-TO-DATE
+> Task :app:processDebugManifestForPackage UP-TO-DATE
+> Task :app:processDebugResources UP-TO-DATE
+> Task :app:javaPreCompileDebug UP-TO-DATE
+> Task :app:mergeDebugShaders UP-TO-DATE
+> Task :app:compileDebugShaders NO-SOURCE
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :app:mergeDebugAssets
+> Task :app:checkDebugDuplicateClasses UP-TO-DATE
+> Task :app:desugarDebugFileDependencies UP-TO-DATE
+> Task :app:mergeDebugStartupProfile UP-TO-DATE
+> Task :app:mergeExtDexDebug UP-TO-DATE
+> Task :app:mergeLibDexDebug UP-TO-DATE
+> Task :app:mergeDebugJniLibFolders UP-TO-DATE
+> Task :app:mergeDebugNativeLibs NO-SOURCE
+> Task :app:stripDebugDebugSymbols NO-SOURCE
+> Task :app:validateSigningDebug UP-TO-DATE
+> Task :app:writeDebugAppMetadata UP-TO-DATE
+> Task :app:writeDebugSigningConfigVersions UP-TO-DATE
+> Task :app:compressDebugAssets
+> Task :app:compileDebugKotlin
+
+> Task :app:compileDebugJavaWithJavac UP-TO-DATE
+Java compiler version 21 has deprecated support for compiling with source/target version 8.
+Try one of the following options:
+    1. [Recommended] Use Java toolchain with a lower language version
+    2. Set a higher source/target version
+    3. Use a lower version of the JDK running the build (if you're not using Java toolchain)
+For more details on how to configure these settings, see https://developer.android.com/build/jdks.
+To suppress this warning, set android.javaCompile.suppressSourceTargetDeprecationWarning=true in gradle.properties.
+
+> Task :app:processDebugJavaRes UP-TO-DATE
+> Task :app:mergeDebugJavaResource UP-TO-DATE
+> Task :app:dexBuilderDebug
+> Task :app:mergeProjectDexDebug
+> Task :app:packageDebug
+> Task :app:createDebugApkListingFileRedirect UP-TO-DATE
+> Task :app:assembleDebug
+
+BUILD SUCCESSFUL in 5s
+36 actionable tasks: 7 executed, 29 up-to-date
+
+C:\Users\Aztr0nutZs\Desktop\prankster-lab>if 0 EQU 0 goto mainEnd 
+
+C:\Users\Aztr0nutZs\Desktop\prankster-lab>if "Windows_NT" == "Windows_NT" endlocal

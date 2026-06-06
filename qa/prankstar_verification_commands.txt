@@ -1,0 +1,18 @@
+pwd
+C:\Users\Aztr0nutZs\Desktop\prankster-lab
+
+git status --short
+?? qa/prankstar_verification_commands.txt
+
+asset file list
+app/src/main/assets/prankstar/assets/bot/celebrate2.mp4
+app/src/main/assets/prankstar/assets/bot/dancing.mp4
+app/src/main/assets/prankstar/assets/bot/high.mp4
+app/src/main/assets/prankstar/assets/bot/powerup2.mp4
+app/src/main/assets/prankstar/assets/bot/scanning2.mp4
+app/src/main/assets/prankstar/assets/prankstar_header.mp4
+app/src/main/assets/prankstar/assets/reactor2.mp4
+app/src/main/assets/prankstar/assets/reactor5.mp4
+app/src/main/assets/prankstar/assets/reactor6.mp4
+app/src/main/assets/prankstar/assets/reactor7.mp4
+app/src/main/assets/prankstar/prankstar_new_home_bot_screen.html
