@@ -50,26 +50,29 @@ fun PranksterApp() {
         "system" -> "system"
         else -> "home"
     }
+    val showNativeDock = currentRoute != "home"
 
     Scaffold(
         containerColor = Color.Black,
         bottomBar = {
-            PrankstarBottomDock(
-                currentRoute = dockRoute,
-                onNavigate = { route ->
-                    navController.navigate(route) {
-                        popUpTo(navController.graph.startDestinationId) { saveState = true }
-                        launchSingleTop = true
-                        restoreState = true
+            if (showNativeDock) {
+                PrankstarBottomDock(
+                    currentRoute = dockRoute,
+                    onNavigate = { route ->
+                        navController.navigate(route) {
+                            popUpTo(navController.graph.startDestinationId) { saveState = true }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
                     }
-                }
-            )
+                )
+            }
         }
     ) { paddingValues ->
         NavHost(
             navController = navController,
             startDestination = "home",
-            modifier = Modifier.padding(paddingValues)
+            modifier = if (showNativeDock) Modifier.padding(paddingValues) else Modifier
         ) {
             composable("home") { HomeScreen(audioPlayerController, soundRepository, onNavigate = { navController.navigate(it) }) }
             composable("library") {
