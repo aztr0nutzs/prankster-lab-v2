@@ -67,16 +67,13 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 
 @Composable
+@Suppress("UNUSED_PARAMETER")
 fun HomeScreen(
     audioPlayerController: AudioPlayerController,
     soundRepository: SoundRepository,
     onNavigate: (String) -> Unit = {}
 ) {
-    UltimateReactorScreen(
-        audioPlayerController = audioPlayerController,
-        soundRepository = soundRepository,
-        onNavigate = onNavigate
-    )
+    PrankstarHomeWebViewScreen()
 }
 
 @Composable
