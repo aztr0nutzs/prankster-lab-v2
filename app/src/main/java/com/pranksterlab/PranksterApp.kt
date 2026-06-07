@@ -43,7 +43,7 @@ fun PranksterApp() {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route ?: "home"
     val dockRoute = when (currentRoute) {
-        "home", "randomizer", "timer" -> "home"
+        "home", "home_native", "home_ultimate", "randomizer", "timer" -> "home"
         "library", "lab" -> "library"
         "forge" -> "forge"
         "voice_lab", "messages" -> "voice_lab"
@@ -74,7 +74,21 @@ fun PranksterApp() {
             startDestination = "home",
             modifier = if (showNativeDock) Modifier.padding(paddingValues) else Modifier
         ) {
-            composable("home") { HomeScreen(audioPlayerController, soundRepository, onNavigate = { navController.navigate(it) }) }
+            composable("home") {
+                PrankstarStableHomeWebViewScreen(
+                    audioPlayerController = audioPlayerController,
+                    soundRepository = soundRepository,
+                    onNavigate = { route ->
+                        navController.navigate(route) {
+                            popUpTo(navController.graph.startDestinationId) { saveState = true }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    }
+                )
+            }
+            composable("home_native") { HomeScreen(audioPlayerController, soundRepository, onNavigate = { navController.navigate(it) }) }
+            composable("home_ultimate") { UltimateReactorScreen(audioPlayerController, soundRepository, onNavigate = { navController.navigate(it) }) }
             composable("library") {
                 LibraryScreen(
                     soundRepository = soundRepository,

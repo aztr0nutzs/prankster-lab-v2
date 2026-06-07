@@ -1284,7 +1284,7 @@ button,.dtab,.rsel,.mode-btn,.joke-btn,.forge-item,.stash-item,.zone-btn,.sb,.bo
 
 <script>
 function psBridge() {
-  return window.PrankstarAndroid || null;
+  return window.PrankstarBridge || window.PrankstarAndroid || null;
 }
 function callAndroid(method) {
   var args=Array.prototype.slice.call(arguments,1);
@@ -1309,7 +1309,7 @@ function bridgeZoneAction(label){
   var l=String(label||'').toLowerCase();
   if(l.indexOf('right')>=0){return callAndroid('playRandomJoke');}
   if(l.indexOf('left')>=0){return callAndroid('playSoundByCategory','effects');}
-  if(l.indexOf('bottom')>=0||l.indexOf('release')>=0||l.indexOf('core')>=0||l.indexOf('deploy')>=0){return callAndroid('playRandomSound');}
+  if(l.indexOf('bottom')>=0||l.indexOf('release')>=0||l.indexOf('core')>=0||l.indexOf('deploy')>=0){return callAndroid('deployRandom')||callAndroid('playRandomSound');}
   return callAndroid('playSoundByCategory',bridgeCategoryFor(label));
 }
 
@@ -1442,6 +1442,11 @@ function switchDock(id,el){
   document.getElementById('dp-'+id).classList.add('active');
   el.classList.add('active');
   curDock=id;
+  callAndroid('setReactorMode',id);
+  if(id==='stash'){callAndroid('openStash');}
+  else if(id==='forge'){callAndroid('openForge');}
+  else if(id==='jokes'){callAndroid('openJokes');}
+  else if(id==='sys'){callAndroid('openSystem');}
 }
 
 // Knobs
@@ -1483,7 +1488,8 @@ function togglePwr(){
 // Deploy
 function mainDeploy(){
   if(!powered)return;
-  callAndroid('playRandomSound');
+  callAndroid('setReactorMode','core');
+  callAndroid('deployRandom') || callAndroid('playRandomSound');
   prankCnt++;updatePrankCnt();
   doRipple(curR);charge=Math.min(100,charge+30);
   document.getElementById('slot-'+curR).style.filter='brightness(1.8) saturate(1.6)';
@@ -1494,12 +1500,13 @@ function mainDeploy(){
 
 // Stash / Forge / Jokes
 function stashDeploy(name){callAndroid('playSoundByCategory','stash');prankCnt++;updatePrankCnt();doRipple(curR);charge=Math.min(100,charge+20);showAlert('◈ '+name+' ARMED! ◈',false);}
-function forgeAction(name){callAndroid('playSoundByCategory','forge');showAlert('⚙ FORGING: '+name,false);doRipple(curR);}
-function jokeAction(type){callAndroid('playJokeByType',type);prankCnt++;updatePrankCnt();doRipple(curR);charge=Math.min(100,charge+25);showAlert('🎯 '+type+' SEQUENCE FIRED!',false);}
+function forgeAction(name){callAndroid('setReactorMode','forge');callAndroid('playSoundByCategory','forge');showAlert('⚙ FORGING: '+name,false);doRipple(curR);}
+function jokeAction(type){callAndroid('setReactorMode','jokes');callAndroid('playJokeByType',type);prankCnt++;updatePrankCnt();doRipple(curR);charge=Math.min(100,charge+25);showAlert('🎯 '+type+' SEQUENCE FIRED!',false);}
 
 // Side actions
 function sAct(t){
-  if(t==='audio')callAndroid('stopPlayback');else if(t==='zap')callAndroid('playSoundByCategory','effects');
+  if(t==='audio')callAndroid('stopAll');else if(t==='zap')callAndroid('playSoundByCategory','effects');
+  if(t==='gear')callAndroid('openSystem');
   doRipple(curR);
   var m={audio:'◈ AUDIO MOD TOGGLED',gear:'⚙ SETTINGS ACTIVE',holo:'◈ HOLO TARGET LOCKED',zap:'⚡ ZAP ARMED',ai:'◈ AI ONLINE',spring:'◈ SPRING LOADED'};
   showAlert(m[t]||'SYSTEM OK',t==='zap');
@@ -1625,6 +1632,7 @@ function setBotMode(mode,soft){
 }
 function botPulse(label,mode){
   showScreen('bot');
+  callAndroid('setReactorMode','bot');
   if(mode==='scan')callAndroid('playSoundByCategory','scan');
   else if(mode==='power')callAndroid('playSoundByCategory','power');
   else if(mode==='dance')callAndroid('playSoundByCategory','funny');

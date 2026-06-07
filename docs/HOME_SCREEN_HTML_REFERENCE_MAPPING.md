@@ -1,27 +1,22 @@
 # Home Screen HTML Reference Mapping
 
-Reference: `docs/reference/prankstar_home.html`
+## Updated runtime mapping
 
-## Runtime mapping
-
-| HTML-inspired element | Android runtime implementation | Status |
+| HTML element | Android runtime | Status |
 | --- | --- | --- |
-| Animated background | `PrankstarVideoBackground` using `R.raw.prankstar_bg` | Mounted on actual `home` route |
-| Top banner | `PrankstarHeaderVideo` using `R.raw.prankstar_header` | Mounted as Home/Core top banner |
-| Prank counter | `UltimateReactorState.prankCount` in the reactor bottom controls/readouts | Preserved |
-| Central reactor stage | `UltimateReactorCanvas`, `ReactorCorePanel`, compact canvas, or visualizer canvas depending on selected mode | Added selectable modes |
-| Left/right VU strips | `VisualizerStage` side strips | Added in visualizer mode |
-| FX/ripple overlay | `PrankstarFxOverlay` | Mounted above stage content |
-| Floating controls | `PrankstarFloatingControls` | Real deploy/stop/navigation callbacks |
-| Reactor name/status readout | `ReactorReadout` | Visible in every mode |
-| Robot avatar / bot | `PrankstarBotVideo` | Always visible compact Home assistant |
-| Bottom navigation | Existing global `PrankstarBottomDock` | Retained; no duplicate Home dock added |
+| Home/Core screen | `PrankstarStableHomeWebViewScreen` | Default `home` route |
+| HTML bundle | `file:///android_asset/prankstar/prankstar_new_home_bot_screen.html` | Loaded in WebView |
+| Header video | `assets/prankstar_header.mp4` | Preserved in HTML bundle |
+| Reactor videos | `assets/reactor1.mp4` to `assets/reactor7.mp4` | Preserved in HTML bundle |
+| Bot videos | `assets/bot/high.mp4`, `scanning2.mp4`, `powerup2.mp4`, `dancing.mp4`, `celebrate2.mp4` | Preserved in HTML bundle |
+| Deploy action | `PrankstarWebBridge.deployRandom()` | Real catalog sound playback |
+| Stop action | `PrankstarWebBridge.stopAll()` | Stops Android audio |
+| Stash button | `PrankstarWebBridge.openStash()` | Navigates to native Library |
+| Jokes button | `PrankstarWebBridge.openJokes()` | Navigates to native Voice Lab |
+| Forge button | `PrankstarWebBridge.openForge()` | Navigates to native Forge |
+| System button | `PrankstarWebBridge.openSystem()` | Navigates to native Settings/System |
 
-## Mode behavior
-
-- `ULTIMATE` preserves the original ultimate stage and side strips.
-- `CLASSIC` renders the existing classic reactor path so old reactor behavior is not bypassed.
-- `COMPACT` uses a smaller high-contrast reactor card for tight mobile screens.
-- `VISUALIZER` emphasizes VU bars and ripple energy for an audio-reactive presentation.
-
-All modes call the same real deploy and stop functions, so they do not create fake controls.
+## Notes
+- The HTML keeps its own animation/state behavior.
+- The native app still owns Library, Voice Lab, Forge, and System screens.
+- The global bottom dock is hidden on Home to avoid duplicate dock UI.
