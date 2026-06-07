@@ -5,7 +5,7 @@ import com.pranksterlab.core.model.PrankSound
 
 data class PrankstarBotState(
     val message: PrankstarBotMessage = PrankstarBotMessage("Tell me what kind of prank sound you want."),
-    val mood: PrankstarBotMood = PrankstarBotMood.IDLE,
+    val mood: PrankstarBotMood = PrankstarBotMood.RELAXED,
     val suggestedChips: List<String> = listOf("Find Creepy", "Funny Sound", "Make Joke", "Open Stash", "Stop All"),
     val recommendations: List<PrankSound> = emptyList(),
     val recommendationReason: String? = null,

@@ -140,7 +140,7 @@ fun SequenceBuilderScreen(soundRepository: SoundRepository, audioPlayerControlle
                 PrankstarHeader(
                     title = "Sequence Builder",
                     subtitle = "Multi-Stage Prank Timeline",
-                    imageRes = R.drawable.prankstar_sn3,
+                    imageRes = R.drawable.prankstar_header,
                     statusLabel = if (isPlaying) "RUNNING" else "${sequence.size} STEPS"
                 )
             }

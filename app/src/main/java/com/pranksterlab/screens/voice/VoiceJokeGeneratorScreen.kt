@@ -244,7 +244,7 @@ fun VoiceJokeGeneratorScreen(soundRepository: SoundRepository) {
                 PrankstarHeader(
                     title = "Jokes",
                     subtitle = "Voice Lab / Meme Clip Generator",
-                    imageRes = R.drawable.header_joke_gen,
+                    imageRes = R.drawable.prankstar_header,
                     statusLabel = status,
                     showTextOverlay = false
                 )

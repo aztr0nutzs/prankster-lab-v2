@@ -15,5 +15,5 @@ class PrankstarBotResponseBuilder {
 
     fun plan(title: String): String = "Plan assembled: $title. Every step stays harmless and user-controlled."
 
-    fun help(): String = "Try: find creepy sounds, play something funny, make a joke about being late, create an office prank plan, open stash, open jokes, open forge, or stop all."
+    fun help(): String = "Try: find creepy sounds, show animal sounds, play something funny, make a joke about being late, create a robot announcement, open stash, open jokes, open forge, open system, or stop all."
 }

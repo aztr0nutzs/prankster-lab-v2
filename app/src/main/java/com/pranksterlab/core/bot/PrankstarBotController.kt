@@ -24,8 +24,9 @@ class PrankstarBotController(
         }
 
         return when (val intent = commandParser.parse(input)) {
-            is PrankstarBotIntent.SearchSounds -> recommend(intent.query, sounds, PrankstarBotMood.THINKING)
-            is PrankstarBotIntent.RecommendSounds -> recommend(intent.vibe, sounds, PrankstarBotMood.PLAYING)
+            is PrankstarBotIntent.SearchSounds -> recommend(intent.query, sounds, PrankstarBotMood.SEARCHING)
+            is PrankstarBotIntent.RecommendSounds -> recommend(intent.vibe, sounds, PrankstarBotMood.SEARCHING)
+            is PrankstarBotIntent.PlayRecommended -> recommend(intent.vibe, sounds, PrankstarBotMood.PLAYING, autoPlayFirst = true)
             is PrankstarBotIntent.GenerateJoke -> generateJoke(intent.prompt)
             is PrankstarBotIntent.BuildPrankPlan -> buildPlan(intent.prompt, sounds)
             is PrankstarBotIntent.ChooseVoice -> chooseVoice(intent.prompt)
@@ -39,6 +40,7 @@ class PrankstarBotController(
             PrankstarBotIntent.OpenStash -> navigate("library", "Opening Sound Stash. I’ll keep the neon warm.")
             PrankstarBotIntent.OpenJokes -> navigate("voice_lab", "Opening Voice Lab / Joke Gen. Bring the line, you tap Generate.")
             PrankstarBotIntent.OpenForge -> navigate("forge", "Opening Sound Forge for handcrafted chaos.")
+            PrankstarBotIntent.OpenSystem -> navigate("system", "Opening System controls.")
             PrankstarBotIntent.Help -> PrankstarBotResult(
                 message = responseBuilder.help(),
                 actions = listOf(PrankstarBotAction.ShowMessage(responseBuilder.help())),
@@ -53,17 +55,20 @@ class PrankstarBotController(
         }
     }
 
-    private fun recommend(query: String, sounds: List<PrankSound>, mood: PrankstarBotMood): PrankstarBotResult {
+    private fun recommend(query: String, sounds: List<PrankSound>, mood: PrankstarBotMood, autoPlayFirst: Boolean = false): PrankstarBotResult {
         val recommended = soundRecommender.recommend(query, sounds.filter { it.assetPath.isNotBlank() || it.localUri != null })
         val message = responseBuilder.recommendations(query, recommended)
         val actions = mutableListOf<PrankstarBotAction>(PrankstarBotAction.ShowMessage(message))
         if (recommended.isNotEmpty()) {
             actions += PrankstarBotAction.ShowSoundRecommendations(recommended, "Matched name, category, tags, pack, and vibe keywords for '$query'.")
+            if (autoPlayFirst) {
+                actions += PrankstarBotAction.PlaySound(recommended.first())
+            }
         }
         return PrankstarBotResult(
             message = message,
             actions = actions,
-            mood = if (recommended.isEmpty()) PrankstarBotMood.CONFUSED else mood,
+            mood = if (recommended.isEmpty()) PrankstarBotMood.SAD else mood,
             suggestedChips = listOf("Play Random", "Make Joke", "Open Stash", "Stop All")
         )
     }

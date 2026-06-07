@@ -165,7 +165,7 @@ fun LibraryScreen(
             PrankstarHeader(
                 title = "Sound Stash",
                 subtitle = "Bundled Pranks / Generated Clips / Favorites",
-                imageRes = R.drawable.header_sound_stash,
+                imageRes = R.drawable.prankstar_header,
                 statusLabel = "${validSounds.size} ASSETS",
                 showTextOverlay = false,
                 modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp)

@@ -131,7 +131,7 @@ fun SoundForgeWorkbench(
             PrankstarHeader(
                 title = "Sound Forge",
                 subtitle = "Procedural Synthesis Lab",
-                imageRes = R.drawable.header_sound_gen,
+                imageRes = R.drawable.prankstar_header,
                 statusLabel = when {
                     isGenerating -> "RENDER"
                     isPlaying -> "PREVIEW"

@@ -163,7 +163,7 @@ fun PrankstarBotVideo(
             } else {
                 StaticBotImage(staticDrawableId = staticDrawableId, mood = mood)
             }
-            if (mood in setOf(PrankstarBotMood.PROCESSING, PrankstarBotMood.GENERATING, PrankstarBotMood.THINKING)) {
+            if (mood in setOf(PrankstarBotMood.PROCESSING, PrankstarBotMood.GENERATING, PrankstarBotMood.THINKING, PrankstarBotMood.SEARCHING, PrankstarBotMood.SEARCHING_ALT)) {
                 ProcessingRing(accent = accent, pulse = pulse, compact = compact)
             }
             if (mood == PrankstarBotMood.PLAYING) {

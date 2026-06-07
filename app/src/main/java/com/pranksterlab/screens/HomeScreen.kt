@@ -104,21 +104,13 @@ private fun LegacyHomeScreen(
     val botSuggestionsEnabled by soundRepository.getBotSuggestionsEnabledFlow().collectAsState(initial = true)
 
     val botMood = when {
-        showWakeup                                       -> PrankstarBotMood.WAKEUP
+        showWakeup                                       -> PrankstarBotMood.POWERUP
         playbackError != null
-            || playbackState.lastError != null           -> PrankstarBotMood.ERROR
+            || playbackState.lastError != null           -> PrankstarBotMood.SAD
         playbackState.isPlaying                          -> PrankstarBotMood.PLAYING
-        soundsList.isEmpty()                             -> PrankstarBotMood.THINKING
+        soundsList.isEmpty()                             -> PrankstarBotMood.SEARCHING
         else                                             -> PrankstarBotMood.ARMED
     }
-    val botMessage = when (botMood) {
-        PrankstarBotMood.WAKEUP   -> "Booting NEO assistant."
-        PrankstarBotMood.PLAYING  -> "Signal deployed: ${playbackState.currentSoundTitle ?: lastSoundName ?: "chaos sample"}."
-        PrankstarBotMood.ERROR    -> "Playback needs attention. Check the trace log."
-        PrankstarBotMood.THINKING -> "Scanning the Sound Stash."
-        else                      -> "Ready to deploy chaos."
-    }
-
     LaunchedEffect(Unit) {
         delay(1600)
         showWakeup = false
@@ -198,7 +190,7 @@ private fun LegacyHomeScreen(
                 PrankstarHeader(
                     title       = "Core",
                     subtitle    = "Quick Play Reactor / Stash + Joke Launch",
-                    imageRes    = R.drawable.prankstar_sn1,
+                    imageRes    = R.drawable.prankstar_header,
                     statusLabel = if (playbackState.isPlaying) "LIVE" else "ARMED"
                 )
             }
@@ -232,6 +224,7 @@ private fun LegacyHomeScreen(
                                         addLog("BOT STOP ALL")
                                     }
                                     is PrankstarBotAction.Navigate -> onNavigate(action.route)
+                                    is PrankstarBotAction.FillVoiceLabText -> PrankstarBotVoiceLabBridge.submit(action.text, action.suggestedVoicePresetId)
                                     else -> Unit
                                 }
                             }
@@ -267,6 +260,14 @@ private fun LegacyHomeScreen(
                         onSendToVoiceLab = { text, presetId ->
                             PrankstarBotVoiceLabBridge.submit(text, presetId)
                             onNavigate("voice_lab")
+                        },
+                        onInputChanged = { text ->
+                            if (text.isNotBlank()) {
+                                botAgentState = botAgentState.copy(
+                                    message = PrankstarBotMessage("Listening. Send it when ready."),
+                                    mood = PrankstarBotMood.TYPING
+                                )
+                            }
                         },
                         modifier = Modifier.fillMaxWidth()
                     )

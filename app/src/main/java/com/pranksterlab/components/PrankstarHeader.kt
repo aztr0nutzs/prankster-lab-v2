@@ -43,12 +43,13 @@ import com.pranksterlab.theme.LimeAccent
  * helper exists so callers can stay consistent with the dark neon palette already in use.
  */
 enum class PrankstarHeaderVariant(val drawableId: Int, val accent: Color) {
-    SN1(R.drawable.prankstar_sn1, CyanAccent),
-    SN2(R.drawable.prankstar_sn2, FuchsiaAccent),
-    SN3(R.drawable.prankstar_sn3, LimeAccent),
+    SN1(R.drawable.prankstar_header, CyanAccent),
+    SN2(R.drawable.prankstar_header, FuchsiaAccent),
+    SN3(R.drawable.prankstar_header, LimeAccent),
 }
 
 private fun accentForImage(imageRes: Int): Color = when (imageRes) {
+    R.drawable.prankstar_header -> CyanAccent
     R.drawable.prankstar_sn1 -> CyanAccent
     R.drawable.prankstar_sn2 -> FuchsiaAccent
     R.drawable.prankstar_sn3 -> LimeAccent
@@ -75,7 +76,7 @@ fun PrankstarHeader(
     imageRes: Int,
     modifier: Modifier = Modifier,
     statusLabel: String? = null,
-    showTextOverlay: Boolean = true,
+    showTextOverlay: Boolean = false,
     trailingContent: (@Composable RowScope.() -> Unit)? = null,
 ) {
     val accent = accentForImage(imageRes)
@@ -84,7 +85,7 @@ fun PrankstarHeader(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .heightIn(min = 88.dp, max = 108.dp)
+            .heightIn(min = 88.dp, max = 96.dp)
             .clip(shape)
             .background(Color.Black)
             .border(
