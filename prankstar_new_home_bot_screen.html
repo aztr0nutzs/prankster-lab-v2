@@ -298,56 +298,210 @@ input[type=range]{width:100%;height:3px;accent-color:var(--g);cursor:pointer;bor
 
 
 
-/* ===== REACTOR RESPONSIVENESS + LEGIBILITY PATCH ===== */
-.reactor-slot{overflow:visible;isolation:isolate;touch-action:none}
-.ctrl-overlay{touch-action:none}
-.zone-btn,.ring-touch{touch-action:none;-webkit-tap-highlight-color:transparent}
-.zone-btn{min-width:42px;min-height:42px;filter:drop-shadow(0 0 6px rgba(0,0,0,.85))}
-.zone-btn .zone-inner{
-  opacity:.18;
-  background:radial-gradient(circle at 50% 45%,rgba(255,255,255,.11),rgba(0,0,0,.16) 62%,rgba(0,0,0,.02));
-  border-width:2px!important;
-  box-shadow:inset 0 0 18px rgba(255,255,255,.055),0 0 10px currentColor;
-  font-size:15px!important;
-  line-height:1;
-  font-family:'Black Ops One',cursive;
-  font-style:italic;
-  text-shadow:0 0 9px currentColor,0 1px 2px #000;
+/* ===== PRANKSTAR STABLE V9 SURGICAL RESTORE =====
+   Purpose: keep original working DOM + handlers + embedded reactors, fix only visibility/layout styling. */
+:root{
+  --ps-red:#ff2a18;
+  --ps-orange:#ff7a00;
+  --ps-cyan:#00e8ff;
+  --ps-blue:#2e7dff;
+  --ps-pink:#ff00cc;
+  --ps-gold:#ffcc00;
+  --ps-lime:#b7ff00;
+  --ps-panel:#07090d;
+  --ps-line:rgba(255,255,255,.22);
 }
-.zone-btn:hover .zone-inner,.zone-btn:focus-visible .zone-inner{opacity:.58;transform:scale(1.04)}
-.zone-btn:active .zone-inner,.zone-btn.hot-active .zone-inner{opacity:.95;transform:scale(.91);box-shadow:inset 0 0 24px currentColor,0 0 22px currentColor}
-.ring-touch{border-width:2px!important;opacity:.46;box-shadow:inset 0 0 22px rgba(255,255,255,.035)}
-.ring-touch.hot-active{opacity:.98;box-shadow:inset 0 0 40px currentColor,0 0 24px currentColor;transform:scale(.985)}
-.zone-label{
-  font-size:9px!important;
-  letter-spacing:1.8px!important;
-  line-height:1.15;
-  background:rgba(0,0,0,.62);
-  border:1px solid rgba(255,255,255,.1);
-  border-radius:4px;
-  padding:2px 7px;
-  text-shadow:0 0 10px currentColor,0 2px 2px #000!important;
-  backdrop-filter:blur(2px);
+html,body{background:#000!important;overflow:hidden!important;font-family:'Black Ops One','Orbitron',Impact,sans-serif!important;}
+#app{background:#000!important;overflow:hidden!important;}
+
+/* Header: force visible and not tiny. If video asset is missing, overlay still proves the header zone exists. */
+#topbar{
+  height:clamp(118px,28vw,158px)!important;
+  min-height:118px!important;
+  max-height:158px!important;
+  display:block!important;
+  flex-shrink:0!important;
+  position:relative!important;
+  overflow:hidden!important;
+  background:linear-gradient(180deg,#050505,#000)!important;
+  border-bottom:2px solid rgba(255,122,0,.72)!important;
+  box-shadow:none!important;
+  z-index:80!important;
 }
-.reactor-slot.reactor-armed video{filter:drop-shadow(0 0 34px currentColor) saturate(1.25) contrast(1.12) brightness(1.08)}
-.reactor-slot.reactor-armed{animation:reactorMicroJolt .22s ease-out}
-@keyframes reactorMicroJolt{0%{transform:translate3d(0,0,0) scale(1)}35%{transform:translate3d(.5px,-.8px,0) scale(1.012)}70%{transform:translate3d(-.4px,.6px,0) scale(1.006)}100%{transform:translate3d(0,0,0) scale(1)}}
-.hotspot-label{
-  position:absolute;z-index:18;pointer-events:none;opacity:0;transform:translate(-50%,-50%) skew(-7deg) scale(.92);
-  font-family:'Black Ops One',cursive;font-style:italic;font-size:9px;letter-spacing:1.8px;
-  color:var(--g);background:rgba(0,0,0,.74);border:1px solid currentColor;border-radius:4px;padding:3px 8px;
-  text-shadow:0 0 10px currentColor;box-shadow:0 0 14px rgba(0,0,0,.85);white-space:nowrap;transition:opacity .12s,transform .12s;
+#header-video{
+  position:absolute!important;
+  inset:0!important;
+  width:100%!important;
+  height:100%!important;
+  min-width:100%!important;
+  min-height:100%!important;
+  display:block!important;
+  object-fit:cover!important;
+  object-position:center center!important;
+  opacity:1!important;
+  visibility:visible!important;
+  filter:contrast(1.08) saturate(1.18) brightness(1.08)!important;
+  background:#000!important;
+  z-index:0!important;
 }
-.hotspot-label.on{opacity:1;transform:translate(-50%,-50%) skew(-7deg) scale(1)}
-.reactor-spark{position:absolute;z-index:19;width:7px;height:7px;border-radius:50%;pointer-events:none;background:currentColor;box-shadow:0 0 12px currentColor;animation:sparkOut .48s ease-out forwards}
-@keyframes sparkOut{to{opacity:0;transform:translate(var(--sx),var(--sy)) scale(.25)}}
-.reactor-reticle{position:absolute;z-index:17;pointer-events:none;border:1px solid currentColor;border-radius:50%;width:42px;height:42px;opacity:0;transform:translate(-50%,-50%) scale(.55);box-shadow:0 0 14px currentColor,inset 0 0 10px currentColor;animation:reticlePop .42s ease-out forwards}
-.reactor-reticle::before,.reactor-reticle::after{content:'';position:absolute;background:currentColor;opacity:.8}.reactor-reticle::before{left:50%;top:-8px;width:1px;height:58px}.reactor-reticle::after{top:50%;left:-8px;height:1px;width:58px}
-@keyframes reticlePop{0%{opacity:0;transform:translate(-50%,-50%) scale(.45)}35%{opacity:.95}100%{opacity:0;transform:translate(-50%,-50%) scale(1.35)}}
-#reactor-hold-meter{position:absolute;left:50%;bottom:6%;transform:translateX(-50%) skew(-7deg);z-index:32;width:164px;height:10px;border:1px solid rgba(255,255,255,.18);border-radius:8px;background:rgba(0,0,0,.75);overflow:hidden;opacity:0;transition:opacity .15s;box-shadow:0 0 12px rgba(0,0,0,.8)}
-#reactor-hold-meter.on{opacity:1}#reactor-hold-fill{height:100%;width:0;background:linear-gradient(90deg,var(--g),var(--b),var(--pk),var(--o),var(--r));box-shadow:0 0 12px currentColor;transition:width .05s}
-.rsel{padding:5px 2px!important;min-height:42px}.rsel-icon{font-size:15px!important}.rsel-lbl{font-size:6.2px!important;letter-spacing:.55px!important;text-shadow:0 0 7px currentColor,0 1px 2px #000!important}.dtab-lbl{font-size:9px!important}.mode-btn{font-size:7.4px!important;padding:5px 3px!important}.bot-act{font-size:8.4px!important;padding:7px 4px!important}
-@media(max-width:380px){.zone-btn{min-width:38px;min-height:38px}.zone-btn .zone-inner{font-size:13px!important}.zone-label{font-size:8px!important}.rsel-lbl{font-size:5.7px!important}.rsel-icon{font-size:14px!important}}
+#topbar::before{background:linear-gradient(90deg,rgba(0,0,0,.26),rgba(0,0,0,0),rgba(0,0,0,.26))!important;z-index:1!important;}
+#topbar::after{opacity:.35!important;z-index:2!important;}
+#header-overlay{z-index:5!important;padding:10px 12px!important;}
+#tb-brand{font-size:clamp(18px,5.2vw,28px)!important;color:#fff!important;text-shadow:-2px 2px 0 #000,0 0 12px rgba(255,122,0,.55)!important;letter-spacing:2.2px!important;}
+#tb-brand span{color:var(--ps-orange)!important;}
+#tb-rname{font-size:clamp(12px,3.4vw,17px)!important;color:var(--ps-cyan)!important;text-shadow:-1px 1px 0 #000!important;max-width:170px!important;}
+#tb-temp{font-size:11px!important;color:var(--ps-orange)!important;text-shadow:none!important;}
+.header-chip{font-size:8px!important;color:var(--ps-gold)!important;text-shadow:none!important;bottom:7px!important;background:rgba(0,0,0,.52)!important;border:1px solid rgba(255,204,0,.28)!important;padding:3px 8px!important;border-radius:0!important;}
+
+/* Stage: restore normal original structure but give reactor real room. */
+.screen-view.active-view{display:flex!important;}
+#reactor-area{
+  flex:1 1 auto!important;
+  min-height:330px!important;
+  height:auto!important;
+  overflow:visible!important;
+  background:
+    radial-gradient(circle at 50% 47%,rgba(0,232,255,.085),transparent 35%),
+    radial-gradient(circle at 50% 58%,rgba(255,0,204,.055),transparent 48%),
+    #000!important;
+}
+#bg-cv{opacity:.65!important;}
+#reactor-video-wrap{overflow:visible!important;z-index:5!important;}
+.reactor-slot{
+  width:min(360px,88vw)!important;
+  height:min(360px,88vw)!important;
+  max-width:360px!important;
+  max-height:360px!important;
+  overflow:visible!important;
+  background:transparent!important;
+  border:none!important;
+  box-shadow:none!important;
+  clip-path:none!important;
+}
+.reactor-slot.active-slot{display:block!important;opacity:1!important;visibility:visible!important;}
+.reactor-slot video{
+  width:100%!important;
+  height:100%!important;
+  display:block!important;
+  object-fit:contain!important;
+  object-position:center center!important;
+  opacity:1!important;
+  visibility:visible!important;
+  background:transparent!important;
+  border-radius:0!important;
+  border:none!important;
+  outline:none!important;
+  box-shadow:none!important;
+  mix-blend-mode:normal!important;
+  filter:brightness(1.24) contrast(1.12) saturate(1.18) drop-shadow(0 0 18px rgba(0,232,255,.26))!important;
+}
+/* Remove the visible rings/targets that made reactors look pasted-on. Touch zones still work. */
+.ring-touch{border:none!important;box-shadow:none!important;background:transparent!important;outline:none!important;}
+.rpl-ring{border-width:0!important;box-shadow:none!important;}
+.touch-flash{border:none!important;box-shadow:none!important;}
+.zone-inner{opacity:0!important;border:none!important;background:transparent!important;box-shadow:none!important;text-shadow:none!important;}
+.zone-label{display:none!important;}
+.ctrl-overlay{background:transparent!important;}
+
+/* Charge/power controls: visible but no internal glow puddles. */
+#pwr-btn{width:44px!important;height:44px!important;top:10px!important;background:#080808!important;border:2px solid var(--ps-red)!important;border-radius:4px!important;color:var(--ps-red)!important;box-shadow:none!important;text-shadow:none!important;font-size:18px!important;}
+#pwr-btn.on{box-shadow:none!important;background:#0c0503!important;}
+#ch-strip{top:58px!important;width:min(250px,74vw)!important;}
+#ch-outer{height:8px!important;border-radius:0!important;border:1px solid rgba(255,122,0,.45)!important;background:#050505!important;}
+#ch-fill{background:linear-gradient(90deg,var(--ps-cyan),var(--ps-pink),var(--ps-orange))!important;box-shadow:none!important;border-radius:0!important;}
+#ch-lbl{font-family:'Black Ops One','Orbitron',Impact,sans-serif!important;color:#e9faff!important;font-size:8px!important;letter-spacing:2px!important;text-shadow:none!important;}
+#alert-box,#bot-alert{font-size:10px!important;border-radius:0!important;text-shadow:none!important;box-shadow:none!important;background:#050505!important;color:#fff!important;border:1px solid var(--ps-orange)!important;}
+
+/* Side strips: angular, quieter, no swamp glow. */
+.side-strip{width:36px!important;gap:5px!important;}
+#s-left{left:8px!important;} #s-right{right:8px!important;}
+.sb{width:34px!important;height:32px!important;border-radius:0!important;background:#07090d!important;border:1px solid rgba(0,232,255,.34)!important;color:#fff!important;box-shadow:none!important;font-size:15px!important;clip-path:polygon(10% 0,100% 0,90% 100%,0 100%)!important;}
+.sb:active{box-shadow:none!important;border-color:var(--ps-orange)!important;}
+.side-vu{height:46px!important;border-color:rgba(255,255,255,.18)!important;}
+.sled{width:5px!important;height:5px!important;box-shadow:none!important;}
+
+/* Global text/control cleanup: bolder, aggressive, no glowing inside controls. */
+body,button,input,.rsel,.dtab,.mode-btn,.ctrl-card,.stash-item,.forge-item,.joke-btn,.tog-lbl,.stat-txt,.dtab-lbl,.rsel-lbl,.cc-title,.si-name,.fi-name,.bot-act{
+  font-family:'Black Ops One','Orbitron',Impact,sans-serif!important;
+  font-style:italic!important;
+  text-transform:uppercase!important;
+}
+button,.rsel,.dtab,.mode-btn,.stash-item,.forge-item,.joke-btn,.ctrl-card,.bot-act,.tog-sw{
+  box-shadow:none!important;
+  text-shadow:none!important;
+}
+
+/* Reactor selector: make all seven obvious and present without eating the stage. */
+#reactor-sel{display:grid!important;grid-template-columns:repeat(4,1fr)!important;gap:6px!important;padding:8px 9px!important;background:#000!important;border-top:1px solid rgba(255,255,255,.08)!important;}
+.rsel{min-height:50px!important;border-radius:0!important;padding:6px 3px!important;background:linear-gradient(180deg,#10141c,#050608)!important;border:1px solid rgba(255,255,255,.25)!important;clip-path:polygon(9% 0,100% 0,91% 100%,0 100%)!important;}
+.rsel-icon{font-size:20px!important;line-height:1!important;margin-bottom:3px!important;}
+.rsel-lbl{font-size:9px!important;letter-spacing:1px!important;color:#fff!important;white-space:nowrap!important;text-shadow:none!important;}
+.rsel.on-g,.rsel.on-b,.rsel.on-pk,.rsel.on-y,.rsel.on-o,.rsel.on-r,.rsel.on-teal{background:linear-gradient(180deg,#1a1e2a,#06070b)!important;border-color:var(--ps-orange)!important;box-shadow:none!important;}
+
+/* Bottom dock: make it look different from other buttons; flat angular command deck, no inner glow. */
+#bottom-dock{display:block!important;flex-shrink:0!important;background:#000!important;border-top:2px solid rgba(255,122,0,.48)!important;z-index:90!important;}
+#dock-tabs{display:grid!important;grid-template-columns:repeat(6,1fr)!important;gap:5px!important;padding:8px 8px 6px!important;background:#000!important;}
+.dtab{min-height:66px!important;border-radius:0!important;padding:7px 2px 5px!important;background:#07090d!important;border:1px solid rgba(255,255,255,.28)!important;border-bottom:1px solid rgba(255,255,255,.28)!important;clip-path:polygon(12% 0,100% 0,88% 100%,0 100%)!important;box-shadow:none!important;justify-content:center!important;gap:4px!important;}
+.dtab.active{background:linear-gradient(180deg,#181c25,#090a0e)!important;border-color:var(--ps-orange)!important;box-shadow:none!important;}
+.crystal-pad{height:32px!important;width:100%!important;background:transparent!important;border:none!important;box-shadow:none!important;margin:0!important;overflow:visible!important;display:flex!important;align-items:center!important;justify-content:center!important;}
+.crystal-pad::before,.crystal-pad::after{display:none!important;}
+.crystal-ico{position:static!important;transform:none!important;font-size:24px!important;line-height:1!important;filter:none!important;color:#fff!important;text-shadow:none!important;}
+.ps-logo{position:static!important;transform:none!important;display:flex!important;justify-content:center!important;align-items:center!important;}
+.ps-logo-text{font-size:12px!important;color:#fff!important;text-shadow:none!important;}
+.ps-logo-bolt{font-size:20px!important;filter:none!important;color:var(--ps-orange)!important;}
+.dtab-lbl{font-size:10px!important;letter-spacing:1.2px!important;color:#fff!important;text-shadow:none!important;transform:none!important;}
+.dtab[data-t="core"]{border-top:3px solid var(--ps-cyan)!important;}
+.dtab[data-t="stash"]{border-top:3px solid var(--ps-gold)!important;}
+.dtab[data-t="forge"]{border-top:3px solid var(--ps-lime)!important;}
+.dtab[data-t="jokes"]{border-top:3px solid var(--ps-blue)!important;}
+.dtab[data-t="sys"]{border-top:3px solid var(--ps-red)!important;}
+.dtab[data-t="bot"]{border-top:3px solid var(--ps-pink)!important;}
+.dtab[data-t="core"] .dtab-lbl,.dtab[data-t="stash"] .dtab-lbl,.dtab[data-t="forge"] .dtab-lbl,.dtab[data-t="jokes"] .dtab-lbl,.dtab[data-t="sys"] .dtab-lbl,.dtab[data-t="bot"] .dtab-lbl{color:#fff!important;text-shadow:none!important;}
+
+/* Panels: force open/close visibility, clean organization, no glow. */
+#dock-content{display:block!important;background:#000!important;border-top:1px solid rgba(255,255,255,.12)!important;max-height:190px!important;overflow-y:auto!important;padding:8px!important;}
+.dpanel{display:none!important;padding:10px!important;border:1px solid rgba(255,255,255,.22)!important;background:#07090d!important;border-radius:0!important;box-shadow:none!important;}
+.dpanel.active{display:block!important;}
+.ctrl-grid{display:grid!important;grid-template-columns:repeat(3,1fr)!important;gap:8px!important;margin-bottom:8px!important;}
+.ctrl-card{min-height:98px!important;border-radius:0!important;padding:9px 5px!important;background:#0b0e14!important;border:1px solid rgba(0,232,255,.28)!important;}
+.cc-title{font-size:11px!important;color:#fff!important;letter-spacing:1.4px!important;margin-bottom:6px!important;text-shadow:none!important;}
+.knob-w{width:45px!important;height:45px!important;border-radius:50%!important;background:#050505!important;border:2px solid rgba(255,122,0,.55)!important;box-shadow:none!important;}
+.knob-ring{border-color:rgba(255,255,255,.18)!important;}
+.knob-mk{background:var(--ps-orange)!important;box-shadow:none!important;}
+.knob-val{font-size:10px!important;color:#fff!important;text-shadow:none!important;}
+.knob-lbl{font-size:9px!important;color:#ccc!important;text-shadow:none!important;}
+.sl-head,.pb-lbl,.stat-txt,.si-desc,.fi-stat,.jb-cnt{font-family:'Share Tech Mono',monospace!important;font-size:9px!important;color:#b8c7d9!important;text-shadow:none!important;}
+input[type=range]{height:5px!important;accent-color:var(--ps-orange)!important;}
+.mode-row{display:grid!important;grid-template-columns:repeat(2,1fr)!important;gap:7px!important;margin-top:8px!important;}
+.mode-btn,.joke-btn,.forge-item,.stash-item{min-height:46px!important;border-radius:0!important;background:#0b0e14!important;border:1px solid rgba(255,255,255,.25)!important;color:#fff!important;font-size:10px!important;letter-spacing:1.2px!important;clip-path:polygon(5% 0,100% 0,95% 100%,0 100%)!important;}
+.si-icon,.fi-icon{font-size:22px!important;}
+.si-name,.fi-name{font-size:11px!important;color:#fff!important;letter-spacing:1.2px!important;text-shadow:none!important;}
+#deploy-btn{min-height:56px!important;border-radius:0!important;background:linear-gradient(180deg,#3c0904,#100000)!important;border:2px solid var(--ps-red)!important;color:#fff!important;font-size:15px!important;letter-spacing:2.5px!important;text-shadow:none!important;box-shadow:none!important;clip-path:polygon(4% 0,100% 0,96% 100%,0 100%)!important;}
+
+/* Bot: keep original but force visible, large, and not clipped. */
+#prankstar-bot-screen{background:radial-gradient(circle at 50% 44%,rgba(0,232,255,.08),transparent 42%),#000!important;overflow:visible!important;min-height:330px!important;}
+#bot-video-shell{width:min(340px,86vw)!important;height:min(430px,56vh)!important;min-height:340px!important;border-radius:0!important;background:transparent!important;border:none!important;box-shadow:none!important;overflow:visible!important;}
+#bot-video-shell::before,#bot-video-shell::after,.bot-hud-ring{display:none!important;}
+.bot-vid{opacity:0!important;mix-blend-mode:normal!important;filter:brightness(1.18) contrast(1.08) saturate(1.1) drop-shadow(0 0 14px rgba(0,232,255,.22))!important;}
+.bot-vid.active-bot{opacity:1!important;display:block!important;}
+.bot-touch-zone{border:none!important;background:transparent!important;box-shadow:none!important;}
+#bot-action-panel{grid-template-columns:repeat(5,1fr)!important;gap:6px!important;padding:8px!important;margin-top:6px!important;}
+.bot-act{min-height:46px!important;border-radius:0!important;background:#0b0e14!important;border:1px solid rgba(255,255,255,.25)!important;color:#fff!important;font-size:9px!important;clip-path:polygon(8% 0,100% 0,92% 100%,0 100%)!important;}
+#bot-title-plate{border-radius:0!important;box-shadow:none!important;text-shadow:none!important;background:#07090d!important;color:#fff!important;border-color:var(--ps-pink)!important;}
+#bot-status-strip{background:#050505!important;border-color:rgba(255,255,255,.14)!important;}
+#bot-status-inner{color:#fff!important;text-shadow:none!important;}
+
+/* Remove bad small-screen overrides from earlier passes by overpowering them. */
+@media(max-height:720px){
+  #topbar{height:clamp(108px,26vw,140px)!important;min-height:108px!important;}
+  #reactor-area{min-height:300px!important;}
+  .reactor-slot{width:min(322px,84vw)!important;height:min(322px,84vw)!important;}
+  .crystal-pad{height:32px!important;}
+  .dtab-lbl{font-size:9px!important;}
+  #bot-video-shell{height:min(390px,54vh)!important;width:min(330px,84vw)!important;min-height:320px!important;}
+  .bot-act{font-size:8px!important;min-height:42px!important;}
+}
+#layout-version-stamp{position:fixed;right:6px;bottom:3px;z-index:999999;font:italic 8px 'Black Ops One',Impact,sans-serif;color:rgba(255,122,0,.75);pointer-events:none;background:rgba(0,0,0,.45);padding:2px 5px;border:1px solid rgba(255,122,0,.25)}
 
 </style>
 </head>
@@ -1202,121 +1356,85 @@ document.addEventListener('touchstart',function(){
 },{once:true,passive:true});
 
 
-/* ===== REACTOR RESPONSIVENESS + EXTRA TOUCH CONTROL PATCH ===== */
+/* ===== STABLE V9 SURGICAL JS SAFETY PATCH ===== */
 (function(){
-  var ids=['r1','r2','r3','r4','r5','r6','r7'];
-  var holdTimer=null,holdStart=0,holdRid=null,lastMove=0;
-  var dynamicHotspots={
-    r1:[['TOP SENSOR','📡',44,8,12,10],['LEFT VALVE','🔒',8,43,13,18],['RIGHT VALVE','🔓',79,43,13,18],['BOTTOM VENT','💨',42,82,16,10],['MICRO PRANK','🎯',43,43,14,14]],
-    r2:[['LAUGH NODE','😜',43,12,14,10],['ECHO PAD','🔊',12,38,15,21],['PITCH PAD','🎚',73,38,15,21],['BOOST VENT','⚡',42,78,16,12],['CORE JAB','💥',38,38,24,24]],
-    r3:[['NOISE SCAN','👁',43,9,14,11],['LEFT SAMPLE','🎤',9,37,15,24],['RIGHT SAMPLE','📣',76,37,15,24],['REMIX VENT','🧪',42,79,16,11],['MIDDLE MIX','🔊',37,36,26,26]],
-    r4:[['STATUS TAP','📊',42,10,16,11],['BATTERY BANK','🔋',6,35,15,29],['ZAP BANK','⚡',79,35,15,29],['BOOST ARC','🌀',42,79,16,11],['CENTER HIT','💥',34,34,32,32]],
-    r5:[['SURGE TOP','▲',42,8,16,13],['SURGE LEFT','◂',7,35,17,28],['SURGE RIGHT','▸',76,35,17,28],['SURGE DROP','▼',42,80,16,12],['SURGE CORE','💥',34,34,32,32]],
-    r6:[['LAUGH TOP','😂',42,8,16,13],['LOOP LEFT','◂',7,35,17,28],['LOOP RIGHT','▸',76,35,17,28],['GIGGLE DROP','▼',42,80,16,12],['LAUGH CORE','😂',34,34,32,32]],
-    r7:[['CHAOS TOP','⚡',42,8,16,13],['CHAOS LEFT','◂',7,35,17,28],['CHAOS RIGHT','▸',76,35,17,28],['CHAOS DROP','▼',42,80,16,12],['CHAOS CORE','🔥',34,34,32,32]]
-  };
-  function cfgColor(rid){return (window.rConfig&&rConfig[rid]&&rConfig[rid].color)||'var(--g)';}
-  function safeAlert(msg,err){if(typeof showAlert==='function')showAlert(msg,!!err);}
-  function safeLog(msg){if(typeof updateLog==='function')updateLog(msg);}
-  function safeRipple(rid){if(typeof doRipple==='function')doRipple(rid);}
-  function safeFlash(rid){if(typeof vidFlash==='function')vidFlash(rid);}
-  function bumpCharge(v){window.charge=Math.min(100,(window.charge||0)+v);}
-  function currentOverlay(rid){return document.getElementById('ovl-'+rid);}
-  function slot(rid){return document.getElementById('slot-'+rid);}
-  function installMeter(){
-    if(document.getElementById('reactor-hold-meter'))return;
-    var area=document.getElementById('reactor-area');if(!area)return;
-    var m=document.createElement('div');m.id='reactor-hold-meter';m.innerHTML='<div id="reactor-hold-fill"></div>';area.appendChild(m);
+  function qs(s){return document.querySelector(s)}
+  function qsa(s){return Array.prototype.slice.call(document.querySelectorAll(s))}
+  window.__psV9 = true;
+
+  function safePlayVideo(id){
+    var v=document.getElementById(id);
+    if(!v)return;
+    v.muted=true; v.playsInline=true; v.autoplay=true; v.loop=true;
+    try{ var p=v.play(); if(p&&p.catch)p.catch(function(){}); }catch(e){}
   }
-  function setMeter(p){
-    var m=document.getElementById('reactor-hold-meter'),f=document.getElementById('reactor-hold-fill');if(!m||!f)return;
-    m.classList.toggle('on',p>0);f.style.width=Math.max(0,Math.min(100,p))+'%';
+  function ensureAllMedia(){
+    safePlayVideo('header-video');
+    ['r1','r2','r3','r4','r5','r6','r7'].forEach(function(r){
+      var v=document.getElementById('vid-'+r);
+      if(v){ v.muted=true; v.playsInline=true; v.loop=true; if(r===window.curR || (window.curR===undefined && r==='r1')) safePlayVideo('vid-'+r); }
+    });
+    ['bot-idle','bot-scan','bot-power','bot-dance','bot-celebrate'].forEach(safePlayVideo);
   }
-  function showFloatingLabel(ovl,x,y,text,color){
-    if(!ovl)return;
-    var old=ovl.querySelector('.hotspot-label');if(old)old.remove();
-    var l=document.createElement('div');l.className='hotspot-label';l.textContent=text;l.style.left=x+'px';l.style.top=y+'px';l.style.color=color;
-    ovl.appendChild(l);requestAnimationFrame(function(){l.classList.add('on');});setTimeout(function(){l.classList.remove('on');},520);setTimeout(function(){if(l.parentNode)l.remove();},760);
-  }
-  function sparks(ovl,x,y,color,count){
-    if(!ovl)return;
-    for(var i=0;i<count;i++){
-      var s=document.createElement('i');s.className='reactor-spark';s.style.left=x+'px';s.style.top=y+'px';s.style.color=color;
-      var a=(Math.PI*2)*(i/count)+Math.random()*.45;var d=18+Math.random()*42;s.style.setProperty('--sx',Math.cos(a)*d+'px');s.style.setProperty('--sy',Math.sin(a)*d+'px');
-      ovl.appendChild(s);setTimeout((function(n){return function(){if(n.parentNode)n.remove();};})(s),520);
+
+  var oldSwitchDock = window.switchDock;
+  window.switchDock = function(id, el){
+    try{
+      if(id==='bot'){ if(typeof window.showScreen==='function') window.showScreen('bot'); }
+      else { if(typeof window.showScreen==='function') window.showScreen('reactor'); }
+      qsa('.dpanel').forEach(function(p){p.classList.remove('active')});
+      qsa('.dtab').forEach(function(t){t.classList.remove('active')});
+      var panel=document.getElementById('dp-'+id);
+      if(panel) panel.classList.add('active');
+      var tab = el || qs('.dtab[data-t="'+id+'"]');
+      if(tab) tab.classList.add('active');
+      window.curDock=id;
+      ensureAllMedia();
+      return false;
+    }catch(e){
+      console.error('[PrankStar V9] switchDock failed', e);
+      if(oldSwitchDock) return oldSwitchDock(id,el);
     }
-  }
-  function reticle(ovl,x,y,color){
-    if(!ovl)return;var r=document.createElement('i');r.className='reactor-reticle';r.style.left=x+'px';r.style.top=y+'px';r.style.color=color;ovl.appendChild(r);setTimeout(function(){if(r.parentNode)r.remove();},460);
-  }
-  function pulseSlot(rid){
-    var s=slot(rid);if(!s)return;
-    s.style.color=cfgColor(rid);s.classList.remove('reactor-armed');void s.offsetWidth;s.classList.add('reactor-armed');
-    setTimeout(function(){s.classList.remove('reactor-armed');},260);
-  }
-  function coords(e,ovl){
-    var rc=ovl.getBoundingClientRect();var p=e.touches&&e.touches[0]?e.touches[0]:e.changedTouches&&e.changedTouches[0]?e.changedTouches[0]:e;
-    return {x:p.clientX-rc.left,y:p.clientY-rc.top,px:(p.clientX-rc.left)/rc.width*100,py:(p.clientY-rc.top)/rc.height*100};
-  }
-  function inferZone(px,py){
-    var dx=px-50,dy=py-50,dist=Math.sqrt(dx*dx+dy*dy);
-    if(dist<16)return ['CORE PAYLOAD','💥',28];
-    if(py<26)return ['TOP CHARGE NODE','▲',18];
-    if(py>74)return ['BOTTOM RELEASE NODE','▼',22];
-    if(px<30)return ['LEFT TRIGGER BANK','◂',16];
-    if(px>70)return ['RIGHT TRIGGER BANK','▸',16];
-    if(dist>32)return ['OUTER MISCHIEF RING','◉',14];
-    return ['INNER REACTOR PLATE','◆',15];
-  }
-  function tactileReact(e,rid,kind){
-    if(!window.powered)return;
-    var ovl=currentOverlay(rid);if(!ovl)return;
-    var c=coords(e,ovl),z=inferZone(c.px,c.py),color=cfgColor(rid);
-    bumpCharge(z[2]);safeRipple(rid);safeFlash(rid);pulseSlot(rid);reticle(ovl,c.x,c.y,color);sparks(ovl,c.x,c.y,color,kind==='hold'?13:8);showFloatingLabel(ovl,c.x,c.y,z[1]+' '+z[0],color);
-    safeLog((kind==='hold'?'HOLD':'TOUCH')+': '+z[0]+' ['+rid.toUpperCase()+']');
-  }
-  var oldZone=window.zoneAction;
-  window.zoneAction=function(rid,label,icon){
-    if(typeof oldZone==='function')oldZone(rid,label,icon);
-    var ovl=currentOverlay(rid),color=cfgColor(rid),rc=ovl?ovl.getBoundingClientRect():null;
-    pulseSlot(rid);if(ovl&&rc){reticle(ovl,rc.width/2,rc.height/2,color);sparks(ovl,rc.width/2,rc.height/2,color,12);showFloatingLabel(ovl,rc.width/2,rc.height*.18,(icon||'◈')+' '+label,color);} 
   };
-  function installDynamicZones(){
-    ids.forEach(function(rid){
-      var ovl=currentOverlay(rid);if(!ovl||ovl.dataset.enhancedZones==='1')return;ovl.dataset.enhancedZones='1';
-      (dynamicHotspots[rid]||[]).forEach(function(h){
-        var b=document.createElement('button');b.type='button';b.className='zone-btn enhanced-zone';b.setAttribute('aria-label',h[0]);
-        b.style.left=h[2]+'%';b.style.top=h[3]+'%';b.style.width=h[4]+'%';b.style.height=h[5]+'%';b.style.borderRadius=(h[4]>26||h[5]>20)?'16px':'50%';
-        b.style.color=cfgColor(rid);b.onclick=function(ev){ev.stopPropagation();window.zoneAction(rid,h[0],h[1]);};
-        var inner=document.createElement('div');inner.className='zone-inner';inner.style.color=cfgColor(rid);inner.style.borderColor='currentColor';inner.style.borderRadius=b.style.borderRadius;inner.textContent=h[1];b.appendChild(inner);ovl.appendChild(b);
-      });
-    });
-  }
-  function installGestures(){
-    ids.forEach(function(rid){
-      var ovl=currentOverlay(rid);if(!ovl||ovl.dataset.gestures==='1')return;ovl.dataset.gestures='1';
-      ovl.addEventListener('pointerdown',function(e){
-        if(!window.powered)return;e.preventDefault();holdRid=rid;holdStart=Date.now();lastMove=0;tactileReact(e,rid,'tap');setMeter(8);
-        clearInterval(holdTimer);holdTimer=setInterval(function(){
-          if(!holdRid)return;var p=Math.min(100,(Date.now()-holdStart)/8);setMeter(p);
-          if(p>=100){clearInterval(holdTimer);holdTimer=null;var fake={clientX:e.clientX,clientY:e.clientY};tactileReact(fake,rid,'hold');bumpCharge(35);safeAlert('🔥 FULL REACTOR CHARGE RELEASED!',false);setMeter(0);holdRid=null;}
-        },45);
-      },{passive:false});
-      ovl.addEventListener('pointermove',function(e){
-        if(holdRid!==rid||Date.now()-lastMove<95)return;lastMove=Date.now();e.preventDefault();tactileReact(e,rid,'drag');bumpCharge(4);
-      },{passive:false});
-      ['pointerup','pointercancel','pointerleave'].forEach(function(type){ovl.addEventListener(type,function(){if(holdRid===rid){holdRid=null;clearInterval(holdTimer);holdTimer=null;setMeter(0);}}, {passive:true});});
-    });
-  }
-  var oldSwitch=window.switchR;
-  window.switchR=function(rid,el,cls){
-    if(typeof oldSwitch==='function')oldSwitch(rid,el,cls);
-    installDynamicZones();installGestures();
-    var ovl=currentOverlay(rid),color=cfgColor(rid);if(ovl){var rc=ovl.getBoundingClientRect();showFloatingLabel(ovl,rc.width/2,rc.height*.12,'◈ '+((rConfig[rid]&&rConfig[rid].name)||rid.toUpperCase())+' ARMED ◈',color);sparks(ovl,rc.width/2,rc.height/2,color,10);}pulseSlot(rid);
+
+  var oldSwitchR = window.switchR;
+  window.switchR = function(rid, el, cls){
+    try{
+      qsa('.reactor-slot').forEach(function(slot){slot.classList.remove('active-slot'); slot.style.display='none';});
+      var slot=document.getElementById('slot-'+rid);
+      if(slot){slot.classList.add('active-slot');slot.style.display='block';}
+      window.curR=rid;
+      safePlayVideo('vid-'+rid);
+      var cfg=(window.rConfig&&window.rConfig[rid])||{name:rid.toUpperCase(),color:'var(--ps-cyan)',rsel:''};
+      var nm=document.getElementById('tb-rname');
+      if(nm){nm.textContent=cfg.name;nm.style.color='';nm.style.textShadow='none';}
+      qsa('.rsel').forEach(function(b){b.className='rsel';});
+      if(el) el.className='rsel '+(cls||cfg.rsel||'');
+      if(typeof window.showAlert==='function') window.showAlert('◈ REACTOR: '+cfg.name+' ◈',false);
+      return false;
+    }catch(e){
+      console.error('[PrankStar V9] switchR failed', e);
+      if(oldSwitchR) return oldSwitchR(rid,el,cls);
+    }
   };
-  installMeter();installDynamicZones();installGestures();
+
+  document.addEventListener('DOMContentLoaded',function(){
+    ensureAllMedia();
+    qsa('.dtab').forEach(function(tab){
+      tab.addEventListener('click',function(ev){
+        var id=tab.getAttribute('data-t');
+        if(id){ ev.preventDefault(); window.switchDock(id,tab); }
+      }, {passive:false});
+    });
+    qsa('.rsel').forEach(function(btn){
+      btn.addEventListener('click',function(){ setTimeout(ensureAllMedia,40); });
+    });
+    setTimeout(ensureAllMedia,250);
+    setTimeout(ensureAllMedia,900);
+  });
 })();
 
 </script>
+<div id="layout-version-stamp">STABLE V9 SURGICAL</div>
 </body>
 </html>
