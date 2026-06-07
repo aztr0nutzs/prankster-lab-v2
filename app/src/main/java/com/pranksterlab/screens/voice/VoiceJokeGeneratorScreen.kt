@@ -43,6 +43,8 @@ import com.pranksterlab.components.PrankstarHeader
 import com.pranksterlab.components.ScanlineOverlay
 import com.pranksterlab.components.bot.PrankstarBotMood
 import com.pranksterlab.components.bot.PrankstarBotVideo
+import com.pranksterlab.core.bot.PrankstarBotJokeGenerator
+import com.pranksterlab.core.bot.PrankstarBotVoiceLabBridge
 import com.pranksterlab.core.repository.SoundRepository
 import com.pranksterlab.core.voice.AndroidTextToSpeechEngine
 import com.pranksterlab.core.voice.GeneratedVoiceRepository
@@ -131,6 +133,8 @@ fun VoiceJokeGeneratorScreen(soundRepository: SoundRepository) {
     val allPresets = VoicePresetLibrary.presets
     val ttsReadiness by tts.readiness.collectAsState()
     val previewPlayer = remember { ManagedPreviewPlayer() }
+    val botJokeGenerator = remember { PrankstarBotJokeGenerator() }
+    val pendingBotDraft by PrankstarBotVoiceLabBridge.pendingDraft.collectAsState()
 
     var preset by remember { mutableStateOf(allPresets.first()) }
     var selectedCategory by remember { mutableStateOf<VoiceCategory?>(null) }
@@ -169,6 +173,17 @@ fun VoiceJokeGeneratorScreen(soundRepository: SoundRepository) {
             tts.stopPreview()
             tts.release()
         }
+    }
+
+    LaunchedEffect(pendingBotDraft) {
+        val draft = pendingBotDraft ?: return@LaunchedEffect
+        text = draft.text.take(300)
+        draft.suggestedVoicePresetId?.let { presetId ->
+            allPresets.firstOrNull { it.id == presetId }?.let { applyPreset(it) }
+        }
+        status = "BOT DRAFT LOADED"
+        statusDetail = "Prankstar Bot filled the line. Review it, then tap Generate when ready."
+        PrankstarBotVoiceLabBridge.consume()
     }
 
     LaunchedEffect(ttsReadiness) {
@@ -241,6 +256,36 @@ fun VoiceJokeGeneratorScreen(soundRepository: SoundRepository) {
                     compact = true,
                     modifier = Modifier.fillMaxWidth()
                 )
+            }
+            item {
+                var botPrompt by remember { mutableStateOf("") }
+                Column(Modifier.fillMaxWidth().background(GlassBackground, RoundedCornerShape(14.dp)).border(1.dp, FuchsiaAccent.copy(alpha = 0.45f), RoundedCornerShape(14.dp)).padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("Bot Helper", color = FuchsiaAccent, style = MaterialTheme.typography.labelLarge)
+                    Text("Ask for a harmless line. The bot fills this screen only; Generate stays user-controlled.", color = Color.LightGray, style = MaterialTheme.typography.bodySmall)
+                    OutlinedTextField(
+                        value = botPrompt,
+                        onValueChange = { botPrompt = it.take(180) },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text("Make a joke/comment about...") },
+                        placeholder = { Text("my friend being late") }
+                    )
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Button(onClick = {
+                            val generated = botJokeGenerator.generate(botPrompt)
+                            text = generated.text.take(300)
+                            allPresets.firstOrNull { it.id == generated.suggestedVoicePresetId }?.let { applyPreset(it) }
+                            status = "BOT LINE READY"
+                            statusDetail = "Generated locally from safe templates. Review before Generate."
+                        }) { Text("Make Line") }
+                        Button(onClick = {
+                            val generated = botJokeGenerator.generate("robot announcement ${botPrompt}")
+                            text = generated.text.take(300)
+                            allPresets.firstOrNull { it.id == generated.suggestedVoicePresetId }?.let { applyPreset(it) }
+                            status = "BOT ROBOT LINE READY"
+                            statusDetail = "Robot-style line filled. Generate remains manual."
+                        }) { Text("Robot") }
+                    }
+                }
             }
             item { Text("Synthetic Presets", color = LimeAccent) }
             item { Text("Warning: All voices are synthetic styling presets, not real-person clones.", color = OrangeAccent) }

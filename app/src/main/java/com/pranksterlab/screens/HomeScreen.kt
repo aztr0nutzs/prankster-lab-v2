@@ -33,6 +33,7 @@ import com.pranksterlab.components.LabelCaps
 import com.pranksterlab.components.PrankstarHeader
 import com.pranksterlab.components.ScanlineOverlay
 import com.pranksterlab.components.bot.PrankstarBotMood
+import com.pranksterlab.components.bot.PrankstarBotPanel
 import com.pranksterlab.components.bot.PrankstarBotVideo
 import com.pranksterlab.R
 import com.pranksterlab.components.reactor.ReactorCorePanel
@@ -42,6 +43,11 @@ import com.pranksterlab.components.reactor.TraceLogPanel
 import com.pranksterlab.components.reactor.TraceEntry
 import com.pranksterlab.components.reactor.KillAudioPanel
 import com.pranksterlab.core.audio.AudioPlayerController
+import com.pranksterlab.core.bot.PrankstarBotAction
+import com.pranksterlab.core.bot.PrankstarBotController
+import com.pranksterlab.core.bot.PrankstarBotMessage
+import com.pranksterlab.core.bot.PrankstarBotState
+import com.pranksterlab.core.bot.PrankstarBotVoiceLabBridge
 import com.pranksterlab.core.repository.SoundRepository
 import com.pranksterlab.core.model.PrankSound
 import androidx.compose.runtime.LaunchedEffect
@@ -51,6 +57,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import com.pranksterlab.theme.BackgroundDark
 import com.pranksterlab.theme.CyanAccent
@@ -65,15 +72,15 @@ import com.pranksterlab.theme.PrimaryContainer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.launch
 
 @Composable
-@Suppress("UNUSED_PARAMETER")
 fun HomeScreen(
     audioPlayerController: AudioPlayerController,
     soundRepository: SoundRepository,
     onNavigate: (String) -> Unit = {}
 ) {
-    PrankstarHomeWebViewScreen(audioPlayerController, soundRepository)
+    LegacyHomeScreen(audioPlayerController, soundRepository, onNavigate)
 }
 
 @Composable
@@ -88,8 +95,13 @@ private fun LegacyHomeScreen(
     var selectedCategory by remember { mutableStateOf("FUNNY") }
     var playbackError    by remember { mutableStateOf<String?>(null) }
     var showWakeup       by remember { mutableStateOf(true) }
+    var botAgentState   by remember { mutableStateOf(PrankstarBotState()) }
 
+    val scope = rememberCoroutineScope()
+    val botController = remember { PrankstarBotController() }
     val playbackState by audioPlayerController.playbackState.collectAsState()
+    val botAssistantEnabled by soundRepository.getBotAssistantEnabledFlow().collectAsState(initial = true)
+    val botSuggestionsEnabled by soundRepository.getBotSuggestionsEnabledFlow().collectAsState(initial = true)
 
     val botMood = when {
         showWakeup                                       -> PrankstarBotMood.WAKEUP
@@ -194,14 +206,78 @@ private fun LegacyHomeScreen(
             // ── Waveform decoration ──────────────────────────────────────
             item { WaveformHeader() }
 
-            // ── Prankstar Bot compact panel ──────────────────────────────
+            // ── Prankstar Bot Agent panel ──────────────────────────────
             item {
-                PrankstarBotVideo(
-                    mood     = botMood,
-                    message  = botMessage,
-                    compact  = true,
-                    modifier = Modifier.fillMaxWidth()
-                )
+                if (botAssistantEnabled) {
+                    PrankstarBotPanel(
+                        state = botAgentState.copy(
+                            mood = when {
+                                botAgentState.lastActions.isNotEmpty() -> botAgentState.mood
+                                else -> botMood
+                            },
+                            message = if (botAgentState.lastActions.isNotEmpty()) botAgentState.message else botAgentState.message,
+                            recommendations = if (botSuggestionsEnabled) botAgentState.recommendations else emptyList()
+                        ),
+                        onSubmit = { request ->
+                            val availableSounds = soundsList.filter { soundRepository.isSoundPlayable(it) }
+                            val result = botController.handle(request, availableSounds)
+                            result.actions.forEach { action ->
+                                when (action) {
+                                    is PrankstarBotAction.PlaySound -> {
+                                        val started = audioPlayerController.playPrankSound(action.sound)
+                                        addLog(if (started) "BOT PLAY: ${action.sound.name}" else "BOT REJECTED: ${action.sound.name}")
+                                    }
+                                    PrankstarBotAction.StopAllSounds -> {
+                                        audioPlayerController.stopAll()
+                                        addLog("BOT STOP ALL")
+                                    }
+                                    is PrankstarBotAction.Navigate -> onNavigate(action.route)
+                                    else -> Unit
+                                }
+                            }
+                            botAgentState = PrankstarBotState(
+                                message = PrankstarBotMessage(result.message),
+                                mood = result.mood,
+                                suggestedChips = result.suggestedChips,
+                                recommendations = result.actions.filterIsInstance<PrankstarBotAction.ShowSoundRecommendations>().firstOrNull()?.sounds ?: emptyList(),
+                                recommendationReason = result.actions.filterIsInstance<PrankstarBotAction.ShowSoundRecommendations>().firstOrNull()?.reason,
+                                generatedText = result.generatedText,
+                                suggestedVoicePresetId = result.suggestedVoicePresetId,
+                                prankPlan = result.prankPlan,
+                                lastActions = result.actions
+                            )
+                        },
+                        onPlaySound = { sound ->
+                            val started = audioPlayerController.playPrankSound(sound)
+                            addLog(if (started) "BOT CARD PLAY: ${sound.name}" else "BOT CARD REJECTED: ${sound.name}")
+                        },
+                        onStopAll = {
+                            audioPlayerController.stopAll()
+                            addLog("BOT STOP ALL")
+                            botAgentState = botAgentState.copy(
+                                message = PrankstarBotMessage("All prank audio stopped. Reactor is safe and quiet."),
+                                mood = PrankstarBotMood.HAPPY
+                            )
+                        },
+                        onFavoriteSound = { sound ->
+                            scope.launch { soundRepository.toggleFavorite(sound.id) }
+                            addLog("BOT FAVORITE: ${sound.name}")
+                        },
+                        onOpenStash = { onNavigate("library") },
+                        onSendToVoiceLab = { text, presetId ->
+                            PrankstarBotVoiceLabBridge.submit(text, presetId)
+                            onNavigate("voice_lab")
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                } else {
+                    PrankstarBotVideo(
+                        mood = botMood,
+                        message = "Bot assistant disabled in System. Video mascot preserved.",
+                        compact = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
             }
 
             // ── CORE REACTOR (enhanced — with nav callbacks) ─────────────
