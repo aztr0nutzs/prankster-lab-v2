@@ -1,23 +1,42 @@
 # UI Asset Integration Report
 
-## Packaged MP4 resources referenced by Home/Core
+## Preserved assets and identity
 
-- `app/src/main/res/raw/prankstar_bg.mp4` — Home/Core background video.
-- `app/src/main/res/raw/prankstar_header.mp4` — Home/Core header banner video.
-- `app/src/main/res/raw/prankstar_boot.mp4` — startup boot video.
+The Prankstar dark neon cyberpunk identity is preserved. This feature keeps:
 
-## Bot video resources
+- Existing Prankstar Bot MP4 mood system.
+- Existing `PrankstarBotVideo` mascot component.
+- Existing mood clips and static fallback behavior.
+- Existing Sound Stash / Library concepts.
+- Bundled sound catalog and audio assets.
+- Voice Lab / Joke Gen.
+- Sound Forge.
+- Settings/System.
+- Enhanced reactor components.
+- Existing background/header assets.
 
-- This PR does **not** add bot MP4 binaries to `app/src/main/res/raw/`.
-- `PrankstarBotVideo` still resolves animated bot videos through `PrankstarBotMood.videoResourceName()` and `videoResId(context)` using `prankstar_bot_*` raw resource names when those resources are already packaged by the repository/app.
-- If a matching packaged bot raw resource is unavailable, the existing bot component falls back to its static rendering path instead of blocking Home/Core rendering.
+No audio assets or `sound_catalog.json` were intentionally modified.
 
-## Runtime references
+## New UI surfaces
 
-- Background and header videos are referenced through `R.raw.prankstar_bg` and `R.raw.prankstar_header`.
-- Boot video is referenced by `MainActivity.kt` through `R.raw.prankstar_boot`.
-- Bot video resource lookup remains runtime-based through the existing `PrankstarBotMood` mapping; no new binary bot asset is introduced by this change.
+- Home now shows a compact `PrankstarBotPanel` with:
+  - robot video
+  - message bubble
+  - input field
+  - send button
+  - quick chips
+  - real recommendation cards
+  - generated joke preview
+  - harmless prank plan preview
+- Voice Lab includes a Bot Helper card that fills text locally while keeping Generate user-controlled.
+- Settings includes Bot Assistant and Bot Suggestions toggles alongside Animated Bot.
 
-## Integration result
+## Accessibility basics
 
-The Home/Core route now uses the existing packaged background/header assets directly in the visible runtime composition. Bot visibility is wired into Home/Core without adding new binary MP4 files to this PR.
+- Bot input and send actions expose content descriptions.
+- Recommendation buttons expose sound-specific content descriptions.
+- Touch targets use Material button/icon sizes where practical.
+
+## Asset safety
+
+The feature adds no WebView assistant UI, no cloud calls, no new audio files, and no fake sound rows.

@@ -1,124 +1,36 @@
-# REMAINING_BLOCKERS.md
+# Remaining Blockers
 
-Last updated: 2026-06-01
+## Runtime QA
 
-## Build Status
+Manual device/emulator QA depends on `adb` availability. If `adb` is not available in the execution environment, screenshots and logcat should not be faked.
 
-PASS.
+Recommended manual checks when a device is available:
 
-Commands run:
+1. Bot visible on Home.
+2. Type `find creepy sounds`.
+3. Verify real recommendations appear.
+4. Tap Play on a recommendation.
+5. Verify sound plays.
+6. Type `make a joke about being late`.
+7. Verify safe generated text appears.
+8. Tap Send to Voice Lab.
+9. Verify Voice Lab receives text and preset when available.
+10. Tap Stop All.
+11. Verify playback stops.
+12. Type an unsafe emergency impersonation request.
+13. Verify refusal.
 
-- `bash scripts/android-env-check.sh`
-- `bash scripts/build-android-debug.sh`
+## Known limitations
 
-`assembleDebug` completed successfully in 51 seconds.
+- Parser is deterministic and keyword-based; it is not a cloud LLM.
+- Library screen natural-language filtering is not deeply embedded yet; Home bot can recommend and navigate to Sound Stash.
+- Prank plans are displayed but not runnable. This avoids hidden or destructive automation.
+- Voice Lab prefill uses an in-memory app bridge. It works during the same app process; persistent cross-process drafts are future work.
+- Suggested voice preset selection only applies when the suggested preset ID exists in `VoicePresetLibrary`.
 
-Ultimate Reactor follow-up build also passed with `bash scripts/build-android-debug.sh`.
+## Future work
 
-Notes:
-
-- The shell scripts were normalized to LF line endings so Bash can execute them.
-- `scripts/android-env-check.sh` now reads `local.properties` and translates Windows SDK paths when needed.
-- `scripts/build-android-debug.sh` now falls back to `gradlew.bat` through `cmd.exe` when only Windows Java is available from Bash.
-
-Build warnings remain:
-
-- Deprecated TTS override warning in `AndroidTextToSpeechEngine`.
-- Existing unused `onBack` parameter warning in Sound Forge.
-- Existing Java 8 target warning under JDK 21.
-
-## Validator Status
-
-PASS.
-
-Commands run:
-
-- `python3 tools/validate_sound_catalog.py` failed because `python3` is not installed on PATH.
-- `python tools/validate_sound_catalog.py` passed.
-- `node tools/advanced_validate.cjs` passed.
-
-Validator results:
-
-- Catalog entries: 369
-- Missing files: 0
-- Unsupported extensions: 0
-- Bad headers: 0
-- UTF-8 corrupted: 0
-- Uncataloged on disk: 0
-- Orphan catalog rows: 0
-- Advanced validator checked 369 files with 0 warnings ignored.
-
-## Runtime QA Status
-
-Partial PASS for the Ultimate Reactor follow-up. ADB was available through the Android SDK and device `RFCT70ET5TF` was attached.
-
-Captured:
-
-- `qa/screenshots/ultimate_reactor_idle.png`
-- `qa/screenshots/ultimate_reactor_power_off.png`
-- `qa/screenshots/ultimate_reactor_playing.png`
-- `qa/screenshots/ultimate_reactor_tab_core.png`
-- `qa/screenshots/ultimate_reactor_tab_mode.png`
-- `qa/screenshots/ultimate_reactor_tab_sensor.png`
-- `qa/screenshots/ultimate_reactor_tab_log.png`
-- `qa/screenshots/ultimate_reactor_strip_actions.png`
-- `qa/ultimate_reactor_logcat.txt`
-
-Observed:
-
-- Core/Home launched after the existing boot video.
-- Ultimate Reactor rendered natively.
-- Power off updated topbar/offline state and dimmed reactor.
-- Reactor tap played real catalog sounds and updated current sound/readout.
-- Local tabs opened.
-- Side strip taps completed without crash.
-
-Screens that still need broader runtime verification:
-
-- Sound Stash load/search/filter/play/favorite/timer shortcut
-- Forge generate/preview/save-to-Stash
-- Jokes generate/preview/stop/save-to-Stash
-- System generated cleanup and diagnostics
-
-## Library Crash Status
-
-No Library crash was reproduced during static inspection. Runtime launch still needs device/emulator verification before calling this production ready.
-
-## Voice Lab TTS Limitations
-
-Voice Lab depends on the Android device text-to-speech engine. If no TTS engine or language data is installed, generation is disabled and the screen reports the unavailable state.
-
-Generated output is labeled as WAV/PCM, not MP3. Save is blocked unless the generated file exists and is non-empty.
-
-## Dock/Header Visual Risks
-
-The custom dock image is preserved. Active tab overlay was strengthened, but final judgment requires screenshots at phone widths, especially 360dp, to confirm Jokes does not appear active on every route and labels do not wrap.
-
-Screen headers are preserved. Visual QA should confirm baked text and overlay text remain legible on small devices.
-
-## Not Yet Tested
-
-- Manual playback of at least five bundled sounds
-- Saved Voice Lab clip appearing in Stash after app restart
-- Saved Forge clip appearing in Stash after app restart
-- Settings generated cleanup deleting generated metadata and internal files
-- Screenshot capture for Core, Stash, Forge, Jokes, and System
-## Home/Core Asset Pass - 2026-06-05
-
-- Root asset search found `prankstar_bg.mp4`, `prankstar_header.mp4`, and `prankstar_home.html` at the project root.
-- Assets were copied to:
-  - `app/src/main/res/raw/prankstar_bg.mp4`
-  - `app/src/main/res/raw/prankstar_header.mp4`
-  - `docs/reference/prankstar_home.html`
-- `.\gradlew.bat assembleDebug --stacktrace --console=plain` passed and produced a debug APK.
-- Audio validators passed for all 369 catalog entries/files.
-- Remaining runtime blocker: ADB is available, but no device/emulator was attached, so visual QA and screenshots for the new Home/Core MP4 background/header were not captured.
-
-## Home/Core runtime wiring follow-up blockers (2026-06-05)
-
-- Upstream sync could not be performed in this environment because no `origin` remote is configured.
-- Android SDK validation failed in this Linux container: `local.properties` points to a Windows SDK path and `ANDROID_HOME` / `ANDROID_SDK_ROOT` are unset.
-- Because the SDK check failed, Gradle `assembleDebug` was not run here.
-- No ADB device/emulator is attached, so Home/Core screenshots and logcat runtime QA were not captured.
-- Reactor mode selection is currently `rememberSaveable` session/activity state; DataStore persistence can be added in a separate focused change if required.
-- This PR no longer adds `prankstar_bot_*.mp4` binaries; animated bot video depends on those raw resources already existing in the packaged app, otherwise the static bot fallback is used.
+- Add an interface for optional cloud LLM routing after local safety checks.
+- Add Library-scoped assistant search chips that do not clutter every sound card.
+- Add plan review/run UX with explicit per-step user confirmation.
+- Add richer bot memory through DataStore if product requires process-persistent drafts.
