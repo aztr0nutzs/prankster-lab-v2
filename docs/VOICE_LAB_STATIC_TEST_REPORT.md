@@ -55,3 +55,11 @@ Added:
 ## Runtime QA gap
 
 `adb devices` returned no attached devices, so tap, visual overlap, and generated-audio runtime checks still need a device or emulator.
+
+## ElevenLabs Tweaker Geographic Static Check
+
+- Dedicated voice ID constant added: `wV67xHKrIHTU0gtChZiQ`.
+- API key is read via `BuildConfig.ELEVENLABS_API_KEY` from local Gradle/environment inputs; no key is stored in source.
+- Voice Lab preserves Android TTS WAV generation and adds a user-confirmed ElevenLabs MP3 path for Tweaker Geographic.
+- Preview uses local `MediaPlayer` file playback, which supports local MP3 paths in addition to existing WAV output.
+- Save to Stash uses generated metadata with source, voice ID, format, and feature fields.

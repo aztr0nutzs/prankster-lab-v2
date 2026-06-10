@@ -224,7 +224,7 @@ private fun LegacyHomeScreen(
                                         addLog("BOT STOP ALL")
                                     }
                                     is PrankstarBotAction.Navigate -> onNavigate(action.route)
-                                    is PrankstarBotAction.FillVoiceLabText -> PrankstarBotVoiceLabBridge.submit(action.text, action.suggestedVoicePresetId)
+                                    is PrankstarBotAction.FillVoiceLabText -> PrankstarBotVoiceLabBridge.submit(action.text, action.suggestedVoicePresetId, action.preferBritishNarrator)
                                     else -> Unit
                                 }
                             }

@@ -48,3 +48,7 @@ C:\Users\Aztr0nutZs\Desktop\prankster-lab\app\build\intermediates\compile_and_ru
 - `npm run build` passed.
 - `testDebugUnitTest` passed with no test sources.
 - `lintDebug` passed.
+
+## ElevenLabs Tweaker Geographic Runtime QA Blocker
+
+Manual ElevenLabs runtime QA still requires an Android device/emulator and a locally configured `ELEVENLABS_API_KEY`. Without those, the implementation can be unit-tested and built, but real audio generation, preview, Save to Stash playback, screenshots, and logcat capture remain device QA tasks.

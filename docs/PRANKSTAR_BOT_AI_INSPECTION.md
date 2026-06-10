@@ -50,3 +50,7 @@ It does not auto-navigate to Voice Lab, auto-play sounds, or auto-generate TTS a
 - `.\gradlew.bat lintDebug --stacktrace --console=plain`: PASS.
 - `.\gradlew.bat assembleDebug --stacktrace --console=plain`: PASS.
 - Runtime bot tap QA is pending because `adb devices` returned no attached devices.
+
+## ElevenLabs Tweaker Geographic Bot Handoff
+
+Bot Tweaker Geographic commands now prefer a Voice Lab handoff with the British Narrator path flagged. The bot response can suggest **Generate with British Narrator**, but it only fills/routes the narration text; ElevenLabs generation remains user-confirmed in Voice Lab.
