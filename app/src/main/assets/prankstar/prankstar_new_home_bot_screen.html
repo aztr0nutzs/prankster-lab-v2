@@ -781,6 +781,15 @@ button,.dtab,.rsel,.mode-btn,.joke-btn,.forge-item,.stash-item,.zone-btn,.sb,.bo
   .rsel-lbl{font-size:8px !important;letter-spacing:.35px !important}
   .mode-btn,.joke-btn,.ctrl-card{font-size:9px !important}
 }
+
+/* Canonical reactor registry layer */
+.rsel .rsel-sub{font-size:4.8px;line-height:1.05;color:rgba(180,255,255,.72);letter-spacing:.25px;margin-top:1px}
+.rsel[data-state="ARMED"]{box-shadow:0 0 14px rgba(255,204,0,.34),inset 0 0 18px rgba(255,204,0,.10)}
+.rsel[data-state="ACTIVE"],.rsel[data-state="OVERDRIVE"]{box-shadow:0 0 16px rgba(255,0,204,.36),inset 0 0 18px rgba(0,232,255,.10)}
+.reactor-slot.registry-slot .zone-label{max-width:84%;text-align:center;white-space:normal;line-height:1.05;text-shadow:0 0 8px currentColor}
+.reactor-state-badge{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) skew(-8deg);z-index:24;padding:4px 9px;border:1px solid currentColor;border-radius:4px;background:rgba(0,0,0,.72);font-family:var(--ps-font-display);font-size:8px;letter-spacing:1.3px;color:currentColor;text-shadow:0 0 8px currentColor;pointer-events:none;opacity:.92}
+.reactor-video-missing{position:absolute;inset:10%;z-index:4;border:1px dashed currentColor;border-radius:50%;display:flex;align-items:center;justify-content:center;text-align:center;padding:10px;color:currentColor;background:radial-gradient(circle,rgba(0,232,255,.10),rgba(0,0,0,.78));font-family:var(--ps-font-tech);font-size:8px;letter-spacing:1px;pointer-events:none}
+
 </style>
 </head>
 <body>
@@ -1429,7 +1438,7 @@ function switchR(rid,el,cls){
   ensurePlay(rid);
   var cfg=rConfig[rid]||{name:rid.toUpperCase(),color:'var(--g)'};
   var nm=document.getElementById('tb-rname');nm.textContent=cfg.name;nm.style.color=cfg.color;nm.style.textShadow='0 0 8px '+cfg.color;
-  document.querySelectorAll('.rsel').forEach(function(b){b.className='rsel';});
+  document.querySelectorAll('.rsel').forEach(function(b){var ent=window.reactorRegistryByRid&&window.reactorRegistryByRid[b.dataset.rid];b.className='rsel '+(ent&&!ent.enabled?'disabled':'');});
   el.className='rsel '+cls;
   showAlert('◈ REACTOR: '+cfg.name+' ◈',false);
 }
@@ -1686,6 +1695,277 @@ document.addEventListener('touchstart',function(){
 },{once:true,passive:true});
 
 
+
+
+/* ===== CANONICAL REACTOR REGISTRY RUNTIME LAYER ===== */
+(function(){
+  var registryUrl='reactor_registry.json';
+  var selectorId='reactor-sel';
+  var wrapId='reactor-video-wrap';
+  var classCycle=['on-g','on-pk','on-r','on-o','on-b','on-y','on-teal'];
+  var colorCycle=['var(--g)','var(--pk)','var(--r)','var(--o)','var(--b)','var(--y)','var(--teal)'];
+  var glitchProfiles=['STUTTER','LOW-G','REVERSE-FEEL','CHIPMUNK','SLOW-MO'];
+  var disguisePresets=['ROBOT','ALIEN','ANNOUNCER','MONSTER','PIXIE'];
+  var soundCategories=['funny','effects','cartoon','creepy','animal','voice'];
+  var reactorTapDelay=260, reactorHoldMs=620;
+
+  window.reactorRuntimeState=window.reactorRuntimeState||{
+    safeModeEnabled:true,
+    overdriveEnabled:false,
+    activeReactorId:null,
+    armedTrap:null,
+    liveQueue:[],
+    selectedSound:'funny',
+    lastSelectedSound:'funny',
+    selectedGlitchProfile:'STUTTER',
+    selectedDisguisePreset:'ROBOT',
+    cooldownUntil:0,
+    currentGagCombo:null,
+    savedGagCombo:null,
+    statusByRid:{},
+    chainSeed:0
+  };
+  var reactorState=window.reactorRuntimeState;
+
+  function deactivateLegacyReactorDom(){
+    var selector=document.getElementById(selectorId),wrap=document.getElementById(wrapId);
+    if(selector)selector.innerHTML='';
+    if(wrap)wrap.querySelectorAll('.reactor-slot').forEach(function(slot){slot.remove();});
+  }
+  deactivateLegacyReactorDom();
+  function slotRid(entry){return 'r'+entry.slot;}
+  function labelFor(entry){return String(entry.title||entry.id||'REACTOR').toUpperCase();}
+  function subFor(entry){return String(entry.subtitle||entry.mode||'').toUpperCase();}
+  function actionLabel(action){return String(action||'DEPLOY').replace(/_/g,' ');}
+  function currentEntry(rid){return (window.reactorRegistryByRid&&window.reactorRegistryByRid[rid])||null;}
+  function registryColor(entry,index){return colorCycle[index%colorCycle.length];}
+  function registryClass(index){return classCycle[index%classCycle.length];}
+  function randomItem(list){return list[Math.floor(Math.random()*list.length)];}
+  function now(){return Date.now();}
+  function cooldownActive(){return reactorState.cooldownUntil&&reactorState.cooldownUntil>now();}
+  function setHeader(entry){
+    var name=document.getElementById('tb-rname');
+    if(!name||!entry)return;
+    name.textContent=labelFor(entry);
+    name.style.color=entry.color||'var(--g)';
+    name.style.textShadow='0 0 8px '+(entry.color||'var(--g)');
+  }
+  function openDockPanel(id){
+    showScreen('reactor');
+    var tab=document.querySelector('.dtab[data-t="'+id+'"]');
+    if(tab&&typeof switchDock==='function')switchDock(id,tab);
+  }
+  function openCorePanel(entry,status){
+    openDockPanel('core');
+    setHeader(entry);
+    setReactorStatus(entry,status||'ACTIVE');
+  }
+  function activateEntry(entry){
+    var rid=slotRid(entry);curR=rid;
+    document.querySelectorAll('.reactor-slot').forEach(function(slot){slot.classList.toggle('active-slot',slot.id==='slot-'+rid);});
+    document.querySelectorAll('.rsel').forEach(function(sel){var cfg=rConfig[sel.dataset.rid];sel.className='rsel '+(cfg&&sel.dataset.rid===rid?cfg.rsel:'');});
+    ensurePlay(rid);setHeader(entry);
+  }
+  function setReactorStatus(entry,status){
+    if(!entry)return;
+    var rid=slotRid(entry);reactorState.activeReactorId=rid;reactorState.statusByRid[rid]=status;
+    var badge=document.getElementById('state-'+rid);if(badge)badge.textContent=status;
+    var selector=document.getElementById('rsel-'+rid);if(selector)selector.dataset.state=status;
+    showAlert('◈ '+labelFor(entry)+' '+status+' ◈',status==='COOLDOWN');
+    updateLog('REACTOR '+entry.slot+' '+labelFor(entry)+' STATE: '+status);
+  }
+  function feedback(entry,gesture,status){
+    var rid=slotRid(entry);
+    activateEntry(entry);
+    if(typeof doRipple==='function')doRipple(rid);
+    if(typeof vidFlash==='function')vidFlash(rid);
+    charge=Math.min(100,charge+(gesture==='hold'?32:(gesture==='double'?18:12)));
+    updatePrankCnt();
+    setReactorStatus(entry,status||'ACTIVE');
+    callAndroid('setReactorMode',entry.mode||rid);
+  }
+  function deployCategory(category){
+    reactorState.lastSelectedSound=category;reactorState.selectedSound=category;
+    return callAndroid('playReactorCategory',category)||callAndroid('playSoundByCategory',category)||callAndroid('playRandomSound');
+  }
+  function deployRandom(){
+    reactorState.lastSelectedSound=reactorState.selectedSound||reactorState.lastSelectedSound||'funny';
+    return callAndroid('deployRandom')||callAndroid('playRandomSound');
+  }
+  function deployChain(count){
+    prankCnt++;updatePrankCnt();reactorState.chainSeed++;
+    return callAndroid('deployChain',count)||callAndroid('playRandomSound');
+  }
+  function delayedDeploy(ms,category){
+    setTimeout(function(){category?deployCategory(category):deployRandom();},ms);
+  }
+  function clearQueue(){reactorState.liveQueue=[];}
+  function enqueue(label){reactorState.liveQueue.push(label);reactorState.liveQueue=reactorState.liveQueue.slice(-5);}
+  function gagCombo(){return [randomItem(['KNOCK','BURP','ALIEN','SQUEAK']),randomItem(['DOOR','LASER','BOING','ROBOT']),randomItem(['LAUGH','MEOW','BUZZ','FART'])].join(' + ');}
+  function rerollGlitch(){reactorState.selectedGlitchProfile=randomItem(glitchProfiles);return reactorState.selectedGlitchProfile;}
+  function rerollDisguise(){reactorState.selectedDisguisePreset=randomItem(disguisePresets);return reactorState.selectedDisguisePreset;}
+
+  // Central registry action dispatcher. Some audio FX (true pitch, reverse, stutter processing) are not exposed by the current Android bridge;
+  // those modes truthfully fall back to existing category playback plus visible GLITCH/DISGUISE state and route to Forge/Voice Lab where available.
+  function dispatchReactorAction(entry,gesture){
+    if(!entry||!entry.enabled)return;
+    var rid=slotRid(entry),action=gesture==='hold'?entry.holdAction:(gesture==='double'?entry.doubleTapAction:entry.primaryAction);
+    if(cooldownActive()&&action!=='STOP_ALL'&&action!=='TOGGLE_SAFE_MODE'){
+      setReactorStatus(entry,'COOLDOWN');
+      updateLog('COOLDOWN ACTIVE UNTIL '+new Date(reactorState.cooldownUntil).toLocaleTimeString());
+      return;
+    }
+    feedback(entry,gesture,'ACTIVE');
+    switch(action){
+      case 'OPEN_VORTEX_PANEL': openCorePanel(entry,'READY'); enqueue('VORTEX CHAIN'); return;
+      case 'DEPLOY_PRANK_CHAIN': setReactorStatus(entry,'ARMED'); enqueue('CHAIN x3'); return deployChain(3);
+      case 'REROLL_PRANK_CHAIN': reactorState.chainSeed++; reactorState.selectedSound=randomItem(soundCategories); setReactorStatus(entry,'READY'); return updateLog('VORTEX CHAIN REROLLED: '+reactorState.selectedSound.toUpperCase());
+
+      case 'OPEN_PORTAL_PANEL': openCorePanel(entry,'READY'); return callAndroid('openTimer');
+      case 'ARM_WARP_DELAY': reactorState.armedTrap={reactor:rid,delayMs:2200,category:randomItem(soundCategories)}; setReactorStatus(entry,'ARMED'); return delayedDeploy(2200,reactorState.armedTrap.category);
+      case 'TELEPORT_REROUTE': reactorState.selectedSound=randomItem(soundCategories); setReactorStatus(entry,'ACTIVE'); return deployCategory(reactorState.selectedSound);
+
+      case 'OPEN_PIXEL_PANEL': openCorePanel(entry,'GLITCH'); return callAndroid('openForge');
+      case 'GLITCH_BURST': setReactorStatus(entry,'GLITCH'); deployCategory('effects'); return setTimeout(function(){deployCategory('cartoon');},420);
+      case 'SCRAMBLE_PRANK_SET': reactorState.selectedSound=randomItem(soundCategories); setReactorStatus(entry,'GLITCH'); return updateLog('PIXEL BOMB SCRAMBLED SET: '+reactorState.selectedSound.toUpperCase());
+
+      case 'OPEN_SONIC_PANEL': openCorePanel(entry,reactorState.overdriveEnabled?'OVERDRIVE':'READY'); return;
+      case 'DEPLOY_INTENSE_SOUND': intensity=Math.min(reactorState.overdriveEnabled?92:78,Math.max(intensity,72)); setReactorStatus(entry,reactorState.overdriveEnabled?'OVERDRIVE':'ACTIVE'); return deployCategory('audio');
+      case 'TOGGLE_OVERDRIVE': reactorState.overdriveEnabled=!reactorState.overdriveEnabled; intensity=reactorState.overdriveEnabled?88:72; return setReactorStatus(entry,reactorState.overdriveEnabled?'OVERDRIVE':'READY');
+
+      case 'OPEN_SHIELD_PANEL': openCorePanel(entry,reactorState.safeModeEnabled?'SAFE':'READY'); return callAndroid('openSystem');
+      case 'STOP_ALL': reactorState.cooldownUntil=now()+2500; clearQueue(); setReactorStatus(entry,'COOLDOWN'); return callAndroid('stopAll');
+      case 'TOGGLE_SAFE_MODE': reactorState.safeModeEnabled=!reactorState.safeModeEnabled; reactorState.cooldownUntil=reactorState.safeModeEnabled?now()+1500:0; return setReactorStatus(entry,reactorState.safeModeEnabled?'SAFE':'READY');
+
+      case 'OPEN_LIVE_PANEL': openCorePanel(entry,'READY'); enqueue('ARMED '+(reactorState.selectedSound||'RANDOM').toUpperCase()); return;
+      case 'DEPLOY_ARMED_SOUND': setReactorStatus(entry,'ACTIVE'); enqueue('DEPLOY '+(reactorState.selectedSound||'RANDOM').toUpperCase()); return reactorState.selectedSound?deployCategory(reactorState.selectedSound):deployRandom();
+      case 'CLEAR_QUEUE': clearQueue(); setReactorStatus(entry,'READY'); return updateLog('LIVE DEPLOY QUEUE CLEARED');
+
+      case 'OPEN_GAG_PANEL': openDockPanel('jokes'); return setReactorStatus(entry,'READY');
+      case 'GENERATE_GAG_COMBO': reactorState.currentGagCombo=gagCombo(); setReactorStatus(entry,'ACTIVE'); callAndroid('playRandomJoke'); return updateLog('GAG COMBO: '+reactorState.currentGagCombo);
+      case 'SAVE_GAG_COMBO': reactorState.savedGagCombo=reactorState.currentGagCombo||gagCombo(); setReactorStatus(entry,'READY'); return updateLog('GAG COMBO SAVED LOCALLY: '+reactorState.savedGagCombo);
+
+      case 'OPEN_SOUNDBOARD': openDockPanel('stash'); return callAndroid('openStash');
+      case 'PLAY_LAST_SOUND': setReactorStatus(entry,'ACTIVE'); return deployCategory(reactorState.lastSelectedSound||'funny');
+      case 'OPEN_FAVORITES': openDockPanel('stash'); setReactorStatus(entry,'READY'); return callAndroid('openStash');
+
+      case 'OPEN_TRAP_PANEL': openCorePanel(entry,reactorState.armedTrap?'ARMED':'READY'); return callAndroid('openTimer');
+      case 'ARM_TIMED_TRAP': reactorState.armedTrap={reactor:rid,delayMs:3000,category:reactorState.selectedSound||'creepy'}; setReactorStatus(entry,'ARMED'); return delayedDeploy(3000,reactorState.armedTrap.category);
+      case 'DISARM_TRAPS': reactorState.armedTrap=null; setReactorStatus(entry,'READY'); return updateLog('ALL TIMED TRAPS DISARMED');
+
+      case 'OPEN_LOUD_PANEL': openCorePanel(entry,'READY'); return;
+      case 'FIRE_LOUD_FAVORITE': setReactorStatus(entry,'ACTIVE'); return deployCategory('cartoon');
+
+      case 'OPEN_GRAVITY_PANEL': openCorePanel(entry,'GLITCH'); return callAndroid('openForge');
+      case 'PLAY_GLITCH_PROFILE': setReactorStatus(entry,'GLITCH'); updateLog('GRAVITY PROFILE: '+reactorState.selectedGlitchProfile+' (category playback fallback)'); return deployCategory('effects');
+      case 'REROLL_GLITCH_PROFILE': rerollGlitch(); setReactorStatus(entry,'GLITCH'); return updateLog('GRAVITY PROFILE REROLLED: '+reactorState.selectedGlitchProfile);
+
+      case 'OPEN_DISGUISE_PANEL': openDockPanel('jokes'); setReactorStatus(entry,'DISGUISE'); return callAndroid('openJokes');
+      case 'APPLY_DISGUISE_PRESET': setReactorStatus(entry,'DISGUISE'); updateLog('DISGUISE PRESET APPLIED: '+reactorState.selectedDisguisePreset+' (Voice Lab fallback)'); return deployCategory('voice');
+      case 'RANDOM_DISGUISE_PRESET': rerollDisguise(); setReactorStatus(entry,'DISGUISE'); callAndroid('openJokes'); return updateLog('DISGUISE PRESET ROLLED: '+reactorState.selectedDisguisePreset);
+
+      default: setReactorStatus(entry,'READY'); return deployRandom();
+    }
+  }
+  function createSelector(entry,index,activeRid){
+    var rid=slotRid(entry),el=document.createElement('div');
+    el.className='rsel '+registryClass(index)+(rid===activeRid?' '+registryClass(index):'');
+    el.id='rsel-'+rid;el.dataset.rid=rid;el.dataset.registryId=entry.id;el.dataset.state='READY';el.setAttribute('role','button');
+    el.setAttribute('aria-label',labelFor(entry)+' '+subFor(entry));
+    el.innerHTML='<div class="rsel-icon">◈</div><div class="rsel-lbl">'+labelFor(entry)+'</div><div class="rsel-sub">'+subFor(entry)+'</div>';
+    attachReactorGestures(el,entry,true);
+    return el;
+  }
+  function createSlot(entry,index,activeRid){
+    var rid=slotRid(entry),slot=document.createElement('div');
+    slot.className='reactor-slot registry-slot'+(rid===activeRid?' active-slot':'');
+    slot.id='slot-'+rid;slot.dataset.rid=rid;slot.dataset.registryId=entry.id;slot.style.color=registryColor(entry,index);
+    var actionButtons='<button type="button" class="zone-btn" style="left:34%;top:30%;width:32%;height:30%;" aria-label="Tap '+actionLabel(entry.primaryAction)+'" data-gesture="tap"><div class="zone-inner" style="border-color:currentColor">◈</div></button>'+
+      '<button type="button" class="zone-btn" style="left:6%;top:28%;width:18%;height:18%;" aria-label="Hold '+actionLabel(entry.holdAction)+'" data-gesture="hold"><div class="zone-inner" style="border-color:currentColor">◆</div></button>'+
+      '<button type="button" class="zone-btn" style="right:6%;top:28%;width:18%;height:18%;" aria-label="Double tap '+actionLabel(entry.doubleTapAction)+'" data-gesture="double"><div class="zone-inner" style="border-color:currentColor">◇</div></button>';
+    var suppressVideo=entry.id==='reactor_05';
+    var videoMarkup=suppressVideo?'<video id="vid-'+rid+'" muted playsinline preload="none" style="display:none"></video>':'<video id="vid-'+rid+'" autoplay loop muted playsinline preload="metadata"><source src="'+entry.assetPath+'" type="video/mp4"></video>';
+    slot.innerHTML=videoMarkup+
+      '<div class="reactor-video-missing" id="missing-'+rid+'" style="display:'+(suppressVideo?'flex':'none')+'">'+(suppressVideo?'REPLACEMENT ASSET PENDING':'VIDEO ASSET PENDING')+'<br>'+entry.assetPath+'</div>'+
+      '<div class="ctrl-overlay interactive" id="ovl-'+rid+'">'+
+      '<div class="rpl-ring" id="rpl-'+rid+'-1" style="width:0;height:0;border-color:currentColor"></div>'+
+      '<div class="rpl-ring" id="rpl-'+rid+'-2" style="width:0;height:0;border-color:currentColor;border-width:2.5px"></div>'+
+      '<div class="rpl-ring" id="rpl-'+rid+'-3" style="width:0;height:0;border-color:currentColor;border-width:2px"></div>'+
+      '<div class="touch-flash" id="tf-'+rid+'"></div>'+actionButtons+
+      '<div class="reactor-state-badge" id="state-'+rid+'">READY</div>'+
+      '<div class="zone-label visible" style="top:10%;left:50%;transform:translateX(-50%);color:currentColor">'+labelFor(entry)+'</div>'+
+      '<div class="zone-label visible" style="bottom:10%;left:50%;transform:translateX(-50%);color:currentColor">'+subFor(entry)+'</div>'+
+      '</div>';
+    var video=slot.querySelector('video');if(video){video.addEventListener('error',function(){video.style.opacity='.08';var m=document.getElementById('missing-'+rid);if(m)m.style.display='flex';});}
+    attachReactorGestures(slot,entry,false);
+    slot.querySelectorAll('[data-gesture]').forEach(function(btn){btn.onclick=function(ev){ev.preventDefault();ev.stopPropagation();dispatchReactorAction(entry,btn.dataset.gesture);};});
+    return slot;
+  }
+  function attachReactorGestures(target,entry,selectorOnly){
+    var holdTimer=null,tapTimer=null,lastTap=0,held=false;
+    target.addEventListener('pointerdown',function(ev){
+      if(selectorOnly&&ev.target.closest&&ev.target.closest('[data-gesture]'))return;
+      held=false;clearTimeout(holdTimer);
+      holdTimer=setTimeout(function(){held=true;dispatchReactorAction(entry,'hold');},reactorHoldMs);
+    },{passive:true});
+    ['pointerup','pointercancel','pointerleave'].forEach(function(type){target.addEventListener(type,function(ev){
+      clearTimeout(holdTimer);if(type!=='pointerup'||held)return;
+      var t=Date.now();
+      if(t-lastTap<320){clearTimeout(tapTimer);lastTap=0;dispatchReactorAction(entry,'double');return;}
+      lastTap=t;clearTimeout(tapTimer);tapTimer=setTimeout(function(){dispatchReactorAction(entry,'tap');},reactorTapDelay);
+    },{passive:true});});
+  }
+  function normalizeRegistry(entries){
+    return entries.map(function(entry,index){
+      var e=Object.assign({},entry);e.color=registryColor(e,index);e.rsel=registryClass(index);e.name=e.title;return e;
+    }).sort(function(a,b){return a.slot-b.slot;});
+  }
+  function renderRegistry(entries){
+    entries=normalizeRegistry(entries);
+    window.reactorRegistry=entries;window.reactorRegistryByRid={};
+    var first=entries[0];if(!first)return;
+    var activeRid=slotRid(first);curR=activeRid;
+    rConfig={};window.rConfig=rConfig;
+    entries.forEach(function(entry,index){var rid=slotRid(entry);window.reactorRegistryByRid[rid]=entry;rConfig[rid]={name:entry.title,color:entry.color,rsel:entry.rsel,mode:entry.mode,subtitle:entry.subtitle,group:entry.group};});
+    var selector=document.getElementById(selectorId),wrap=document.getElementById(wrapId);
+    if(selector){selector.innerHTML='';entries.forEach(function(entry,index){selector.appendChild(createSelector(entry,index,activeRid));});}
+    if(wrap){wrap.querySelectorAll('.reactor-slot').forEach(function(slot){slot.remove();});entries.forEach(function(entry,index){wrap.appendChild(createSlot(entry,index,activeRid));});}
+    setHeader(first);ensurePlay(activeRid);setReactorStatus(first,'READY');updateLog('CANONICAL REACTOR REGISTRY LOADED: '+entries.length+' ACTION-READY ENTRIES');
+  }
+  window.reactorAction=function(rid,kind){
+    var entry=currentEntry(rid);if(!entry)return;
+    dispatchReactorAction(entry,kind==='hold'?'hold':(kind==='double'?'double':'tap'));
+  };
+  function loadRegistryWithXhr(){
+    var xhr=new XMLHttpRequest();
+    xhr.overrideMimeType('application/json');
+    xhr.onreadystatechange=function(){
+      if(xhr.readyState!==4)return;
+      try{
+        if(xhr.status===0||xhr.status===200){renderRegistry(JSON.parse(xhr.responseText));}
+        else{throw new Error('registry status '+xhr.status);}
+      }catch(xhrErr){
+        console.error('[PrankStar] canonical reactor registry failed',xhrErr);
+        showAlert('⚠ REACTOR REGISTRY LOAD FAILED',true);
+        updateLog('CANONICAL REACTOR REGISTRY LOAD FAILED');
+      }
+    };
+    xhr.open('GET',registryUrl,true);xhr.send(null);
+  }
+  window.loadCanonicalReactors=function(){
+    fetch(registryUrl,{cache:'no-store'}).then(function(response){return response.json();}).then(renderRegistry).catch(function(err){
+      console.warn('[PrankStar] fetch registry failed; trying XHR',err);
+      try{loadRegistryWithXhr();}
+      catch(xhrErr){
+        console.error('[PrankStar] canonical reactor registry failed',xhrErr);
+        showAlert('⚠ REACTOR REGISTRY LOAD FAILED',true);
+        updateLog('CANONICAL REACTOR REGISTRY LOAD FAILED');
+      }
+    });
+  };
+  window.addEventListener('load',window.loadCanonicalReactors);
+})();
+
 /* ===== REACTOR RESPONSIVENESS + EXTRA TOUCH CONTROL PATCH ===== */
 (function(){
   var ids=['r1','r2','r3','r4','r5','r6','r7'];
@@ -1763,7 +2043,7 @@ document.addEventListener('touchstart',function(){
   window.zoneAction=function(rid,label,icon){
     if(typeof oldZone==='function')oldZone(rid,label,icon);
     var ovl=currentOverlay(rid),color=cfgColor(rid),rc=ovl?ovl.getBoundingClientRect():null;
-    pulseSlot(rid);if(ovl&&rc){reticle(ovl,rc.width/2,rc.height/2,color);sparks(ovl,rc.width/2,rc.height/2,color,12);showFloatingLabel(ovl,rc.width/2,rc.height*.18,(icon||'◈')+' '+label,color);} 
+    pulseSlot(rid);if(ovl&&rc){reticle(ovl,rc.width/2,rc.height/2,color);sparks(ovl,rc.width/2,rc.height/2,color,12);showFloatingLabel(ovl,rc.width/2,rc.height*.18,(icon||'◈')+' '+label,color);}
   };
   function installDynamicZones(){
     ids.forEach(function(rid){
