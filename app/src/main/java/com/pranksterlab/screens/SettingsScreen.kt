@@ -53,6 +53,8 @@ import com.pranksterlab.components.LabelCaps
 import com.pranksterlab.components.PrankstarHeader
 import com.pranksterlab.components.ScanlineOverlay
 import com.pranksterlab.core.audio.AudioPlayerController
+import com.pranksterlab.core.billing.BillingProductIds
+import com.pranksterlab.core.billing.FeatureGate
 import com.pranksterlab.core.elevenlabs.TWEAKER_GEOGRAPHIC_VOICE_ID
 import com.pranksterlab.core.repository.AudioDiagnostics
 import com.pranksterlab.core.repository.SoundRepository
@@ -82,6 +84,7 @@ fun SettingsScreen(soundRepository: SoundRepository, audioPlayerController: Audi
     val playbackState by audioPlayerController.playbackState.collectAsState()
     val elevenLabsApiKeyStatus = if (BuildConfig.ELEVENLABS_API_KEY.isBlank()) "Missing" else "Configured"
     val elevenLabsApiKeySuffix = BuildConfig.ELEVENLABS_API_KEY.takeLast(4)
+    val featureGate = remember { FeatureGate.unconfiguredFree() }
 
     var diagnostics by remember { mutableStateOf<AudioDiagnostics?>(null) }
     var confirmAction by remember { mutableStateOf<String?>(null) }
@@ -174,6 +177,19 @@ fun SettingsScreen(soundRepository: SoundRepository, audioPlayerController: Audi
                         Text("Add ELEVENLABS_API_KEY to local.properties or environment variables, then rebuild.", color = Color.LightGray, style = MaterialTheme.typography.bodySmall)
                     }
                     Text("Preferred Tweaker Geographic Voice: British Narrator (${TWEAKER_GEOGRAPHIC_VOICE_ID.take(6)}…)", color = Color.LightGray, style = MaterialTheme.typography.bodySmall)
+                }
+            }
+        }
+
+        item {
+            HUDCard(modifier = Modifier.fillMaxWidth(), accentColor = LimeAccent) {
+                Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    LabelCaps("PRANKSTAR PRO", color = LimeAccent)
+                    DiagnosticLine("Current plan", featureGate.entitlement.displayName, LimeAccent)
+                    DiagnosticLine("Voice credits", featureGate.voiceCredits.statusLabel, OrangeAccent)
+                    DiagnosticLine("Billing status", if (featureGate.entitlement.billingConfigured) "Configured" else "Not configured", OrangeAccent)
+                    Text("Pro will unlock British Narrator credits, advanced Twak-Attacks tones, higher generated-clip saves, and premium assistant actions once Google Play Billing and backend entitlement verification are connected.", color = Color.LightGray, style = MaterialTheme.typography.bodySmall)
+                    Text("Planned products: ${BillingProductIds.PRO_MONTHLY}, ${BillingProductIds.PRO_YEARLY}, ${BillingProductIds.PRO_LIFETIME}, ${BillingProductIds.VOICE_CREDITS_MEDIUM}, ${BillingProductIds.VOICE_CREDITS_LARGE}", color = Color.Gray, style = MaterialTheme.typography.bodySmall)
                 }
             }
         }

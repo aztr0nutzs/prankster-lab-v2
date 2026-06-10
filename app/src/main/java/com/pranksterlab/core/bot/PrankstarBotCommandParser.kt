@@ -15,10 +15,6 @@ class PrankstarBotCommandParser {
         if (containsAny(normalized, "open forge", "forge", "sound forge")) return PrankstarBotIntent.OpenForge
         if (containsAny(normalized, "open system", "system", "settings")) return PrankstarBotIntent.OpenSystem
         if (containsAny(normalized, "random", "surprise me")) return PrankstarBotIntent.PlayRandom
-        if (containsAny(normalized, "twak attack", "twak-attacks", "twak bot")) {
-            return PrankstarBotIntent.GenerateTwakAttack(cleanPrompt(normalized, raw, listOf("make a twak attack about", "twak attack about", "twak-attacks about", "twak bot", "twak attack")))
-        }
-
         if (containsAny(normalized, "twak attack", "twak attacks", "twak-attack", "twak-attacks", "twak attack narration", "tweaker geographic", "tweakographic", "field report", "mock documentary", "documentary narration", "urban wildlife narration", "urban wildlife report")) {
             val fieldPrompt = splitNarrationSetting(
                 cleanNarrationPrompt(

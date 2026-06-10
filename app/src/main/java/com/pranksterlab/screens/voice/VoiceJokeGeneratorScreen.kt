@@ -49,6 +49,7 @@ import com.pranksterlab.components.bot.PrankstarBotVideo
 import com.pranksterlab.components.twak.TwakAttackHeader
 import com.pranksterlab.components.twak.TwakBotVideo
 import com.pranksterlab.core.audio.AudioPlayerController
+import com.pranksterlab.core.billing.FeatureGate
 import com.pranksterlab.core.bot.PrankstarBotAction
 import com.pranksterlab.core.bot.PrankstarBotController
 import com.pranksterlab.core.bot.PrankstarBotMessage
@@ -176,6 +177,7 @@ fun VoiceJokeGeneratorScreen(
     }
     val narrationOutputDir = remember(context) { File(context.filesDir, "generated/elevenlabs") }
     val voiceGenerationMode = remember { VoiceGenerationMode.fromBuildConfig(BuildConfig.VOICE_GENERATION_MODE) }
+    val featureGate = remember { FeatureGate.unconfiguredFree() }
     val generatedRepo = remember { GeneratedVoiceRepository(soundRepository) }
     val allPresets = VoicePresetLibrary.presets
     val ttsReadiness by tts.readiness.collectAsState()
@@ -211,6 +213,7 @@ fun VoiceJokeGeneratorScreen(
     var generatedTweakerNarrationTitle by remember { mutableStateOf<String?>(null) }
     var generatedTweakerNarrationText by remember { mutableStateOf<String?>(null) }
     var twakBotMood by remember { mutableStateOf(TwakBotMood.IDLE) }
+    var twakTextGenerationCount by remember { mutableStateOf(0) }
 
     fun applyPreset(selected: VoicePreset) {
         preset = selected
@@ -309,8 +312,11 @@ fun VoiceJokeGeneratorScreen(
         }
     }
 
+    val generatedVoiceClipCount = customSounds.count { soundRepository.isGeneratedVoiceClip(it) }
+    val debugDirectNarrationEnabled = voiceGenerationMode == VoiceGenerationMode.DEBUG_ELEVENLABS_DIRECT &&
+        BuildConfig.ELEVENLABS_API_KEY.isNotBlank()
     val canGenerate = ttsReadiness is VoiceEngineReadiness.READY && text.isNotBlank() && status != "GENERATING"
-    val canGenerateBritishNarration = fieldResult?.isAllowed == true && status != "GENERATING"
+    val canUsePremiumNarration = featureGate.canUseElevenLabsNarrator || debugDirectNarrationEnabled
     val canUseGeneratedFile = isValidGeneratedFile(generatedFile) && generatedResult?.success == true
     val botMood = when (status) {
         "INITIALIZING VOICE ENGINE" -> PrankstarBotMood.THINKING
@@ -467,16 +473,31 @@ fun VoiceJokeGeneratorScreen(
                     TweakerGeographicTone.entries.chunked(3).forEach { toneRow ->
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
                             toneRow.forEach { tone ->
+                                val toneAllowed = featureGate.isToneAllowed(tone)
                                 FilterChip(
                                     selected = fieldTone == tone,
                                     onClick = {
-                                        fieldTone = tone
-                                        twakBotMood = TwakBotMood.SEARCHING
+                                        if (toneAllowed) {
+                                            fieldTone = tone
+                                            twakBotMood = TwakBotMood.SEARCHING
+                                        } else {
+                                            status = "PRO FEATURE LOCKED"
+                                            statusDetail = "Advanced Twak-Attacks tones are planned for Prankstar Pro. Billing is not configured yet."
+                                            twakBotMood = TwakBotMood.IDLE
+                                        }
                                     },
-                                    label = { Text(tone.label) }
+                                    label = { Text(if (toneAllowed) tone.label else "${tone.label} Pro") }
                                 )
                             }
                         }
+                    }
+                    Text(
+                        "Plan: ${featureGate.entitlement.displayName} • ${featureGate.voiceCredits.statusLabel}",
+                        color = Color.Gray,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                    if (!featureGate.entitlement.billingConfigured) {
+                        Text("Prankstar Pro purchases are not configured yet.", color = OrangeAccent, style = MaterialTheme.typography.bodySmall)
                     }
                     Row {
                         Checkbox(fieldIncludeSoundCue, {
@@ -510,6 +531,18 @@ fun VoiceJokeGeneratorScreen(
                         ) { Text(example) }
                     }
                     Button(onClick = {
+                        if (!featureGate.canGenerateTwakText(twakTextGenerationCount)) {
+                            status = "PRO FEATURE LOCKED"
+                            statusDetail = "Free Twak-Attacks text generations are used for this session. Prankstar Pro billing is not configured yet."
+                            twakBotMood = TwakBotMood.IDLE
+                            return@Button
+                        }
+                        if (!featureGate.isToneAllowed(fieldTone)) {
+                            status = "PRO FEATURE LOCKED"
+                            statusDetail = "Advanced Twak-Attacks tones are planned for Prankstar Pro. Billing is not configured yet."
+                            twakBotMood = TwakBotMood.IDLE
+                            return@Button
+                        }
                         twakBotMood = TwakBotMood.GENERATING
                         val result = tweakographicNarrator.generate(
                             TweakerGeographicRequest(
@@ -520,6 +553,7 @@ fun VoiceJokeGeneratorScreen(
                             )
                         )
                         fieldResult = result
+                        if (result.isAllowed) twakTextGenerationCount += 1
                         if (result.isAllowed) {
                             voiceSourceMode = VoiceSourceMode.TWEAKER_GEOGRAPHIC_BRITISH_NARRATOR
                             status = "FIELD REPORT READY"
@@ -553,6 +587,12 @@ fun VoiceJokeGeneratorScreen(
                                     twakBotMood = TwakBotMood.EXCITED
                                 }) { Text("Send to Voice Lab") }
                                 Button(onClick = {
+                                    if (!canUsePremiumNarration) {
+                                        status = "PRO FEATURE LOCKED"
+                                        statusDetail = "British Narrator requires Prankstar Pro voice credits. Purchases and backend credits are not configured yet."
+                                        twakBotMood = TwakBotMood.IDLE
+                                        return@Button
+                                    }
                                     voiceSourceMode = VoiceSourceMode.TWEAKER_GEOGRAPHIC_BRITISH_NARRATOR
                                     text = result.narration.take(300)
                                     outputName = result.title
@@ -607,7 +647,14 @@ fun VoiceJokeGeneratorScreen(
                                             }
                                         }
                                     }
-                                }, enabled = canGenerateBritishNarration) { Text("Generate British Narration") }
+                                }, enabled = fieldResult?.isAllowed == true && status != "GENERATING") { Text("Generate British Narration") }
+                                if (!canUsePremiumNarration) {
+                                    Text("British Narrator is a Prankstar Pro voice-credit feature.", color = OrangeAccent, style = MaterialTheme.typography.bodySmall)
+                                    Button(onClick = {
+                                        status = "BILLING NOT CONFIGURED"
+                                        statusDetail = "Upgrade to Pro is coming soon. Google Play Billing is not connected in this build."
+                                    }) { Text("Upgrade to Pro (Coming Soon)") }
+                                }
                             }
                         }
                     }
@@ -784,9 +831,15 @@ fun VoiceJokeGeneratorScreen(
                     if (!isValidGeneratedFile(file)) {
                         status = "ERROR"
                         statusDetail = "Cannot save an empty or missing generated file."
-                        return@Button
-                    }
-                    scope.launch {
+                            return@Button
+                        }
+                        if (!featureGate.canSaveGeneratedClip(generatedVoiceClipCount)) {
+                            status = "PRO FEATURE LOCKED"
+                            statusDetail = "${featureGate.generatedClipSaveLimitLabel()} used. Higher save limits are planned for Prankstar Pro; billing is not configured yet."
+                            if (voiceSourceMode == VoiceSourceMode.TWEAKER_GEOGRAPHIC_BRITISH_NARRATOR) twakBotMood = TwakBotMood.IDLE
+                            return@Button
+                        }
+                        scope.launch {
                         val generationIsValid = generatedResult?.success == true
                         if (!generationIsValid) {
                             status = "ERROR"
@@ -824,7 +877,7 @@ fun VoiceJokeGeneratorScreen(
             item {
                 Text(
                     if (ttsReadiness is VoiceEngineReadiness.READY) {
-                        "Output: WAV/PCM generated locally on device, or MP3 for confirmed Tweaker Geographic British Narrator requests."
+                        "Output: WAV/PCM generated locally on device, or MP3 for confirmed Tweaker Geographic British Narrator requests. ${featureGate.generatedClipSaveLimitLabel()}."
                     } else {
                         "TTS unavailable: install or enable an Android text-to-speech engine."
                     },
