@@ -7,11 +7,19 @@
     "subtitle": "Singularity Shenanigans",
     "mode": "VORTEX_X",
     "group": "CORE",
+<<<<<<< ours
     "primaryAction": "DEPLOY_CHAIN",
     "holdAction": "ARM_RANDOM_CHAIN",
     "doubleTapAction": "STOP_ALL",
     "enabled": false,
     "description": "Random prank-chain reactor for safe chained deployments with visible charge and stop-all fallback; disabled until the MP4 is added in a separate asset-only PR."
+=======
+    "primaryAction": "OPEN_VORTEX_PANEL",
+    "holdAction": "DEPLOY_PRANK_CHAIN",
+    "doubleTapAction": "REROLL_PRANK_CHAIN",
+    "enabled": true,
+    "description": "Random multi-sound prank-chain reactor using the existing safe catalog deploy pipeline."
+>>>>>>> theirs
   },
   {
     "id": "reactor_03",
@@ -21,11 +29,19 @@
     "subtitle": "Space-Time Trolling",
     "mode": "PORTAL_PULSE",
     "group": "CORE",
+<<<<<<< ours
     "primaryAction": "OPEN_TIMER",
     "holdAction": "DELAYED_DEPLOY",
     "doubleTapAction": "OPEN_RANDOMIZER",
     "enabled": false,
     "description": "Warp-delay and teleport-feel prank routing; disabled until reactor3.mp4 is supplied at the active asset path."
+=======
+    "primaryAction": "OPEN_PORTAL_PANEL",
+    "holdAction": "ARM_WARP_DELAY",
+    "doubleTapAction": "TELEPORT_REROUTE",
+    "enabled": true,
+    "description": "Delay, warp, and teleport-feel prank routing using timer/randomizer and category reroutes."
+>>>>>>> theirs
   },
   {
     "id": "reactor_05",
@@ -35,11 +51,19 @@
     "subtitle": "Data Corruption Initiated",
     "mode": "PIXEL_BOMB",
     "group": "CORE",
+<<<<<<< ours
     "primaryAction": "PLAY_GLITCH_EFFECTS",
     "holdAction": "OPEN_FORGE",
     "doubleTapAction": "DEPLOY_RANDOM",
     "enabled": false,
     "description": "Glitch burst and scrambled audio/visual prank effects; disabled so the old packaged reactor5 video does not remain active as the replacement."
+=======
+    "primaryAction": "OPEN_PIXEL_PANEL",
+    "holdAction": "GLITCH_BURST",
+    "doubleTapAction": "SCRAMBLE_PRANK_SET",
+    "enabled": true,
+    "description": "Glitchy UI/audio effect mode with scrambled safe catalog categories and corruption-style bursts."
+>>>>>>> theirs
   },
   {
     "id": "reactor_08",
@@ -49,11 +73,19 @@
     "subtitle": "Decibel Reactor Overdrive",
     "mode": "SONIC_BLAST",
     "group": "FX",
+<<<<<<< ours
     "primaryAction": "PLAY_SONIC_OVERDRIVE",
     "holdAction": "BOOST_INTENSITY",
     "doubleTapAction": "STOP_ALL",
     "enabled": false,
     "description": "Sound intensity and overdrive controls; disabled until reactor8.mp4 is supplied at the active asset path."
+=======
+    "primaryAction": "OPEN_SONIC_PANEL",
+    "holdAction": "DEPLOY_INTENSE_SOUND",
+    "doubleTapAction": "TOGGLE_OVERDRIVE",
+    "enabled": true,
+    "description": "Volume/intensity control mode with safe overdrive cap and ambience/cartoon fallback playback."
+>>>>>>> theirs
   },
   {
     "id": "reactor_09",
@@ -63,11 +95,19 @@
     "subtitle": "Prank Shield Active",
     "mode": "PRANK_SHIELD",
     "group": "CONTROL",
+<<<<<<< ours
     "primaryAction": "STOP_ALL",
     "holdAction": "OPEN_SYSTEM",
     "doubleTapAction": "SAFE_RANDOM",
     "enabled": false,
     "description": "Safety, cooldown, stop-all, and prank limit control reactor; disabled until the MP4 is added in a separate asset-only PR."
+=======
+    "primaryAction": "OPEN_SHIELD_PANEL",
+    "holdAction": "STOP_ALL",
+    "doubleTapAction": "TOGGLE_SAFE_MODE",
+    "enabled": true,
+    "description": "Cooldown, safe mode, stop-all, playback limit, and overlap-prevention control reactor."
+>>>>>>> theirs
   },
   {
     "id": "reactor_12",
@@ -77,11 +117,19 @@
     "subtitle": "Live Deploy Console",
     "mode": "LIVE_DEPLOY",
     "group": "DEPLOY",
+<<<<<<< ours
     "primaryAction": "DEPLOY_RANDOM",
     "holdAction": "DEPLOY_CHAIN",
     "doubleTapAction": "OPEN_RANDOMIZER",
     "enabled": false,
     "description": "Live deploy console and active queue reactor for real catalog playback; disabled until the MP4 is added in a separate asset-only PR."
+=======
+    "primaryAction": "OPEN_LIVE_PANEL",
+    "holdAction": "DEPLOY_ARMED_SOUND",
+    "doubleTapAction": "CLEAR_QUEUE",
+    "enabled": true,
+    "description": "Live deploy queue, armed sound state, deploy, clear, and stop status reactor."
+>>>>>>> theirs
   },
   {
     "id": "reactor_13",
@@ -91,11 +139,19 @@
     "subtitle": "Prank Generator Core",
     "mode": "GAG_ENGINE",
     "group": "CORE",
+<<<<<<< ours
     "primaryAction": "PLAY_JOKE",
     "holdAction": "OPEN_JOKES",
     "doubleTapAction": "DEPLOY_RANDOM",
     "enabled": false,
     "description": "Joke, gag, and prank-combo generator; disabled until reactor13.mp4 is supplied at the active asset path."
+=======
+    "primaryAction": "OPEN_GAG_PANEL",
+    "holdAction": "GENERATE_GAG_COMBO",
+    "doubleTapAction": "SAVE_GAG_COMBO",
+    "enabled": true,
+    "description": "Joke, gag, and prank-combo generator using the existing joke/voice route and safe local fallback combos."
+>>>>>>> theirs
   },
   {
     "id": "reactor_14",
@@ -105,11 +161,19 @@
     "subtitle": "Soundboard Reactor",
     "mode": "MISCHIEF_SOUND",
     "group": "CORE",
+<<<<<<< ours
     "primaryAction": "OPEN_STASH",
     "holdAction": "PLAY_MISCHIEF_SOUND",
     "doubleTapAction": "OPEN_PACKS",
     "enabled": false,
     "description": "Main categorized soundboard reactor; disabled until reactor14.mp4 is supplied at the active asset path."
+=======
+    "primaryAction": "OPEN_SOUNDBOARD",
+    "holdAction": "PLAY_LAST_SOUND",
+    "doubleTapAction": "OPEN_FAVORITES",
+    "enabled": true,
+    "description": "Categorized prank sound browsing and last-selected/favorites routing through the existing library."
+>>>>>>> theirs
   },
   {
     "id": "reactor_15",
@@ -119,11 +183,19 @@
     "subtitle": "Timed Prank Trigger",
     "mode": "TRAP_ACTUATOR",
     "group": "DEPLOY",
+<<<<<<< ours
     "primaryAction": "OPEN_TIMER",
     "holdAction": "DELAYED_DEPLOY",
     "doubleTapAction": "STOP_ALL",
     "enabled": false,
     "description": "Timed traps and trigger-based playback; disabled until reactor15.mp4 is supplied at the active asset path."
+=======
+    "primaryAction": "OPEN_TRAP_PANEL",
+    "holdAction": "ARM_TIMED_TRAP",
+    "doubleTapAction": "DISARM_TRAPS",
+    "enabled": true,
+    "description": "Timed trap arming, delayed playback, visible armed state, and cancel control."
+>>>>>>> theirs
   },
   {
     "id": "reactor_16",
@@ -133,11 +205,19 @@
     "subtitle": "Quick Mischief Launcher",
     "mode": "LOUD_MISCHIEF",
     "group": "DEPLOY",
+<<<<<<< ours
     "primaryAction": "PLAY_LOUD_MISCHIEF",
     "holdAction": "DEPLOY_CHAIN",
     "doubleTapAction": "STOP_ALL",
     "enabled": false,
     "description": "Quick loud favorites launcher with stop-all fallback; disabled until reactor16.mp4 is supplied at the active asset path."
+=======
+    "primaryAction": "OPEN_LOUD_PANEL",
+    "holdAction": "FIRE_LOUD_FAVORITE",
+    "doubleTapAction": "STOP_ALL",
+    "enabled": true,
+    "description": "Quick loud sound launcher separate from Sonic Blast settings, with stop-all fallback."
+>>>>>>> theirs
   },
   {
     "id": "reactor_17",
@@ -147,11 +227,19 @@
     "subtitle": "Zero-G Shenanigans",
     "mode": "GRAVITY_GLITCH",
     "group": "FX",
+<<<<<<< ours
     "primaryAction": "OPEN_FORGE",
     "holdAction": "PLAY_GLITCH_EFFECTS",
     "doubleTapAction": "DEPLOY_RANDOM",
     "enabled": false,
     "description": "Pitch, speed, stutter, reverse, and weird-FX reactor routed to existing forge/effects behavior; disabled until reactor17.mp4 is supplied at the active asset path."
+=======
+    "primaryAction": "OPEN_GRAVITY_PANEL",
+    "holdAction": "PLAY_GLITCH_PROFILE",
+    "doubleTapAction": "REROLL_GLITCH_PROFILE",
+    "enabled": true,
+    "description": "Gravity glitch profiles route to existing forge/effects playback; real pitch/reverse processing is not exposed by the current bridge."
+>>>>>>> theirs
   },
   {
     "id": "reactor_18",
@@ -161,10 +249,18 @@
     "subtitle": "Voice Mask Reactor",
     "mode": "DIGITAL_DISGUISE",
     "group": "FX",
+<<<<<<< ours
     "primaryAction": "OPEN_VOICE_LAB",
     "holdAction": "PLAY_VOICE_SOUND",
     "doubleTapAction": "OPEN_MESSAGES",
     "enabled": false,
     "description": "Voice masks and character voice prank mode; disabled until reactor18.mp4 is supplied at the active asset path."
+=======
+    "primaryAction": "OPEN_DISGUISE_PANEL",
+    "holdAction": "APPLY_DISGUISE_PRESET",
+    "doubleTapAction": "RANDOM_DISGUISE_PRESET",
+    "enabled": true,
+    "description": "Voice mask and character voice prank mode integrated with Voice Lab and safe voice/funny playback fallbacks."
+>>>>>>> theirs
   }
 ]
