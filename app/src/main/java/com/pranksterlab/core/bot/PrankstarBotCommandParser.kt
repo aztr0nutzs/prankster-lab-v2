@@ -16,15 +16,16 @@ class PrankstarBotCommandParser {
         if (containsAny(normalized, "open system", "system", "settings")) return PrankstarBotIntent.OpenSystem
         if (containsAny(normalized, "random", "surprise me")) return PrankstarBotIntent.PlayRandom
 
-        if (containsAny(normalized, "tweaker geographic", "tweakographic", "field report", "mock documentary", "documentary narration", "urban wildlife narration")) {
+        if (containsAny(normalized, "twak attack", "twak attacks", "twak-attack", "twak-attacks", "twak attack narration", "tweaker geographic", "tweakographic", "field report", "mock documentary", "documentary narration", "urban wildlife narration", "urban wildlife report")) {
             val fieldPrompt = splitNarrationSetting(
                 cleanNarrationPrompt(
                     normalized,
                     raw,
                     listOf(
-                        "make a tweaker geographic", "tweaker geographic", "make tweakographic",
+                        "make a twak attack", "twak attack narration", "twak attack", "twak attacks",
+                        "twak-attack", "twak-attacks", "make a tweaker geographic", "tweaker geographic", "make tweakographic",
                         "tweakographic", "make a field report", "field report", "make a mock documentary",
-                        "mock documentary", "documentary narration", "urban wildlife narration"
+                        "mock documentary", "documentary narration", "urban wildlife narration", "urban wildlife report"
                     )
                 )
             )
