@@ -9,7 +9,9 @@
 
 ## API Key Handling
 
-The key is not hardcoded in source code. Android `BuildConfig.ELEVENLABS_API_KEY` is populated from one of these local inputs at build time:
+The key is not hardcoded in source code and must not be present in Android release builds.
+
+Debug builds can still use the direct local/test ElevenLabs flow. In debug only, Android `BuildConfig.ELEVENLABS_API_KEY` is populated from one of these local inputs at build time:
 
 1. Gradle property: `ELEVENLABS_API_KEY`
 2. Environment variable: `ELEVENLABS_API_KEY`
@@ -17,13 +19,15 @@ The key is not hardcoded in source code. Android `BuildConfig.ELEVENLABS_API_KEY
 
 `local.properties` and `.env*` are ignored by git. Settings/System shows only `Configured` or `Missing`; if configured, it shows only the final four key characters.
 
+Release builds force `BuildConfig.ELEVENLABS_API_KEY` to an empty string and set `BuildConfig.VOICE_GENERATION_MODE` to `PRODUCTION_BACKEND`. Production narration must go through the backend/proxy contract in `docs/BACKEND_ELEVENLABS_PROXY_CONTRACT.md`.
+
 Missing-key user error:
 
 > ElevenLabs API key is not configured. Add ELEVENLABS_API_KEY to local.properties or environment variables.
 
-## Endpoint
+## Direct Debug Endpoint
 
-The feature sends user-approved narration text only after the user taps **Generate British Narration**.
+The debug direct provider sends user-approved narration text only after the user taps **Generate British Narration**.
 
 - Method: `POST`
 - URL: `https://api.elevenlabs.io/v1/text-to-speech/wV67xHKrIHTU0gtChZiQ?output_format=mp3_44100_128`
@@ -32,11 +36,13 @@ The feature sends user-approved narration text only after the user taps **Genera
 - Content-Type: `application/json`
 - Header: `xi-api-key`
 
+Production builds must not use this endpoint directly from Android.
+
 ## Generated File Location
 
 ElevenLabs narration audio is saved separately from local Android TTS WAV output:
 
-`context.filesDir/generated/elevenlabs/tweaker_geo_<timestamp>.mp3`
+`context.filesDir/generated/elevenlabs/<safe_output_name>_<timestamp>.mp3`
 
 The implementation does not add generated MP3s to `sound_catalog.json`.
 
@@ -58,7 +64,7 @@ Saved stash entries preserve:
 2. Voice source defaults/points to **Tweaker Geographic British Narrator** for this section.
 3. User taps **Generate British Narration**.
 4. App shows `Recording field narration…`.
-5. ElevenLabs MP3 is generated and saved locally.
+5. Debug builds can generate MP3 directly with ElevenLabs. Release builds call the production backend provider.
 6. Preview and Save to Stash use the existing generated audio flow.
 
 Local Android TTS support remains available and unchanged for normal Voice Lab clips.
@@ -80,8 +86,17 @@ Structured failures are mapped to user-safe messages:
 - Network error
 - Empty audio
 - Unknown failure
+- No backend configured
+- Sign-in required
+- Premium not enabled
+- Out of credits
+- Text rejected
 
 No network failure crashes the app, and failed/empty files are deleted.
+
+## Production Risk Boundary
+
+The production risk is not the dedicated voice ID, which is not a secret. The risk is embedding or transmitting the ElevenLabs API key from the Android client. Release builds now leave the direct key empty and route premium narration through `ProductionBackendVoiceProvider`, which expects a future backend to enforce auth, entitlement, credits, text safety, and rate limits.
 
 ## Tests
 

@@ -53,6 +53,10 @@ The exact source asset `prankstar_header.png` was not found by exact filename du
 - The `google-tts-api` fix path reported by npm is semver-major and should be handled in a separate dependency compatibility pass.
 - Crashlytics or equivalent production crash reporting is not integrated.
 - Analytics/privacy disclosure work remains before enabling production telemetry.
+- Production ElevenLabs narration backend is designed but not deployed.
+- Android `ProductionBackendVoiceProvider` is prepared, but app auth token retrieval is not wired yet.
+- Billing, entitlement, credit ledger, and backend rate limiting are not implemented.
+- `VOICE_BACKEND_BASE_URL` must be configured for release builds before premium narration testing.
 
 ## Android Vitals Risks
 
@@ -60,6 +64,7 @@ The exact source asset `prankstar_header.png` was not found by exact filename du
 - MP4/WebView paths need device coverage for decoder and rendering warnings.
 - Android TextToSpeech behavior varies by device engine and locale.
 - ElevenLabs generation is network-dependent and release-gated until backend/proxy or signing-approved secret delivery exists.
+- Premium narration credit abuse controls need backend implementation before public release.
 - Generated file storage can grow over time; cleanup exists for generated voice clips but needs runtime QA.
 
 ## Passed Checks Recorded Previously

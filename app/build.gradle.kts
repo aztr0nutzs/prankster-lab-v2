@@ -15,6 +15,11 @@ val localProperties = Properties().apply {
 val elevenLabsApiKey = providers.gradleProperty("ELEVENLABS_API_KEY")
     .orElse(providers.environmentVariable("ELEVENLABS_API_KEY"))
     .orElse(localProperties.getProperty("ELEVENLABS_API_KEY", ""))
+val backendBaseUrl = providers.gradleProperty("VOICE_BACKEND_BASE_URL")
+    .orElse(providers.environmentVariable("VOICE_BACKEND_BASE_URL"))
+    .orElse(localProperties.getProperty("VOICE_BACKEND_BASE_URL", ""))
+val debugVoiceGenerationMode = providers.gradleProperty("VOICE_GENERATION_MODE")
+    .orElse(localProperties.getProperty("VOICE_GENERATION_MODE", ""))
 
 fun String.asBuildConfigString(): String {
     return "\"${replace("\\", "\\\\").replace("\"", "\\\"")}\""
@@ -36,6 +41,9 @@ android {
     buildTypes {
         debug {
             buildConfigField("String", "ELEVENLABS_API_KEY", elevenLabsApiKey.get().asBuildConfigString())
+            val defaultMode = if (elevenLabsApiKey.get().isBlank()) "LOCAL_ONLY" else "DEBUG_ELEVENLABS_DIRECT"
+            buildConfigField("String", "VOICE_GENERATION_MODE", (debugVoiceGenerationMode.get().ifBlank { defaultMode }).asBuildConfigString())
+            buildConfigField("String", "VOICE_BACKEND_BASE_URL", backendBaseUrl.get().asBuildConfigString())
         }
         release {
             isMinifyEnabled = true
@@ -45,6 +53,8 @@ android {
                 "proguard-rules.pro"
             )
             buildConfigField("String", "ELEVENLABS_API_KEY", "\"\"")
+            buildConfigField("String", "VOICE_GENERATION_MODE", "\"PRODUCTION_BACKEND\"")
+            buildConfigField("String", "VOICE_BACKEND_BASE_URL", backendBaseUrl.get().asBuildConfigString())
         }
     }
 

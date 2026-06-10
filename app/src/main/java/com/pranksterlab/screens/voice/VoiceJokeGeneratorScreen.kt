@@ -54,8 +54,8 @@ import com.pranksterlab.core.bot.PrankstarBotController
 import com.pranksterlab.core.bot.PrankstarBotMessage
 import com.pranksterlab.core.bot.PrankstarBotState
 import com.pranksterlab.core.bot.PrankstarBotVoiceLabBridge
-import com.pranksterlab.core.elevenlabs.ElevenLabsTtsResult
 import com.pranksterlab.core.elevenlabs.ElevenLabsTtsService
+import com.pranksterlab.core.elevenlabs.TWEAKER_GEOGRAPHIC_FEATURE
 import com.pranksterlab.core.elevenlabs.TWEAKER_GEOGRAPHIC_VOICE_ID
 import com.pranksterlab.core.model.PrankSound
 import com.pranksterlab.core.narration.TweakerGeographicNarrator
@@ -65,9 +65,15 @@ import com.pranksterlab.core.narration.TweakerGeographicTone
 import com.pranksterlab.core.narration.TwakBotMood
 import com.pranksterlab.core.repository.SoundRepository
 import com.pranksterlab.core.voice.AndroidTextToSpeechEngine
+import com.pranksterlab.core.voice.DebugElevenLabsDirectProvider
 import com.pranksterlab.core.voice.GeneratedVoiceRepository
+import com.pranksterlab.core.voice.LocalAndroidTtsVoiceProvider
+import com.pranksterlab.core.voice.NarrationVoiceProvider
+import com.pranksterlab.core.voice.NarrationVoiceResult
+import com.pranksterlab.core.voice.ProductionBackendVoiceProvider
 import com.pranksterlab.core.voice.VoiceCategory
 import com.pranksterlab.core.voice.VoiceEngineReadiness
+import com.pranksterlab.core.voice.VoiceGenerationMode
 import com.pranksterlab.core.voice.VoiceGeneratorSettings
 import com.pranksterlab.core.voice.VoicePreset
 import com.pranksterlab.core.voice.VoicePresetLibrary
@@ -155,16 +161,21 @@ fun VoiceJokeGeneratorScreen(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val tts = remember { AndroidTextToSpeechEngine(context) }
-    val elevenLabsTtsService = remember {
+    val narrationHttpClient = remember {
+        OkHttpClient.Builder()
+            .connectTimeout(20, TimeUnit.SECONDS)
+            .readTimeout(60, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
+            .build()
+    }
+    val elevenLabsTtsService = remember(narrationHttpClient) {
         ElevenLabsTtsService(
-            client = OkHttpClient.Builder()
-                .connectTimeout(20, TimeUnit.SECONDS)
-                .readTimeout(60, TimeUnit.SECONDS)
-                .writeTimeout(30, TimeUnit.SECONDS)
-                .build(),
+            client = narrationHttpClient,
             apiKeyProvider = { BuildConfig.ELEVENLABS_API_KEY }
         )
     }
+    val narrationOutputDir = remember(context) { File(context.filesDir, "generated/elevenlabs") }
+    val voiceGenerationMode = remember { VoiceGenerationMode.fromBuildConfig(BuildConfig.VOICE_GENERATION_MODE) }
     val generatedRepo = remember { GeneratedVoiceRepository(soundRepository) }
     val allPresets = VoicePresetLibrary.presets
     val ttsReadiness by tts.readiness.collectAsState()
@@ -210,6 +221,19 @@ fun VoiceJokeGeneratorScreen(
 
     fun settings() = VoiceGeneratorSettings(preset, text, pitch, speed, volume, preset.toneStyle, effect, echo, outputName)
     fun isValidGeneratedFile(file: File?) = file != null && file.exists() && file.length() > 0L
+    fun narrationProvider(): NarrationVoiceProvider {
+        return when (voiceGenerationMode) {
+            VoiceGenerationMode.LOCAL_ONLY -> LocalAndroidTtsVoiceProvider()
+            VoiceGenerationMode.DEBUG_ELEVENLABS_DIRECT -> DebugElevenLabsDirectProvider(narrationOutputDir, elevenLabsTtsService)
+            VoiceGenerationMode.PRODUCTION_BACKEND -> ProductionBackendVoiceProvider(
+                client = narrationHttpClient,
+                backendBaseUrlProvider = { BuildConfig.VOICE_BACKEND_BASE_URL },
+                authTokenProvider = { null },
+                outputDirectory = narrationOutputDir,
+                toneProvider = { fieldTone.name }
+            )
+        }
+    }
 
     val filteredPresets = allPresets.filter {
         (selectedCategory == null || it.category == selectedCategory) &&
@@ -541,32 +565,44 @@ fun VoiceJokeGeneratorScreen(
                                         savedGeneratedFilePath = null
                                         generatedTweakerNarrationTitle = result.title
                                         generatedTweakerNarrationText = result.narration
-                                        val dir = File(context.filesDir, "generated/elevenlabs")
-                                        val file = File(dir, "tweaker_geo_${System.currentTimeMillis()}.mp3")
-                                        when (val ttsResult = elevenLabsTtsService.generateTweakerGeographicNarration(result.narration, file)) {
-                                            is ElevenLabsTtsResult.Success -> {
-                                                generatedFile = ttsResult.outputFile
+                                        val formatLabel = if (voiceGenerationMode == VoiceGenerationMode.PRODUCTION_BACKEND) {
+                                            "MP3/Premium Narration"
+                                        } else {
+                                            "MP3/ElevenLabs"
+                                        }
+                                        when (val providerResult = narrationProvider().generateNarration(
+                                            text = result.narration,
+                                            feature = TWEAKER_GEOGRAPHIC_FEATURE,
+                                            voiceId = TWEAKER_GEOGRAPHIC_VOICE_ID,
+                                            outputHint = result.title
+                                        )) {
+                                            is NarrationVoiceResult.Success -> {
+                                                generatedFile = providerResult.outputFile
                                                 generatedResult = VoiceSynthesisResult(
-                                                    outputFile = ttsResult.outputFile,
-                                                    formatLabel = "MP3/ElevenLabs",
-                                                    durationMs = ttsResult.durationMs,
+                                                    outputFile = providerResult.outputFile,
+                                                    formatLabel = formatLabel,
+                                                    durationMs = providerResult.durationMs,
                                                     success = true
                                                 )
                                                 status = "GENERATED"
-                                                statusDetail = "Narration generated."
+                                                statusDetail = providerResult.remainingCredits?.let {
+                                                    "Narration generated. $it narration credits remain."
+                                                } ?: "Narration generated."
                                                 twakBotMood = TwakBotMood.EXCITED
                                             }
-                                            is ElevenLabsTtsResult.Failure -> {
+                                            is NarrationVoiceResult.Failure -> {
                                                 generatedFile = null
                                                 generatedResult = VoiceSynthesisResult(
-                                                    outputFile = file,
-                                                    formatLabel = "MP3/ElevenLabs",
+                                                    outputFile = File(narrationOutputDir, "narration_failed.mp3"),
+                                                    formatLabel = formatLabel,
                                                     durationMs = null,
                                                     success = false,
-                                                    errorMessage = ttsResult.error.userMessage
+                                                    errorMessage = providerResult.userMessage
                                                 )
                                                 status = "ERROR"
-                                                statusDetail = ttsResult.error.userMessage
+                                                statusDetail = providerResult.remainingCredits?.let {
+                                                    "${providerResult.userMessage} $it narration credits remain."
+                                                } ?: providerResult.userMessage
                                                 twakBotMood = TwakBotMood.ERROR
                                             }
                                         }

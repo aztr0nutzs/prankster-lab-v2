@@ -127,7 +127,15 @@ The bot controller generates locally, returns a visible message, and fills Voice
 
 ## ElevenLabs British Narrator Addendum
 
-Tweaker Geographic now has a dedicated ElevenLabs narration path using voice ID `wV67xHKrIHTU0gtChZiQ`. The generated narration text remains local until the user explicitly taps **Generate British Narration**. MP3 output is written to `filesDir/generated/elevenlabs/` and saved to Stash through generated voice metadata; it is not added to bundled `sound_catalog.json`.
+Tweaker Geographic now has a dedicated narration path using voice ID `wV67xHKrIHTU0gtChZiQ`. The generated narration text remains local until the user explicitly taps **Generate British Narration**. MP3 output is written to `filesDir/generated/elevenlabs/` and saved to Stash through generated voice metadata; it is not added to bundled `sound_catalog.json`.
+
+Android narration generation is now routed through `NarrationVoiceProvider`:
+
+- `LOCAL_ONLY` keeps users on existing Android TextToSpeech generation.
+- `DEBUG_ELEVENLABS_DIRECT` preserves the local/test ElevenLabs flow for debug builds with a locally configured key.
+- `PRODUCTION_BACKEND` is the release-safe path and calls the future app backend instead of ElevenLabs directly.
+
+Release builds do not embed the ElevenLabs key. Backend entitlement, credits, and app auth remain required before production premium narration can be enabled.
 
 ## Twak-Attacks Visual Addendum
 
