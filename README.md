@@ -136,7 +136,7 @@ The repository’s sound data and planning docs show a broad, curated prank libr
 This structure makes the app easy to browse while keeping the content playful and varied.
 
 <div align="center">
-  <img src="./twak_attacks.png" alt="Prankster Lab v2 banner" width="100%" />
+  <img src="./twak_attack_header.png" alt="Prankster Lab v2 banner" width="100%" />
 </div>
 
 ---
