@@ -1,6 +1,7 @@
 package com.pranksterlab.components.bot
 
 import android.net.Uri
+import androidx.annotation.OptIn
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -59,6 +60,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
@@ -188,6 +190,7 @@ fun PrankstarBotVideo(
 }
 
 @Composable
+@OptIn(UnstableApi::class)
 private fun BotPlayer(mood: PrankstarBotMood, initialResId: Int, muted: Boolean, staticDrawableId: Int) {
     val context = LocalContext.current
     var targetResId by remember(mood, initialResId) { mutableIntStateOf(initialResId) }

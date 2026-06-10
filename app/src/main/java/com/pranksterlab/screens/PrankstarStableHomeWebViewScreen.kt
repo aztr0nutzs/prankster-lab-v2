@@ -24,7 +24,7 @@ import com.pranksterlab.bridge.PrankstarWebBridge
 import com.pranksterlab.core.audio.AudioPlayerController
 import com.pranksterlab.core.repository.SoundRepository
 
-@SuppressLint("SetJavaScriptEnabled")
+@SuppressLint("SetJavaScriptEnabled", "JavascriptInterface")
 @Composable
 fun PrankstarStableHomeWebViewScreen(
     audioPlayerController: AudioPlayerController,
