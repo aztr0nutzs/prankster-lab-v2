@@ -11,7 +11,7 @@ Production Android builds must never call ElevenLabs directly and must never con
 Production builds use `VoiceGenerationMode.PRODUCTION_BACKEND`. The Android client calls only the app backend and sends:
 
 - the generated narration text
-- the feature identifier
+- the feature identifier `twak_attacks`
 - the configured ElevenLabs voice ID
 - the requested tone
 - a client request ID for idempotency and support correlation
@@ -115,4 +115,4 @@ Supported error codes:
 
 ## Android Integration Status
 
-`ProductionBackendVoiceProvider` is present in the Android app and prepared to call this endpoint. Production auth token retrieval, backend deployment, billing, and entitlement checks remain backend/product work before Play testing.
+`ProductionBackendVoiceProvider` is present in the Android app and prepared to call this endpoint. Production auth token retrieval, backend deployment, billing, and entitlement checks remain backend/product work before Play testing. Until those are configured, the client surfaces structured errors such as no backend configured, sign-in required, missing entitlement, out of credits, rate limit, text rejected, provider failed, and network error.

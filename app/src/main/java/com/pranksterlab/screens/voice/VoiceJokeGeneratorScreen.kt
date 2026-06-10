@@ -56,7 +56,7 @@ import com.pranksterlab.core.bot.PrankstarBotMessage
 import com.pranksterlab.core.bot.PrankstarBotState
 import com.pranksterlab.core.bot.PrankstarBotVoiceLabBridge
 import com.pranksterlab.core.elevenlabs.ElevenLabsTtsService
-import com.pranksterlab.core.elevenlabs.TWEAKER_GEOGRAPHIC_FEATURE
+import com.pranksterlab.core.elevenlabs.TWAK_ATTACKS_FEATURE
 import com.pranksterlab.core.elevenlabs.TWEAKER_GEOGRAPHIC_VOICE_ID
 import com.pranksterlab.core.model.PrankSound
 import com.pranksterlab.core.narration.TweakerGeographicNarrator
@@ -315,8 +315,11 @@ fun VoiceJokeGeneratorScreen(
     val generatedVoiceClipCount = customSounds.count { soundRepository.isGeneratedVoiceClip(it) }
     val debugDirectNarrationEnabled = voiceGenerationMode == VoiceGenerationMode.DEBUG_ELEVENLABS_DIRECT &&
         BuildConfig.ELEVENLABS_API_KEY.isNotBlank()
+    val productionBackendNarrationEnabled = voiceGenerationMode == VoiceGenerationMode.PRODUCTION_BACKEND
     val canGenerate = ttsReadiness is VoiceEngineReadiness.READY && text.isNotBlank() && status != "GENERATING"
-    val canUsePremiumNarration = featureGate.canUseElevenLabsNarrator || debugDirectNarrationEnabled
+    val canUsePremiumNarration = featureGate.canUseElevenLabsNarrator ||
+        debugDirectNarrationEnabled ||
+        productionBackendNarrationEnabled
     val canUseGeneratedFile = isValidGeneratedFile(generatedFile) && generatedResult?.success == true
     val botMood = when (status) {
         "INITIALIZING VOICE ENGINE" -> PrankstarBotMood.THINKING
@@ -612,7 +615,7 @@ fun VoiceJokeGeneratorScreen(
                                         }
                                         when (val providerResult = narrationProvider().generateNarration(
                                             text = result.narration,
-                                            feature = TWEAKER_GEOGRAPHIC_FEATURE,
+                                            feature = TWAK_ATTACKS_FEATURE,
                                             voiceId = TWEAKER_GEOGRAPHIC_VOICE_ID,
                                             outputHint = result.title
                                         )) {

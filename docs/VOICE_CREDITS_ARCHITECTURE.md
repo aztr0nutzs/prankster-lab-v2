@@ -50,7 +50,7 @@ Client states to support:
 - provider failed
 - offline or network error
 
-The current Android prep maps those states through `NarrationVoiceResult.Failure`.
+The current Android prep maps those states through `NarrationVoiceResult.Failure`. Release builds are allowed to reach `ProductionBackendVoiceProvider` so those backend/credit states can be displayed, but the Android client remains advisory; the backend must reject unauthenticated, unentitled, or out-of-credit requests before calling ElevenLabs.
 
 ## Abuse Controls
 

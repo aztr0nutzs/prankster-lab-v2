@@ -58,13 +58,15 @@ Saved stash entries preserve:
 - narration text
 - created timestamp
 
+Production backend requests use the contract feature ID `twak_attacks`. Existing generated-file metadata keeps `tweaker_geographic` for local stash compatibility and historical filtering.
+
 ## Voice Lab Flow
 
 1. User creates Tweaker Geographic narration text locally.
 2. Voice source defaults/points to **Tweaker Geographic British Narrator** for this section.
 3. User taps **Generate British Narration**.
 4. App shows `Recording field narration…`.
-5. Debug builds can generate MP3 directly with ElevenLabs. Release builds call the production backend provider.
+5. Debug builds can generate MP3 directly with ElevenLabs when a local key exists. Release builds call the production backend provider with feature `twak_attacks`.
 6. Preview and Save to Stash use the existing generated audio flow.
 
 Local Android TTS support remains available and unchanged for normal Voice Lab clips.

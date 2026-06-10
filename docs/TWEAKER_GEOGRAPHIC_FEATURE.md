@@ -133,7 +133,7 @@ Android narration generation is now routed through `NarrationVoiceProvider`:
 
 - `LOCAL_ONLY` keeps users on existing Android TextToSpeech generation.
 - `DEBUG_ELEVENLABS_DIRECT` preserves the local/test ElevenLabs flow for debug builds with a locally configured key.
-- `PRODUCTION_BACKEND` is the release-safe path and calls the future app backend instead of ElevenLabs directly.
+- `PRODUCTION_BACKEND` is the release-safe path and calls the future app backend instead of ElevenLabs directly. The Android request uses backend feature ID `twak_attacks`; saved local metadata can still tag the generated clip as `tweaker_geographic`.
 
 Release builds do not embed the ElevenLabs key. Backend entitlement, credits, and app auth remain required before production premium narration can be enabled.
 
