@@ -450,6 +450,11 @@ fun VoiceJokeGeneratorScreen(
                         modifier = Modifier.fillMaxWidth()
                     )
                     Text("Tweaker Geographic / Twak-Attacks narrator for harmless fictional behavior.", color = Color.LightGray, style = MaterialTheme.typography.bodySmall)
+                    Text(
+                        "For harmless comedy only. Do not use for threats, harassment, impersonation, emergency hoaxes, or illegal activity.",
+                        color = Color.Gray,
+                        style = MaterialTheme.typography.bodySmall
+                    )
                     OutlinedTextField(
                         value = fieldAction,
                         onValueChange = {
@@ -661,7 +666,7 @@ fun VoiceJokeGeneratorScreen(
                 }
             }
             item { Text("Synthetic Presets", color = LimeAccent) }
-            item { Text("Warning: All voices are synthetic styling presets, not real-person clones.", color = OrangeAccent) }
+            item { Text("Warning: All voices are synthetic styling presets, not real-person voice imitation.", color = OrangeAccent) }
             item {
                 Column(Modifier.fillMaxWidth().background(GlassBackground, RoundedCornerShape(14.dp)).border(1.dp, if (status == "ERROR") OrangeAccent else CyanAccent, RoundedCornerShape(14.dp)).padding(12.dp)) {
                     Text(status, color = if (status == "ERROR") OrangeAccent else LimeAccent)
@@ -884,7 +889,13 @@ fun VoiceJokeGeneratorScreen(
                     color = CyanAccent
                 )
             }
-            item { Text("Safety: Keep pranks harmless. No real-person or official-alert impersonation.", color = OrangeAccent) }
+            item {
+                Text(
+                    "For harmless comedy only. Do not use for threats, harassment, impersonation, emergency hoaxes, or illegal activity.",
+                    color = OrangeAccent,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
         }
     }
 }

@@ -97,6 +97,11 @@ fun PrankstarBotPanel(
             Column(modifier = Modifier.weight(0.62f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text("PRANKSTAR BOT AGENT", color = CyanAccent, style = MaterialTheme.typography.labelLarge)
                 Text(state.message.text, color = Color.White, style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    "For harmless comedy only. Do not use for threats, harassment, impersonation, emergency hoaxes, or illegal activity.",
+                    color = Color.Gray,
+                    style = MaterialTheme.typography.bodySmall
+                )
             }
         }
 

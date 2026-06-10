@@ -262,10 +262,12 @@ fun SettingsScreen(
                         Icon(Icons.Default.WarningAmber, contentDescription = null, tint = Color(0xFFFACC15))
                         LabelCaps("RESPONSIBLE USE", color = Color(0xFFFACC15), modifier = Modifier.padding(start = 8.dp))
                     }
-                    Text("- Keep pranks harmless and consensual.", color = Color.White)
-                    Text("- Do not use emergency/panic sounds publicly.", color = Color.White)
-                    Text("- Do not impersonate people or official alerts.", color = Color.White)
-                    Text("- Prank messaging must not spoof identity.", color = Color.White)
+                    Text(
+                        "For harmless comedy only. Do not use for threats, harassment, impersonation, emergency hoaxes, or illegal activity.",
+                        color = Color.White,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                    Text("Keep volume reasonable, use clips consensually, and stop immediately if asked.", color = Color.LightGray, style = MaterialTheme.typography.bodySmall)
                     NeonSwitchRow("I understand", safetyAck) { scope.launch { soundRepository.setSafetyAck(it) } }
                 }
             }
@@ -282,6 +284,11 @@ fun SettingsScreen(
                     Text("Version: ${BuildConfig.VERSION_NAME}", color = Color.White)
                     Text("Build: ${BuildConfig.VERSION_CODE}", color = Color.White)
                     Text("Package: ${context.packageName}", color = Color.Gray, style = MaterialTheme.typography.bodySmall)
+                    Text(
+                        "For harmless comedy only. Do not use for threats, harassment, impersonation, emergency hoaxes, or illegal activity.",
+                        color = Color.Gray,
+                        style = MaterialTheme.typography.bodySmall
+                    )
                 }
             }
             Spacer(modifier = Modifier.height(80.dp))
