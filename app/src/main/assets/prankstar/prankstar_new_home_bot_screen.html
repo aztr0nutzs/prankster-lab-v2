@@ -790,6 +790,35 @@ button,.dtab,.rsel,.mode-btn,.joke-btn,.forge-item,.stash-item,.zone-btn,.sb,.bo
 .reactor-state-badge{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) skew(-8deg);z-index:24;padding:4px 9px;border:1px solid currentColor;border-radius:4px;background:rgba(0,0,0,.72);font-family:var(--ps-font-display);font-size:8px;letter-spacing:1.3px;color:currentColor;text-shadow:0 0 8px currentColor;pointer-events:none;opacity:.92}
 .reactor-video-missing{position:absolute;inset:10%;z-index:4;border:1px dashed currentColor;border-radius:50%;display:flex;align-items:center;justify-content:center;text-align:center;padding:10px;color:currentColor;background:radial-gradient(circle,rgba(0,232,255,.10),rgba(0,0,0,.78));font-family:var(--ps-font-tech);font-size:8px;letter-spacing:1px;pointer-events:none}
 
+#reactor-mode-panel{display:none;margin-bottom:5px;border:1px solid rgba(0,232,255,.20);border-radius:5px;background:linear-gradient(180deg,rgba(0,10,12,.96),rgba(0,0,0,.94));box-shadow:0 0 14px rgba(0,232,255,.10),inset 0 0 18px rgba(0,232,255,.05);overflow:hidden}
+#reactor-mode-panel.active{display:block}
+.rp-head{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:6px;padding:5px 6px;border-bottom:1px solid rgba(255,255,255,.07);background:rgba(0,232,255,.045)}
+.rp-bot{width:34px;height:34px;border:1px solid currentColor;border-radius:6px;overflow:hidden;background:#000;box-shadow:0 0 10px currentColor}
+.rp-bot video{width:100%;height:100%;object-fit:cover;display:block}
+.rp-title{font-family:var(--ps-font-display);font-size:9px;letter-spacing:1.2px;color:currentColor;text-shadow:0 0 8px currentColor;line-height:1.05}
+.rp-sub{font-family:var(--ps-font-tech);font-size:7px;letter-spacing:.6px;color:rgba(210,255,255,.72);line-height:1.2;margin-top:2px}
+.rp-close{min-width:48px;min-height:30px;border:1px solid rgba(255,255,255,.16);border-radius:4px;background:rgba(0,0,0,.75);color:#d8ffff;font-family:var(--ps-font-display);font-size:8px;letter-spacing:.8px}
+.rp-body{padding:6px;display:grid;gap:6px;max-height:38vh;overflow:auto;overflow-x:hidden}
+.rp-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}
+.rp-grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.rp-cell{min-width:0;border:1px solid rgba(255,255,255,.10);border-radius:4px;background:rgba(0,0,0,.58);padding:5px}
+.rp-label{font-family:var(--ps-font-display);font-size:7px;letter-spacing:.9px;color:rgba(180,255,255,.78);margin-bottom:3px}
+.rp-value{font-family:var(--ps-font-tech);font-size:9px;color:#fff;line-height:1.25;word-break:break-word}
+.rp-list{display:flex;flex-wrap:wrap;gap:4px;min-width:0}
+.rp-chip{min-height:28px;border:1px solid rgba(0,232,255,.28);border-radius:4px;background:rgba(0,232,255,.07);color:#dff;font-family:var(--ps-font-display);font-size:7.5px;letter-spacing:.6px;padding:5px 6px;white-space:normal;text-align:center}
+.rp-chip.hot{border-color:rgba(255,34,0,.38);color:#ffd7d0;background:rgba(255,34,0,.08)}
+.rp-chip.ok{border-color:rgba(102,255,0,.38);color:#dfffcc;background:rgba(102,255,0,.08)}
+.rp-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+.rp-actions.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.rp-actions.four{grid-template-columns:repeat(4,minmax(0,1fr))}
+.rp-btn{min-height:34px;border:1px solid currentColor;border-radius:4px;background:rgba(0,0,0,.78);color:currentColor;font-family:var(--ps-font-display);font-size:8px;letter-spacing:.7px;text-shadow:0 0 7px currentColor;box-shadow:inset 0 0 12px rgba(255,255,255,.035);padding:5px;line-height:1.12}
+.rp-btn:active,.rp-close:active,.rp-chip:active{transform:scale(.96)}
+.rp-input,.rp-select{width:100%;min-height:31px;border:1px solid rgba(0,232,255,.24);border-radius:4px;background:#020707;color:#dff;font-family:var(--ps-font-tech);font-size:10px;padding:4px;box-sizing:border-box}
+.rp-range{width:100%;accent-color:currentColor}
+.rp-check{width:18px;height:18px;vertical-align:middle;accent-color:#66ff00}
+.rp-state{border-left:2px solid currentColor;padding-left:6px;font-family:var(--ps-font-tech);font-size:9px;color:#dff;line-height:1.25}
+@media(max-width:420px){.rp-body{max-height:42vh}.rp-grid,.rp-grid.three{grid-template-columns:1fr}.rp-actions,.rp-actions.two,.rp-actions.four{grid-template-columns:repeat(2,minmax(0,1fr))}.rp-btn{font-size:7.5px}}
+
 </style>
 </head>
 <body>
@@ -1185,6 +1214,7 @@ button,.dtab,.rsel,.mode-btn,.joke-btn,.forge-item,.stash-item,.zone-btn,.sb,.bo
 
     <!-- CORE -->
     <div class="dpanel active" id="dp-core">
+      <div id="reactor-mode-panel"></div>
       <div class="ctrl-grid">
         <div class="ctrl-card">
           <div class="cc-title">CHAOS</div>
@@ -1723,7 +1753,29 @@ document.addEventListener('touchstart',function(){
     currentGagCombo:null,
     savedGagCombo:null,
     statusByRid:{},
-    chainSeed:0
+    chainSeed:0,
+    chainLength:3,
+    chainMix:'funny',
+    randomDelayEnabled:true,
+    warpDelayMs:2200,
+    corruptionIntensity:68,
+    cooldownDurationMs:2500,
+    maxPlaybackMs:5000,
+    overlapPrevention:true,
+    trapDelayMs:3000,
+    trapRepeatMs:0,
+    primaryLoudFavorite:'cartoon',
+    selectedLoudSound:'cartoon',
+    previewPhrase:'This snack drawer is now under audit.',
+    effectPitch:50,
+    effectSpeed:50,
+    effectStutter:true,
+    searchFilter:'',
+    recentSounds:['funny','effects','cartoon'],
+    favorites:['funny','cartoon','voice'],
+    generatedChain:['FUNNY','EFFECTS','CARTOON'],
+    scrambledSet:['EFFECTS','CARTOON','VOICE'],
+    activePlaybackState:'READY'
   };
   var reactorState=window.reactorRuntimeState;
 
@@ -1750,6 +1802,213 @@ document.addEventListener('touchstart',function(){
     name.style.color=entry.color||'var(--g)';
     name.style.textShadow='0 0 8px '+(entry.color||'var(--g)');
   }
+  function robotLineFor(entry,status){
+    if(status==='MUTED')return 'All prank audio stopped.';
+    if(status==='SAFE')return 'Prank shield active.';
+    if(status==='COOLDOWN')return 'Cooldown lock active.';
+    var mode=entry&&entry.mode;
+    return {
+      VORTEX_X:'Singularity chain armed.',
+      PORTAL_PULSE:'Portal delay locked.',
+      PIXEL_BOMB:'Corruption burst ready.',
+      SONIC_BLAST:'Overdrive capped and ready.',
+      PRANK_SHIELD:'Prank shield active.',
+      LIVE_DEPLOY:'Live queue standing by.',
+      GAG_ENGINE:'Gag combo generated.',
+      MISCHIEF_SOUND:'Soundboard ready.',
+      TRAP_ACTUATOR:'Trap armed.',
+      LOUD_MISCHIEF:'Loud favorite loaded.',
+      GRAVITY_GLITCH:'Glitch profile engaged.',
+      DIGITAL_DISGUISE:'Voice mask selected.'
+    }[mode]||'Reactor standing by.';
+  }
+  function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function updateRobotStatus(line,entry){
+    reactorState.robotStatus=line;
+    var guide=document.getElementById('reactor-guide-line');if(guide)guide.textContent=line;
+    if(typeof botNotice==='function')botNotice('🤖 '+line);
+    if(entry)updateLog('PRANKSTAR GUIDE ['+labelFor(entry)+']: '+line);
+  }
+  function queueRecent(category){
+    if(!category)return;
+    var c=String(category).toLowerCase();
+    reactorState.recentSounds=[c].concat((reactorState.recentSounds||[]).filter(function(x){return x!==c;})).slice(0,5);
+  }
+  function clearPanelTimers(){
+    ['portalTimerId','trapTimerId','trapRepeatId','panelCountdownId'].forEach(function(k){if(reactorState[k]){clearTimeout(reactorState[k]);clearInterval(reactorState[k]);reactorState[k]=null;}});
+  }
+  function startPanelCountdown(entry,label,ms,done){
+    if(reactorState.panelCountdownId)clearInterval(reactorState.panelCountdownId);
+    var end=now()+ms;
+    reactorState.activePlaybackState=label+' '+Math.ceil(ms/1000)+'s';
+    reactorState.panelCountdownId=setInterval(function(){
+      var left=end-now();
+      if(left<=0){
+        clearInterval(reactorState.panelCountdownId);reactorState.panelCountdownId=null;
+        reactorState.activePlaybackState=label+' FIRING';
+        if(done)done();
+        renderReactorPanel(entry);
+        return;
+      }
+      reactorState.activePlaybackState=label+' '+Math.ceil(left/1000)+'s';
+      renderReactorPanel(entry);
+    },500);
+    renderReactorPanel(entry);
+  }
+  function rpBtn(label,action,arg,klass){
+    return '<button type="button" class="rp-btn '+(klass||'')+'" onclick="reactorPanelAction(\''+action+'\''+(arg?",'"+arg+"'":"")+')">'+label+'</button>';
+  }
+  function rpCell(label,value){return '<div class="rp-cell"><div class="rp-label">'+label+'</div><div class="rp-value">'+value+'</div></div>';}
+  function rpChips(items,hot){
+    return '<div class="rp-list">'+(items||[]).map(function(x){return '<button type="button" class="rp-chip '+(hot?'hot':'')+'" onclick="reactorPanelAction(\'SELECT_CATEGORY\',\''+esc(String(x).toLowerCase())+'\')">'+esc(String(x).toUpperCase())+'</button>';}).join('')+'</div>';
+  }
+  function rpSelect(key,value,items){
+    return '<select class="rp-select" onchange="reactorPanelSet(\''+key+'\',this.value)">'+items.map(function(x){var v=String(x).toLowerCase();return '<option value="'+v+'" '+(v===String(value).toLowerCase()?'selected':'')+'>'+String(x).toUpperCase()+'</option>';}).join('')+'</select>';
+  }
+  function rpRange(key,value,min,max,step,suffix){
+    return '<input class="rp-range" type="range" min="'+min+'" max="'+max+'" step="'+(step||1)+'" value="'+value+'" oninput="reactorPanelSet(\''+key+'\',this.value,\'number\')"><div class="rp-value">'+value+(suffix||'')+'</div>';
+  }
+  function rpCheck(key,value,label){
+    return '<label class="rp-value"><input class="rp-check" type="checkbox" '+(value?'checked':'')+' onchange="reactorPanelSet(\''+key+'\',this.checked,\'bool\')"> '+label+'</label>';
+  }
+  function renderReactorPanel(entry){
+    var panel=document.getElementById('reactor-mode-panel');if(!panel)return;
+    if(!entry){panel.classList.remove('active');panel.innerHTML='';return;}
+    var mode=entry.mode||'CORE',rid=slotRid(entry),s=reactorState;
+    var line=s.robotStatus||({
+      VORTEX_X:'Singularity chain armed.',
+      PORTAL_PULSE:'Portal delay locked.',
+      PIXEL_BOMB:'Corruption burst ready.',
+      SONIC_BLAST:'Overdrive capped and ready.',
+      PRANK_SHIELD:'Prank shield active.',
+      LIVE_DEPLOY:'Live queue standing by.',
+      GAG_ENGINE:'Gag combo generated.',
+      MISCHIEF_SOUND:'Soundboard ready.',
+      TRAP_ACTUATOR:'Trap armed.',
+      LOUD_MISCHIEF:'Loud favorite loaded.',
+      GRAVITY_GLITCH:'Glitch profile engaged.',
+      DIGITAL_DISGUISE:'Voice mask selected.'
+    }[mode]||'Reactor standing by.');
+    function commonStop(){return rpBtn('STOP','STOP_ALL',null,'hot');}
+    var body='';
+    if(mode==='VORTEX_X'){
+      body+= '<div class="rp-grid">'+rpCell('CHAIN LENGTH',rpRange('chainLength',s.chainLength,1,5,1,'x'))+rpCell('CATEGORY MIX',rpSelect('chainMix',s.chainMix,soundCategories))+rpCell('DELAY MODE',rpCheck('randomDelayEnabled',s.randomDelayEnabled,'RANDOM DELAY'))+rpCell('CHAIN PREVIEW',rpChips(s.generatedChain,false))+'</div><div class="rp-actions">'+rpBtn('DEPLOY CHAIN','DEPLOY_CHAIN_PANEL')+rpBtn('REROLL','REROLL_CHAIN_PANEL')+commonStop()+'</div>';
+    } else if(mode==='PORTAL_PULSE'){
+      body+= '<div class="rp-grid">'+rpCell('WARP DELAY',rpRange('warpDelayMs',s.warpDelayMs,500,6000,250,'ms'))+rpCell('COUNTDOWN / STATE','<div class="rp-state">'+esc(s.activePlaybackState||'READY')+'</div>')+rpCell('RANDOM TELEPORT',rpChips(soundCategories,false))+rpCell('RECENT TELEPORT',rpChips(s.recentSounds,true))+'</div><div class="rp-actions">'+rpBtn('ARM PORTAL','ARM_PORTAL_PANEL')+rpBtn('RECENT HIT','TELEPORT_RECENT')+rpBtn('CANCEL','CANCEL_TIMERS','portal')+'</div>';
+    } else if(mode==='PIXEL_BOMB'){
+      body+= '<div class="rp-grid">'+rpCell('CORRUPTION',rpRange('corruptionIntensity',s.corruptionIntensity,0,100,1,'%'))+rpCell('GLITCH STATE','<div class="rp-state">'+esc(s.statusByRid[rid]||'READY')+'</div>')+rpCell('SCRAMBLED SET',rpChips(s.scrambledSet,true))+rpCell('CURRENT PICK',esc((s.selectedSound||'funny').toUpperCase()))+'</div><div class="rp-actions">'+rpBtn('GLITCH BURST','GLITCH_BURST_PANEL')+rpBtn('SCRAMBLE SET','SCRAMBLE_SET_PANEL')+rpBtn('RESET/STOP','RESET_PIXEL')+'</div>';
+    } else if(mode==='SONIC_BLAST'){
+      body+= '<div class="rp-grid">'+rpCell('INTENSITY',rpRange('sonicIntensity',intensity,20,92,1,'%'))+rpCell('OVERDRIVE',rpCheck('overdriveEnabled',s.overdriveEnabled,'SAFE-CAPPED OVERDRIVE'))+rpCell('LOUD SOUND',rpSelect('selectedLoudSound',s.selectedLoudSound,['audio','cartoon','funny','effects']))+rpCell('SAFE CAP',s.safeModeEnabled?'62-72% ACTIVE':'90% MAX CAP')+'</div><div class="rp-actions">'+rpBtn('DEPLOY','DEPLOY_LOUD_PANEL')+rpBtn('TOGGLE OD','TOGGLE_OVERDRIVE_PANEL')+commonStop()+'</div>';
+    } else if(mode==='PRANK_SHIELD'){
+      body+= '<div class="rp-grid">'+rpCell('SAFE MODE',rpCheck('safeModeEnabled',s.safeModeEnabled,'ENABLED'))+rpCell('COOLDOWN',rpRange('cooldownDurationMs',s.cooldownDurationMs,500,8000,250,'ms'))+rpCell('MAX PLAYBACK',rpRange('maxPlaybackMs',s.maxPlaybackMs,1000,12000,500,'ms'))+rpCell('OVERLAP',rpCheck('overlapPrevention',s.overlapPrevention,'PREVENT OVERLAP'))+'</div><div class="rp-state">CURRENT SAFETY: '+(s.safeModeEnabled?'SAFE':'OPEN')+' / '+(s.overlapPrevention?'NO OVERLAP':'OVERLAP ALLOWED')+'</div><div class="rp-actions two">'+rpBtn('STOP ALL','STOP_ALL')+rpBtn('TOGGLE SAFE','TOGGLE_SAFE_PANEL')+'</div>';
+    } else if(mode==='LIVE_DEPLOY'){
+      body+= '<div class="rp-grid">'+rpCell('ARMED SOUND',esc((s.selectedSound||'random').toUpperCase()))+rpCell('PLAYBACK STATE','<div class="rp-state">'+esc(s.activePlaybackState||'READY')+'</div>')+rpCell('LIVE QUEUE',rpChips(s.liveQueue.length?s.liveQueue:['EMPTY'],false))+rpCell('RECENTS',rpChips(s.recentSounds,true))+'</div><div class="rp-actions">'+rpBtn('DEPLOY ARMED','DEPLOY_ARMED_PANEL')+rpBtn('QUEUE NEXT','QUEUE_NEXT_PANEL')+rpBtn('CLEAR QUEUE','CLEAR_QUEUE_PANEL')+rpBtn('STOP CURRENT','STOP_ALL')+rpBtn('STOP ALL','STOP_ALL')+'</div>';
+    } else if(mode==='GAG_ENGINE'){
+      var combo=(s.currentGagCombo||'NO COMBO YET').split(' + ');
+      body+= '<div class="rp-grid">'+rpCell('GAG TITLE',esc(s.currentGagCombo?'COMBO '+s.chainSeed:'READY TO GENERATE'))+rpCell('SUGGESTED CATEGORY',esc((s.selectedSound||'funny').toUpperCase()))+rpCell('SOUND COMBO',rpChips(combo,false))+rpCell('SAVED',esc(s.savedGagCombo||'NONE'))+'</div><div class="rp-actions">'+rpBtn('GENERATE','GENERATE_GAG_PANEL')+rpBtn('SAVE/FAV','SAVE_GAG_PANEL')+rpBtn('USE LIVE','USE_GAG_LIVE')+'</div>';
+    } else if(mode==='MISCHIEF_SOUND'){
+      var filtered=soundCategories.filter(function(c){return !s.searchFilter||c.indexOf(String(s.searchFilter).toLowerCase())>=0;});
+      body+= '<div class="rp-grid">'+rpCell('SEARCH / FILTER','<input class="rp-input" value="'+esc(s.searchFilter)+'" oninput="reactorPanelSet(\'searchFilter\',this.value)">')+rpCell('LAST SELECTED',esc((s.lastSelectedSound||'none').toUpperCase()))+rpCell('CATEGORIES',rpChips(filtered,false))+rpCell('FAVORITES / RECENT',rpChips((s.favorites||[]).concat(s.recentSounds||[]),true))+'</div><div class="rp-actions">'+rpBtn('PLAY SELECTED','PLAY_SELECTED_PANEL')+rpBtn('FAVORITES','OPEN_FAVORITES_PANEL')+commonStop()+'</div>';
+    } else if(mode==='TRAP_ACTUATOR'){
+      body+= '<div class="rp-grid">'+rpCell('DELAY',rpRange('trapDelayMs',s.trapDelayMs,500,10000,250,'ms'))+rpCell('REPEAT',rpRange('trapRepeatMs',s.trapRepeatMs,0,10000,500,'ms'))+rpCell('TRAP SOUND',rpSelect('selectedSound',s.selectedSound||'creepy',['creepy','funny','effects','cartoon','animal']))+rpCell('ARMED STATUS','<div class="rp-state">'+esc(s.activePlaybackState||'DISARMED')+'</div>')+'</div><div class="rp-actions two">'+rpBtn('ARM TRAP','ARM_TRAP_PANEL')+rpBtn('DISARM ALL','DISARM_TRAPS_PANEL')+'</div>';
+    } else if(mode==='LOUD_MISCHIEF'){
+      body+= '<div class="rp-grid">'+rpCell('PRIMARY LOUD',rpSelect('primaryLoudFavorite',s.primaryLoudFavorite,['cartoon','audio','funny','effects']))+rpCell('SAFE LIMIT',s.safeModeEnabled?'SAFE LIMIT ACTIVE':'LOUD CAP 86%')+rpCell('QUICK GRID',rpChips(['cartoon','audio','funny','effects'],true))+rpCell('LOADED',esc((s.primaryLoudFavorite||'cartoon').toUpperCase()))+'</div><div class="rp-actions four">'+rpBtn('FIRE PRIMARY','FIRE_PRIMARY_LOUD')+rpBtn('CARTOON','FIRE_CATEGORY','cartoon')+rpBtn('AUDIO','FIRE_CATEGORY','audio')+rpBtn('FUNNY','FIRE_CATEGORY','funny')+commonStop()+'</div>';
+    } else if(mode==='GRAVITY_GLITCH'){
+      body+= '<div class="rp-grid">'+rpCell('PROFILE',rpSelect('selectedGlitchProfile',s.selectedGlitchProfile,glitchProfiles))+rpCell('PITCH',rpRange('effectPitch',s.effectPitch,0,100,1,'%'))+rpCell('SPEED',rpRange('effectSpeed',s.effectSpeed,0,100,1,'%'))+rpCell('STUTTER',rpCheck('effectStutter',s.effectStutter,'RANDOM STUTTER FALLBACK'))+'</div><div class="rp-actions">'+rpBtn('PLAY GLITCH','PLAY_GLITCH_PANEL')+rpBtn('REROLL','REROLL_GLITCH_PANEL')+rpBtn('RESET FX','RESET_GLITCH_PANEL')+'</div>';
+    } else if(mode==='DIGITAL_DISGUISE'){
+      body+= '<div class="rp-grid">'+rpCell('PRESET',rpSelect('selectedDisguisePreset',s.selectedDisguisePreset,disguisePresets))+rpCell('VOICE LIST',rpChips(disguisePresets,false))+rpCell('PREVIEW LINE','<input class="rp-input" value="'+esc(s.previewPhrase)+'" oninput="reactorPanelSet(\'previewPhrase\',this.value)">')+rpCell('VOICE LAB',esc((s.selectedDisguisePreset||'robot').toUpperCase())+' READY')+'</div><div class="rp-actions">'+rpBtn('APPLY','APPLY_DISGUISE_PANEL')+rpBtn('RANDOM','RANDOM_DISGUISE_PANEL')+rpBtn('VOICE LAB','OPEN_VOICE_LAB_PANEL')+'</div>';
+    }
+    panel.classList.add('active');
+    panel.style.color=entry.color||'var(--g)';
+    panel.innerHTML='<div class="rp-head"><div class="rp-bot"><video autoplay loop muted playsinline preload="metadata"><source src="assets/bot/high.mp4" type="video/mp4"></video></div><div><div class="rp-title">'+labelFor(entry)+'</div><div class="rp-sub" id="reactor-guide-line">'+esc(line)+'</div></div><button type="button" class="rp-close" onclick="reactorPanelAction(\'CLOSE_PANEL\')">BACK</button></div><div class="rp-body">'+body+'</div>';
+  }
+  window.reactorPanelSet=function(key,value,type){
+    if(type==='number')value=Number(value);
+    if(type==='bool')value=!!value;
+    if(key==='sonicIntensity'){intensity=Number(value);var iv=document.getElementById('iV');if(iv)iv.textContent=Math.round(intensity);updateKnob('kC',Math.round(intensity));}
+    else reactorState[key]=value;
+    var entry=currentEntry(reactorState.activeReactorId||curR);
+    renderReactorPanel(entry);
+  };
+  window.reactorPanelAction=function(action,arg){
+    var entry=currentEntry(reactorState.activeReactorId||curR)||currentEntry(curR);
+    if(!entry)return;
+    var rid=slotRid(entry);
+    switch(action){
+      case 'CLOSE_PANEL':
+        var panel=document.getElementById('reactor-mode-panel');if(panel){panel.classList.remove('active');panel.innerHTML='';}
+        updateRobotStatus('Core controls restored.',entry);return;
+      case 'SELECT_CATEGORY':
+        reactorState.selectedSound=arg;reactorState.lastSelectedSound=arg;queueRecent(arg);updateRobotStatus('Sound route selected: '+String(arg).toUpperCase()+'.',entry);return renderReactorPanel(entry);
+      case 'STOP_ALL':
+        clearPanelTimers();reactorState.activePlaybackState='MUTED';reactorState.cooldownUntil=now()+reactorState.cooldownDurationMs;clearQueue();setReactorStatus(entry,'MUTED');callAndroid('stopAll');updateRobotStatus('All prank audio stopped.',entry);setTimeout(function(){if(cooldownActive())setReactorStatus(entry,'COOLDOWN');},360);return renderReactorPanel(entry);
+      case 'DEPLOY_CHAIN_PANEL':
+        reactorState.generatedChain=Array.from({length:reactorState.chainLength},function(_,i){return (i%2?randomItem(soundCategories):reactorState.chainMix).toUpperCase();});
+        setReactorStatus(entry,'ARMED');updateRobotStatus('Singularity chain armed.',entry);return deployChain(reactorState.chainLength);
+      case 'REROLL_CHAIN_PANEL':
+        reactorState.chainSeed++;reactorState.generatedChain=Array.from({length:reactorState.chainLength},function(){return randomItem(soundCategories).toUpperCase();});
+        setReactorStatus(entry,'READY');updateRobotStatus('Singularity chain rerolled.',entry);return renderReactorPanel(entry);
+      case 'ARM_PORTAL_PANEL':
+        clearPanelTimers();reactorState.armedTrap={reactor:rid,delayMs:reactorState.warpDelayMs,category:randomItem(soundCategories)};setReactorStatus(entry,'ARMED');updateRobotStatus('Portal delay locked.',entry);
+        return startPanelCountdown(entry,'PORTAL',reactorState.warpDelayMs,function(){deployCategory(reactorState.armedTrap.category);});
+      case 'TELEPORT_RECENT':
+        var recent=(reactorState.recentSounds&&reactorState.recentSounds[0])||randomItem(soundCategories);setReactorStatus(entry,'ACTIVE');updateRobotStatus('Recent sound teleported.',entry);return deployCategory(recent);
+      case 'CANCEL_TIMERS':
+        clearPanelTimers();reactorState.armedTrap=null;reactorState.activePlaybackState='CANCELLED';setReactorStatus(entry,'READY');updateRobotStatus('Countdown cancelled.',entry);return renderReactorPanel(entry);
+      case 'GLITCH_BURST_PANEL':
+        setReactorStatus(entry,'GLITCH');reactorState.activePlaybackState='GLITCH '+reactorState.corruptionIntensity+'%';updateRobotStatus('Corruption burst ready.',entry);deployCategory('effects');setTimeout(function(){deployCategory('cartoon');},420);return renderReactorPanel(entry);
+      case 'SCRAMBLE_SET_PANEL':
+        reactorState.scrambledSet=Array.from({length:4},function(){return randomItem(soundCategories).toUpperCase();});reactorState.selectedSound=reactorState.scrambledSet[0].toLowerCase();setReactorStatus(entry,'GLITCH');updateRobotStatus('Sound set scrambled.',entry);return renderReactorPanel(entry);
+      case 'RESET_PIXEL':
+        reactorState.scrambledSet=['EFFECTS','CARTOON','VOICE'];reactorState.activePlaybackState='READY';callAndroid('stopAll');setReactorStatus(entry,'READY');updateRobotStatus('Pixel corruption reset.',entry);return renderReactorPanel(entry);
+      case 'DEPLOY_LOUD_PANEL':
+        callAndroid('setMasterVolume',reactorState.safeModeEnabled?0.72:(reactorState.overdriveEnabled?0.88:0.78));setReactorStatus(entry,reactorState.overdriveEnabled?'OVERDRIVE':'ACTIVE');updateRobotStatus('Overdrive capped and ready.',entry);return deployCategory(reactorState.selectedLoudSound||'audio');
+      case 'TOGGLE_OVERDRIVE_PANEL':
+        reactorState.overdriveEnabled=!reactorState.overdriveEnabled;callAndroid('setMasterVolume',reactorState.overdriveEnabled?0.88:0.72);setReactorStatus(entry,reactorState.overdriveEnabled?'OVERDRIVE':'READY');updateRobotStatus(reactorState.overdriveEnabled?'Overdrive capped and ready.':'Overdrive disengaged.',entry);return renderReactorPanel(entry);
+      case 'TOGGLE_SAFE_PANEL':
+        reactorState.safeModeEnabled=!reactorState.safeModeEnabled;callAndroid('setSafeMode',reactorState.safeModeEnabled);callAndroid('setMasterVolume',reactorState.safeModeEnabled?0.62:0.86);setReactorStatus(entry,reactorState.safeModeEnabled?'SAFE':'READY');updateRobotStatus('Prank shield '+(reactorState.safeModeEnabled?'active.':'open.'),entry);return renderReactorPanel(entry);
+      case 'DEPLOY_ARMED_PANEL':
+        reactorState.activePlaybackState='PLAYING '+(reactorState.selectedSound||'RANDOM').toUpperCase();setReactorStatus(entry,'ACTIVE');updateRobotStatus('Armed sound deploying.',entry);return reactorState.selectedSound?deployCategory(reactorState.selectedSound):deployRandom();
+      case 'QUEUE_NEXT_PANEL':
+        var q=randomItem(soundCategories).toUpperCase();enqueue(q);reactorState.selectedSound=q.toLowerCase();updateRobotStatus('Live queue standing by.',entry);return renderReactorPanel(entry);
+      case 'CLEAR_QUEUE_PANEL':
+        clearQueue();setReactorStatus(entry,'READY');updateRobotStatus('Live queue cleared.',entry);return renderReactorPanel(entry);
+      case 'GENERATE_GAG_PANEL':
+        reactorState.chainSeed++;reactorState.currentGagCombo=gagCombo();reactorState.selectedSound=randomItem(['funny','voice','cartoon']);setReactorStatus(entry,'ACTIVE');callAndroid('playRandomJoke');updateRobotStatus('Gag combo generated.',entry);return renderReactorPanel(entry);
+      case 'SAVE_GAG_PANEL':
+        reactorState.savedGagCombo=reactorState.currentGagCombo||gagCombo();if(reactorState.favorites.indexOf(reactorState.selectedSound)<0)reactorState.favorites.unshift(reactorState.selectedSound);setReactorStatus(entry,'READY');updateRobotStatus('Gag combo saved.',entry);return renderReactorPanel(entry);
+      case 'USE_GAG_LIVE':
+        if(reactorState.currentGagCombo)enqueue('GAG '+reactorState.currentGagCombo);reactorState.activePlaybackState='GAG SENT TO LIVE';updateRobotStatus('Gag loaded into Live Deploy.',entry);return renderReactorPanel(entry);
+      case 'PLAY_SELECTED_PANEL':
+        setReactorStatus(entry,'ACTIVE');updateRobotStatus('Soundboard ready.',entry);return deployCategory(reactorState.selectedSound||reactorState.lastSelectedSound||'funny');
+      case 'OPEN_FAVORITES_PANEL':
+        openDockPanel('stash');callAndroid('openStash');updateRobotStatus('Favorites opened.',entry);return renderReactorPanel(entry);
+      case 'ARM_TRAP_PANEL':
+        clearPanelTimers();reactorState.armedTrap={reactor:rid,delayMs:reactorState.trapDelayMs,category:reactorState.selectedSound||'creepy'};setReactorStatus(entry,'ARMED');updateRobotStatus('Trap armed.',entry);
+        startPanelCountdown(entry,'TRAP',reactorState.trapDelayMs,function(){deployCategory(reactorState.armedTrap.category);if(reactorState.trapRepeatMs>0){reactorState.trapRepeatId=setInterval(function(){deployCategory(reactorState.armedTrap.category);},reactorState.trapRepeatMs);}});
+        return;
+      case 'DISARM_TRAPS_PANEL':
+        clearPanelTimers();reactorState.armedTrap=null;reactorState.activePlaybackState='DISARMED';setReactorStatus(entry,'READY');updateRobotStatus('All traps disarmed.',entry);return renderReactorPanel(entry);
+      case 'FIRE_PRIMARY_LOUD':
+        setReactorStatus(entry,'ACTIVE');updateRobotStatus('Loud favorite loaded.',entry);return deployCategory(reactorState.primaryLoudFavorite||'cartoon');
+      case 'FIRE_CATEGORY':
+        setReactorStatus(entry,'ACTIVE');updateRobotStatus('Loud '+String(arg).toUpperCase()+' fired.',entry);return deployCategory(arg);
+      case 'PLAY_GLITCH_PANEL':
+        setReactorStatus(entry,'GLITCH');reactorState.activePlaybackState='PROFILE '+reactorState.selectedGlitchProfile;updateRobotStatus('Glitch profile engaged.',entry);return deployCategory('effects');
+      case 'REROLL_GLITCH_PANEL':
+        rerollGlitch();setReactorStatus(entry,'GLITCH');updateRobotStatus('Glitch profile rerolled.',entry);return renderReactorPanel(entry);
+      case 'RESET_GLITCH_PANEL':
+        reactorState.effectPitch=50;reactorState.effectSpeed=50;reactorState.effectStutter=false;setReactorStatus(entry,'READY');updateRobotStatus('Glitch effects reset.',entry);return renderReactorPanel(entry);
+      case 'APPLY_DISGUISE_PANEL':
+        setReactorStatus(entry,'DISGUISE');reactorState.activePlaybackState='VOICE '+reactorState.selectedDisguisePreset;updateRobotStatus('Voice mask selected.',entry);return deployCategory('voice');
+      case 'RANDOM_DISGUISE_PANEL':
+        rerollDisguise();setReactorStatus(entry,'DISGUISE');updateRobotStatus('Random voice mask selected.',entry);return renderReactorPanel(entry);
+      case 'OPEN_VOICE_LAB_PANEL':
+        callAndroid('openJokes');updateRobotStatus('Voice Lab opened.',entry);return renderReactorPanel(entry);
+      default:
+        return dispatchReactorAction(entry,'tap');
+    }
+  };
   function openDockPanel(id){
     showScreen('reactor');
     var tab=document.querySelector('.dtab[data-t="'+id+'"]');
@@ -1759,6 +2018,7 @@ document.addEventListener('touchstart',function(){
     openDockPanel('core');
     setHeader(entry);
     setReactorStatus(entry,status||'ACTIVE');
+    renderReactorPanel(entry);
   }
   function activateEntry(entry){
     var rid=slotRid(entry);curR=rid;
@@ -1773,6 +2033,10 @@ document.addEventListener('touchstart',function(){
     var selector=document.getElementById('rsel-'+rid);if(selector)selector.dataset.state=status;
     showAlert('◈ '+labelFor(entry)+' '+status+' ◈',status==='COOLDOWN');
     updateLog('REACTOR '+entry.slot+' '+labelFor(entry)+' STATE: '+status);
+    reactorState.robotStatus=robotLineFor(entry,status);
+    var guide=document.getElementById('reactor-guide-line');if(guide)guide.textContent=reactorState.robotStatus;
+    var panel=document.getElementById('reactor-mode-panel');
+    if(panel&&panel.classList.contains('active'))renderReactorPanel(entry);
   }
   function feedback(entry,gesture,status){
     var rid=slotRid(entry);
@@ -1786,10 +2050,14 @@ document.addEventListener('touchstart',function(){
   }
   function deployCategory(category){
     reactorState.lastSelectedSound=category;reactorState.selectedSound=category;
+    reactorState.activePlaybackState='PLAYING '+String(category||'random').toUpperCase();
+    queueRecent(category);
     return callAndroid('playReactorCategory',category)||callAndroid('playSoundByCategory',category)||callAndroid('playRandomSound');
   }
   function deployRandom(){
     reactorState.lastSelectedSound=reactorState.selectedSound||reactorState.lastSelectedSound||'funny';
+    queueRecent(reactorState.lastSelectedSound);
+    reactorState.activePlaybackState='PLAYING RANDOM';
     return callAndroid('deployRandom')||callAndroid('playRandomSound');
   }
   function deployChain(count){
@@ -1834,7 +2102,7 @@ document.addEventListener('touchstart',function(){
       case 'TOGGLE_OVERDRIVE': reactorState.overdriveEnabled=!reactorState.overdriveEnabled; intensity=reactorState.overdriveEnabled?88:72; callAndroid('setMasterVolume',reactorState.overdriveEnabled?0.88:0.72); return setReactorStatus(entry,reactorState.overdriveEnabled?'OVERDRIVE':'READY');
 
       case 'OPEN_SHIELD_PANEL': openCorePanel(entry,reactorState.safeModeEnabled?'SAFE':'READY'); return callAndroid('openSystem');
-      case 'STOP_ALL': reactorState.cooldownUntil=now()+2500; clearQueue(); setReactorStatus(entry,'MUTED'); setTimeout(function(){if(cooldownActive())setReactorStatus(entry,'COOLDOWN');},360); return callAndroid('stopAll');
+      case 'STOP_ALL': clearPanelTimers(); reactorState.armedTrap=null; reactorState.activePlaybackState='MUTED'; reactorState.cooldownUntil=now()+reactorState.cooldownDurationMs; clearQueue(); setReactorStatus(entry,'MUTED'); setTimeout(function(){if(cooldownActive())setReactorStatus(entry,'COOLDOWN');},360); return callAndroid('stopAll');
       case 'TOGGLE_SAFE_MODE': reactorState.safeModeEnabled=!reactorState.safeModeEnabled; reactorState.cooldownUntil=reactorState.safeModeEnabled?now()+1500:0; callAndroid('setSafeMode',reactorState.safeModeEnabled); callAndroid('setMasterVolume',reactorState.safeModeEnabled?0.62:0.86); return setReactorStatus(entry,reactorState.safeModeEnabled?'SAFE':'READY');
 
       case 'OPEN_LIVE_PANEL': openCorePanel(entry,'READY'); enqueue('ARMED '+(reactorState.selectedSound||'RANDOM').toUpperCase()); return;
