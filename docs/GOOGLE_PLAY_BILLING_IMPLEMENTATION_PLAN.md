@@ -181,4 +181,6 @@ Before production rollout:
 - `FeatureGate` centralizes premium narration, generated saves, advanced Twak tones, premium bot actions, and remaining credits.
 - `EntitlementRepository` is the injection point for backend-verified entitlement and credit state. The current Android app wires `UnconfiguredEntitlementRepository`, which only exposes Free / not configured state until real billing and backend verification are accepted.
 - Voice Lab and System settings show non-fake "not configured" states.
+- Production backend mode does not bypass `FeatureGate`; premium narration still requires a verified Pro entitlement and usable voice credits. Debug direct ElevenLabs mode remains a local developer path only.
+- Premium bot planning actions are routed through `FeatureGate.canUsePremiumBotActions`; free users keep sound search, playback, local joke text, navigation, and stop controls.
 - No Google Play Billing dependency or fake purchase flow has been added.

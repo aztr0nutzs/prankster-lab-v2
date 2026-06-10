@@ -182,7 +182,7 @@ fun VoiceJokeGeneratorScreen(
     val allPresets = VoicePresetLibrary.presets
     val ttsReadiness by tts.readiness.collectAsState()
     val previewPlayer = remember { ManagedPreviewPlayer() }
-    val botController = remember { PrankstarBotController() }
+    val botController = remember(featureGate) { PrankstarBotController(featureGate = featureGate) }
     val tweakographicNarrator = remember { TweakerGeographicNarrator() }
     val pendingBotDraft by PrankstarBotVoiceLabBridge.pendingDraft.collectAsState()
     val customSounds by soundRepository.getCustomSoundsFlow().collectAsState(initial = emptyList())
@@ -315,11 +315,8 @@ fun VoiceJokeGeneratorScreen(
     val generatedVoiceClipCount = customSounds.count { soundRepository.isGeneratedVoiceClip(it) }
     val debugDirectNarrationEnabled = voiceGenerationMode == VoiceGenerationMode.DEBUG_ELEVENLABS_DIRECT &&
         BuildConfig.ELEVENLABS_API_KEY.isNotBlank()
-    val productionBackendNarrationEnabled = voiceGenerationMode == VoiceGenerationMode.PRODUCTION_BACKEND
     val canGenerate = ttsReadiness is VoiceEngineReadiness.READY && text.isNotBlank() && status != "GENERATING"
-    val canUsePremiumNarration = featureGate.canUseElevenLabsNarrator ||
-        debugDirectNarrationEnabled ||
-        productionBackendNarrationEnabled
+    val canUsePremiumNarration = featureGate.canUseElevenLabsNarrator || debugDirectNarrationEnabled
     val canUseGeneratedFile = isValidGeneratedFile(generatedFile) && generatedResult?.success == true
     val botMood = when (status) {
         "INITIALIZING VOICE ENGINE" -> PrankstarBotMood.THINKING

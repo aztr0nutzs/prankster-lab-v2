@@ -1,6 +1,7 @@
 package com.pranksterlab.core.bot
 
 import com.pranksterlab.components.bot.PrankstarBotMood
+import com.pranksterlab.core.billing.FeatureGate
 import com.pranksterlab.core.model.PrankSound
 import com.pranksterlab.core.narration.TweakerGeographicNarrator
 import com.pranksterlab.core.narration.TweakerGeographicRequest
@@ -12,7 +13,8 @@ class PrankstarBotController(
     private val soundRecommender: PrankstarBotSoundRecommender = PrankstarBotSoundRecommender(),
     private val jokeGenerator: PrankstarBotJokeGenerator = PrankstarBotJokeGenerator(safety),
     private val tweakerGeographicNarrator: TweakerGeographicNarrator = TweakerGeographicNarrator(),
-    private val responseBuilder: PrankstarBotResponseBuilder = PrankstarBotResponseBuilder()
+    private val responseBuilder: PrankstarBotResponseBuilder = PrankstarBotResponseBuilder(),
+    private val featureGate: FeatureGate = FeatureGate.unconfiguredFree()
 ) {
     fun handle(input: String, sounds: List<PrankSound>): PrankstarBotResult {
         val safetyResult = safety.check(input)
@@ -162,6 +164,16 @@ class PrankstarBotController(
     }
 
     private fun buildPlan(prompt: String, sounds: List<PrankSound>): PrankstarBotResult {
+        if (!featureGate.canUsePremiumBotActions) {
+            val message = "Premium prank planning actions are planned for Prankstar Pro. Purchases are not configured in this build."
+            return PrankstarBotResult(
+                message = message,
+                actions = listOf(PrankstarBotAction.ShowMessage(message)),
+                mood = PrankstarBotMood.WARNING,
+                suggestedChips = listOf("Find Sounds", "Make Joke", "Open Stash", "Help")
+            )
+        }
+
         val vibe = prompt.ifBlank { "funny" }
         val picks = soundRecommender.recommend(vibe, sounds, limit = 3)
         val joke = jokeGenerator.generate(vibe)
