@@ -19,6 +19,7 @@ class PrankstarBotSafety {
 
     fun check(rawInput: String): SafetyResult {
         val text = rawInput.lowercase()
+            .replace(Regex("\\btwak[- ]?attacks?\\b"), "twak routine")
         val blocked = blockedPatterns.any { it.containsMatchIn(text) }
         return if (blocked) {
             SafetyResult(false, "I can help make it funny, not dangerous. Try a harmless sound prank, goofy voice clip, or consent-friendly joke instead.")

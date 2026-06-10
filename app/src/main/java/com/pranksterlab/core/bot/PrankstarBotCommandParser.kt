@@ -12,6 +12,9 @@ class PrankstarBotCommandParser {
         if (containsAny(normalized, "open jokes", "jokes", "joke gen", "voice lab")) return PrankstarBotIntent.OpenJokes
         if (containsAny(normalized, "open forge", "forge", "sound forge")) return PrankstarBotIntent.OpenForge
         if (containsAny(normalized, "random", "surprise me")) return PrankstarBotIntent.PlayRandom
+        if (containsAny(normalized, "twak attack", "twak-attacks", "twak bot")) {
+            return PrankstarBotIntent.GenerateTwakAttack(cleanPrompt(normalized, raw, listOf("make a twak attack about", "twak attack about", "twak-attacks about", "twak bot", "twak attack")))
+        }
 
         if (containsAny(normalized, "make a joke", "generate joke", "joke about", "roast", "funny comment", "make joke")) {
             return PrankstarBotIntent.GenerateJoke(cleanPrompt(normalized, raw, listOf("make a joke about", "generate joke about", "joke about", "make a joke", "generate joke", "roast", "funny comment")))

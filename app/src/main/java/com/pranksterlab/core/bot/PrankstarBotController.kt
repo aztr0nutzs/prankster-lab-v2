@@ -27,6 +27,7 @@ class PrankstarBotController(
             is PrankstarBotIntent.SearchSounds -> recommend(intent.query, sounds, PrankstarBotMood.THINKING)
             is PrankstarBotIntent.RecommendSounds -> recommend(intent.vibe, sounds, PrankstarBotMood.PLAYING)
             is PrankstarBotIntent.GenerateJoke -> generateJoke(intent.prompt)
+            is PrankstarBotIntent.GenerateTwakAttack -> generateTwakAttack(intent.prompt)
             is PrankstarBotIntent.BuildPrankPlan -> buildPlan(intent.prompt, sounds)
             is PrankstarBotIntent.ChooseVoice -> chooseVoice(intent.prompt)
             PrankstarBotIntent.PlayRandom -> playRandom(sounds)
@@ -80,6 +81,22 @@ class PrankstarBotController(
             suggestedChips = listOf("Send to Voice Lab", "Robot Voice", "Open Jokes", "Find Funny"),
             generatedText = generated.text,
             suggestedVoicePresetId = generated.suggestedVoicePresetId
+        )
+    }
+
+    private fun generateTwakAttack(prompt: String): PrankstarBotResult {
+        val topic = safety.sanitizePrompt(prompt).ifBlank { "looking for a lighter" }
+        val text = "Tweaker Geographic field note: subject observed $topic with absolute confidence, three bad theories, and zero useful tools."
+        return PrankstarBotResult(
+            message = "Twak Attack line ready. Review it in Voice Lab before generating audio.",
+            actions = listOf(
+                PrankstarBotAction.ShowMessage(text),
+                PrankstarBotAction.FillVoiceLabText(text, "overly_serious_narrator")
+            ),
+            mood = PrankstarBotMood.CELEBRATING,
+            suggestedChips = listOf("Send to Voice Lab", "Find Funny", "Open Stash", "Stop All"),
+            generatedText = text,
+            suggestedVoicePresetId = "overly_serious_narrator"
         )
     }
 

@@ -31,6 +31,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -42,9 +43,15 @@ import com.pranksterlab.R
 import com.pranksterlab.components.PrankstarHeader
 import com.pranksterlab.components.ScanlineOverlay
 import com.pranksterlab.components.bot.PrankstarBotMood
+import com.pranksterlab.components.bot.PrankstarBotPanel
 import com.pranksterlab.components.bot.PrankstarBotVideo
-import com.pranksterlab.core.bot.PrankstarBotJokeGenerator
+import com.pranksterlab.core.audio.AudioPlayerController
+import com.pranksterlab.core.bot.PrankstarBotAction
+import com.pranksterlab.core.bot.PrankstarBotController
+import com.pranksterlab.core.bot.PrankstarBotMessage
+import com.pranksterlab.core.bot.PrankstarBotState
 import com.pranksterlab.core.bot.PrankstarBotVoiceLabBridge
+import com.pranksterlab.core.model.PrankSound
 import com.pranksterlab.core.repository.SoundRepository
 import com.pranksterlab.core.voice.AndroidTextToSpeechEngine
 import com.pranksterlab.core.voice.GeneratedVoiceRepository
@@ -125,7 +132,11 @@ private class ManagedPreviewPlayer {
 }
 
 @Composable
-fun VoiceJokeGeneratorScreen(soundRepository: SoundRepository) {
+fun VoiceJokeGeneratorScreen(
+    soundRepository: SoundRepository,
+    audioPlayerController: AudioPlayerController,
+    onNavigate: (String) -> Unit
+) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val tts = remember { AndroidTextToSpeechEngine(context) }
@@ -133,8 +144,9 @@ fun VoiceJokeGeneratorScreen(soundRepository: SoundRepository) {
     val allPresets = VoicePresetLibrary.presets
     val ttsReadiness by tts.readiness.collectAsState()
     val previewPlayer = remember { ManagedPreviewPlayer() }
-    val botJokeGenerator = remember { PrankstarBotJokeGenerator() }
+    val botController = remember { PrankstarBotController() }
     val pendingBotDraft by PrankstarBotVoiceLabBridge.pendingDraft.collectAsState()
+    val customSounds by soundRepository.getCustomSoundsFlow().collectAsState(initial = emptyList())
 
     var preset by remember { mutableStateOf(allPresets.first()) }
     var selectedCategory by remember { mutableStateOf<VoiceCategory?>(null) }
@@ -151,6 +163,8 @@ fun VoiceJokeGeneratorScreen(soundRepository: SoundRepository) {
     var generatedFile by remember { mutableStateOf<File?>(null) }
     var generatedResult by remember { mutableStateOf<VoiceSynthesisResult?>(null) }
     var savedGeneratedFilePath by remember { mutableStateOf<String?>(null) }
+    var bundledSounds by remember { mutableStateOf(emptyList<PrankSound>()) }
+    var botAgentState by remember { mutableStateOf(PrankstarBotState()) }
 
     fun applyPreset(selected: VoicePreset) {
         preset = selected
@@ -167,12 +181,22 @@ fun VoiceJokeGeneratorScreen(soundRepository: SoundRepository) {
             (searchQuery.isBlank() || it.displayName.contains(searchQuery, true) || it.description.contains(searchQuery, true))
     }
 
+    val botPlayableSounds by produceState(initialValue = emptyList<PrankSound>(), bundledSounds, customSounds) {
+        value = withContext(Dispatchers.IO) {
+            (bundledSounds + customSounds).filter { soundRepository.isSoundPlayable(it) }
+        }
+    }
+
     DisposableEffect(Unit) {
         onDispose {
             previewPlayer.stop()
             tts.stopPreview()
             tts.release()
         }
+    }
+
+    LaunchedEffect(soundRepository) {
+        bundledSounds = withContext(Dispatchers.IO) { soundRepository.getBundledSounds() }
     }
 
     LaunchedEffect(pendingBotDraft) {
@@ -233,6 +257,49 @@ fun VoiceJokeGeneratorScreen(soundRepository: SoundRepository) {
         else -> statusDetail
     }
 
+    fun loadBotText(draftText: String, suggestedPresetId: String?) {
+        text = draftText.take(300)
+        suggestedPresetId?.let { presetId ->
+            allPresets.firstOrNull { it.id == presetId }?.let { applyPreset(it) }
+        }
+        status = "BOT DRAFT LOADED"
+        statusDetail = "Prankstar Bot filled the line. Review it, then tap Generate when ready."
+    }
+
+    fun submitBotCommand(command: String) {
+        val result = botController.handle(command, botPlayableSounds)
+        result.actions.forEach { action ->
+            when (action) {
+                is PrankstarBotAction.PlaySound -> audioPlayerController.playPrankSound(action.sound)
+                PrankstarBotAction.StopAllSounds -> {
+                    audioPlayerController.stopAll()
+                    previewPlayer.stop()
+                    tts.stopPreview()
+                }
+                is PrankstarBotAction.Navigate -> onNavigate(action.route)
+                is PrankstarBotAction.FillVoiceLabText -> Unit
+                is PrankstarBotAction.ShowMessage -> Unit
+                is PrankstarBotAction.ShowSoundRecommendations -> Unit
+                is PrankstarBotAction.ShowPrankPlan -> Unit
+                is PrankstarBotAction.Refuse -> Unit
+            }
+        }
+        val recommendations = result.actions
+            .filterIsInstance<PrankstarBotAction.ShowSoundRecommendations>()
+            .firstOrNull()
+        botAgentState = PrankstarBotState(
+            message = PrankstarBotMessage(result.message),
+            mood = result.mood,
+            suggestedChips = result.suggestedChips,
+            recommendations = recommendations?.sounds ?: emptyList(),
+            recommendationReason = recommendations?.reason,
+            generatedText = result.generatedText,
+            suggestedVoicePresetId = result.suggestedVoicePresetId,
+            prankPlan = result.prankPlan,
+            lastActions = result.actions
+        )
+    }
+
     Box(Modifier.fillMaxSize().background(BackgroundDark)) {
         ScanlineOverlay()
         LazyColumn(
@@ -258,34 +325,21 @@ fun VoiceJokeGeneratorScreen(soundRepository: SoundRepository) {
                 )
             }
             item {
-                var botPrompt by remember { mutableStateOf("") }
-                Column(Modifier.fillMaxWidth().background(GlassBackground, RoundedCornerShape(14.dp)).border(1.dp, FuchsiaAccent.copy(alpha = 0.45f), RoundedCornerShape(14.dp)).padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("Bot Helper", color = FuchsiaAccent, style = MaterialTheme.typography.labelLarge)
-                    Text("Ask for a harmless line. The bot fills this screen only; Generate stays user-controlled.", color = Color.LightGray, style = MaterialTheme.typography.bodySmall)
-                    OutlinedTextField(
-                        value = botPrompt,
-                        onValueChange = { botPrompt = it.take(180) },
-                        modifier = Modifier.fillMaxWidth(),
-                        label = { Text("Make a joke/comment about...") },
-                        placeholder = { Text("my friend being late") }
-                    )
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Button(onClick = {
-                            val generated = botJokeGenerator.generate(botPrompt)
-                            text = generated.text.take(300)
-                            allPresets.firstOrNull { it.id == generated.suggestedVoicePresetId }?.let { applyPreset(it) }
-                            status = "BOT LINE READY"
-                            statusDetail = "Generated locally from safe templates. Review before Generate."
-                        }) { Text("Make Line") }
-                        Button(onClick = {
-                            val generated = botJokeGenerator.generate("robot announcement ${botPrompt}")
-                            text = generated.text.take(300)
-                            allPresets.firstOrNull { it.id == generated.suggestedVoicePresetId }?.let { applyPreset(it) }
-                            status = "BOT ROBOT LINE READY"
-                            statusDetail = "Robot-style line filled. Generate remains manual."
-                        }) { Text("Robot") }
-                    }
-                }
+                PrankstarBotPanel(
+                    state = botAgentState,
+                    onSubmit = { submitBotCommand(it) },
+                    onPlaySound = { audioPlayerController.playPrankSound(it) },
+                    onStopAll = {
+                        audioPlayerController.stopAll()
+                        previewPlayer.stop()
+                        tts.stopPreview()
+                        status = if (canUseGeneratedFile) "GENERATED" else "READY"
+                        statusDetail = "All playback stopped."
+                    },
+                    onOpenStash = { onNavigate("library") },
+                    onSendToVoiceLab = { draftText, presetId -> loadBotText(draftText, presetId) },
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
             item { Text("Synthetic Presets", color = LimeAccent) }
             item { Text("Warning: All voices are synthetic styling presets, not real-person clones.", color = OrangeAccent) }

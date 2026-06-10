@@ -4,6 +4,7 @@ sealed class PrankstarBotIntent {
     data class SearchSounds(val query: String) : PrankstarBotIntent()
     data class RecommendSounds(val vibe: String) : PrankstarBotIntent()
     data class GenerateJoke(val prompt: String) : PrankstarBotIntent()
+    data class GenerateTwakAttack(val prompt: String) : PrankstarBotIntent()
     data class BuildPrankPlan(val prompt: String) : PrankstarBotIntent()
     data class ChooseVoice(val prompt: String) : PrankstarBotIntent()
     object PlayRandom : PrankstarBotIntent()

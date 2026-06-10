@@ -101,7 +101,13 @@ fun PranksterApp() {
             composable("forge") { SoundForgeScreen(soundForgeViewModel, audioPlayerController) }
             composable("lab") { SoundPacksScreen(soundRepository, audioPlayerController, onOpenLibrary = { navController.navigate("library") }) }
             composable("system") { SettingsScreen(soundRepository, audioPlayerController) }
-            composable("voice_lab") { VoiceJokeGeneratorScreen(soundRepository) }
+            composable("voice_lab") {
+                VoiceJokeGeneratorScreen(
+                    soundRepository = soundRepository,
+                    audioPlayerController = audioPlayerController,
+                    onNavigate = { navController.navigate(it) }
+                )
+            }
             composable("randomizer") { RandomizerScreen(soundRepository, audioPlayerController) }
             composable("messages") { PrankMessagesScreen() }
         }
