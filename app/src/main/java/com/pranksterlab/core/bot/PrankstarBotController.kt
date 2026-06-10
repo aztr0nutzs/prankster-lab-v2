@@ -2,6 +2,8 @@ package com.pranksterlab.core.bot
 
 import com.pranksterlab.components.bot.PrankstarBotMood
 import com.pranksterlab.core.model.PrankSound
+import com.pranksterlab.core.narration.TweakerGeographicNarrator
+import com.pranksterlab.core.narration.TweakerGeographicRequest
 import com.pranksterlab.core.voice.VoicePresetLibrary
 
 class PrankstarBotController(
@@ -9,6 +11,7 @@ class PrankstarBotController(
     private val safety: PrankstarBotSafety = PrankstarBotSafety(),
     private val soundRecommender: PrankstarBotSoundRecommender = PrankstarBotSoundRecommender(),
     private val jokeGenerator: PrankstarBotJokeGenerator = PrankstarBotJokeGenerator(safety),
+    private val tweakerGeographicNarrator: TweakerGeographicNarrator = TweakerGeographicNarrator(),
     private val responseBuilder: PrankstarBotResponseBuilder = PrankstarBotResponseBuilder()
 ) {
     fun handle(input: String, sounds: List<PrankSound>): PrankstarBotResult {
@@ -28,6 +31,7 @@ class PrankstarBotController(
             is PrankstarBotIntent.RecommendSounds -> recommend(intent.vibe, sounds, PrankstarBotMood.SEARCHING)
             is PrankstarBotIntent.PlayRecommended -> recommend(intent.vibe, sounds, PrankstarBotMood.PLAYING, autoPlayFirst = true)
             is PrankstarBotIntent.GenerateJoke -> generateJoke(intent.prompt)
+            is PrankstarBotIntent.GenerateTweakerGeographic -> generateTweakerGeographic(intent)
             is PrankstarBotIntent.BuildPrankPlan -> buildPlan(intent.prompt, sounds)
             is PrankstarBotIntent.ChooseVoice -> chooseVoice(intent.prompt)
             PrankstarBotIntent.PlayRandom -> playRandom(sounds)
@@ -85,6 +89,36 @@ class PrankstarBotController(
             suggestedChips = listOf("Send to Voice Lab", "Robot Voice", "Open Jokes", "Find Funny"),
             generatedText = generated.text,
             suggestedVoicePresetId = generated.suggestedVoicePresetId
+        )
+    }
+
+    private fun generateTweakerGeographic(intent: PrankstarBotIntent.GenerateTweakerGeographic): PrankstarBotResult {
+        val result = tweakerGeographicNarrator.generate(
+            TweakerGeographicRequest(
+                action = intent.action,
+                setting = intent.setting,
+                tone = intent.tone
+            )
+        )
+        if (!result.isAllowed) {
+            return PrankstarBotResult(
+                message = result.narration,
+                actions = listOf(PrankstarBotAction.Refuse(result.narration), PrankstarBotAction.ShowMessage(result.narration)),
+                mood = PrankstarBotMood.WARNING,
+                suggestedChips = listOf("Tweakographic", "Make Joke", "Find Funny", "Help")
+            )
+        }
+        val message = "Tweakographic narration ready. I placed it in Voice Lab for review; Generate stays manual: \"${result.narration}\""
+        return PrankstarBotResult(
+            message = message,
+            actions = listOf(
+                PrankstarBotAction.ShowMessage(result.narration),
+                PrankstarBotAction.FillVoiceLabText(result.narration.take(300), result.suggestedVoicePresetId)
+            ),
+            mood = PrankstarBotMood.RELAXED,
+            suggestedChips = listOf("Open Jokes", "Robot Voice", "Make Joke", "Find Documentary"),
+            generatedText = result.narration,
+            suggestedVoicePresetId = result.suggestedVoicePresetId
         )
     }
 

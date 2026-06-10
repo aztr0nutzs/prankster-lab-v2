@@ -1,10 +1,17 @@
 package com.pranksterlab.core.bot
 
+import com.pranksterlab.core.narration.TweakerGeographicTone
+
 sealed class PrankstarBotIntent {
     data class SearchSounds(val query: String) : PrankstarBotIntent()
     data class RecommendSounds(val vibe: String) : PrankstarBotIntent()
     data class PlayRecommended(val vibe: String) : PrankstarBotIntent()
     data class GenerateJoke(val prompt: String) : PrankstarBotIntent()
+    data class GenerateTweakerGeographic(
+        val action: String,
+        val setting: String? = null,
+        val tone: TweakerGeographicTone = TweakerGeographicTone.BALANCED
+    ) : PrankstarBotIntent()
     data class BuildPrankPlan(val prompt: String) : PrankstarBotIntent()
     data class ChooseVoice(val prompt: String) : PrankstarBotIntent()
     object PlayRandom : PrankstarBotIntent()

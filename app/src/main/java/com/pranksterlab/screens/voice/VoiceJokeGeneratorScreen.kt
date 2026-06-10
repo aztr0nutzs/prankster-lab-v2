@@ -45,6 +45,10 @@ import com.pranksterlab.components.bot.PrankstarBotMood
 import com.pranksterlab.components.bot.PrankstarBotVideo
 import com.pranksterlab.core.bot.PrankstarBotJokeGenerator
 import com.pranksterlab.core.bot.PrankstarBotVoiceLabBridge
+import com.pranksterlab.core.narration.TweakerGeographicNarrator
+import com.pranksterlab.core.narration.TweakerGeographicRequest
+import com.pranksterlab.core.narration.TweakerGeographicResult
+import com.pranksterlab.core.narration.TweakerGeographicTone
 import com.pranksterlab.core.repository.SoundRepository
 import com.pranksterlab.core.voice.AndroidTextToSpeechEngine
 import com.pranksterlab.core.voice.GeneratedVoiceRepository
@@ -134,6 +138,7 @@ fun VoiceJokeGeneratorScreen(soundRepository: SoundRepository) {
     val ttsReadiness by tts.readiness.collectAsState()
     val previewPlayer = remember { ManagedPreviewPlayer() }
     val botJokeGenerator = remember { PrankstarBotJokeGenerator() }
+    val tweakographicNarrator = remember { TweakerGeographicNarrator() }
     val pendingBotDraft by PrankstarBotVoiceLabBridge.pendingDraft.collectAsState()
 
     var preset by remember { mutableStateOf(allPresets.first()) }
@@ -151,6 +156,11 @@ fun VoiceJokeGeneratorScreen(soundRepository: SoundRepository) {
     var generatedFile by remember { mutableStateOf<File?>(null) }
     var generatedResult by remember { mutableStateOf<VoiceSynthesisResult?>(null) }
     var savedGeneratedFilePath by remember { mutableStateOf<String?>(null) }
+    var fieldAction by remember { mutableStateOf("") }
+    var fieldSetting by remember { mutableStateOf("") }
+    var fieldTone by remember { mutableStateOf(TweakerGeographicTone.BALANCED) }
+    var fieldIncludeSoundCue by remember { mutableStateOf(false) }
+    var fieldResult by remember { mutableStateOf<TweakerGeographicResult?>(null) }
 
     fun applyPreset(selected: VoicePreset) {
         preset = selected
@@ -284,6 +294,96 @@ fun VoiceJokeGeneratorScreen(soundRepository: SoundRepository) {
                             status = "BOT ROBOT LINE READY"
                             statusDetail = "Robot-style line filled. Generate remains manual."
                         }) { Text("Robot") }
+                    }
+                }
+            }
+            item {
+                Column(
+                    Modifier.fillMaxWidth()
+                        .background(GlassBackground, RoundedCornerShape(14.dp))
+                        .border(1.dp, CyanAccent.copy(alpha = 0.55f), RoundedCornerShape(14.dp))
+                        .padding(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Text("Tweakographic Narrator", color = CyanAccent, style = MaterialTheme.typography.labelLarge)
+                    Text("Original mock-documentary narration for harmless fictional behavior.", color = Color.LightGray, style = MaterialTheme.typography.bodySmall)
+                    OutlinedTextField(
+                        value = fieldAction,
+                        onValueChange = { fieldAction = it.take(120) },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text("Action") },
+                        placeholder = { Text("looking for a lighter") }
+                    )
+                    OutlinedTextField(
+                        value = fieldSetting,
+                        onValueChange = { fieldSetting = it.take(80) },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text("Setting (optional)") },
+                        placeholder = { Text("near the couch") }
+                    )
+                    TweakerGeographicTone.entries.chunked(3).forEach { toneRow ->
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                            toneRow.forEach { tone ->
+                                FilterChip(
+                                    selected = fieldTone == tone,
+                                    onClick = { fieldTone = tone },
+                                    label = { Text(tone.label) }
+                                )
+                            }
+                        }
+                    }
+                    Row {
+                        Checkbox(fieldIncludeSoundCue, { fieldIncludeSoundCue = it })
+                        Text("Suggest matching stash sound search", color = Color.White)
+                    }
+                    listOf("looking for a lighter", "protecting the last slice", "hunting for a charger").forEach { example ->
+                        Button(
+                            onClick = {
+                                fieldAction = example
+                                fieldResult = null
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) { Text(example) }
+                    }
+                    Button(onClick = {
+                        val result = tweakographicNarrator.generate(
+                            TweakerGeographicRequest(
+                                action = fieldAction,
+                                setting = fieldSetting.ifBlank { null },
+                                tone = fieldTone,
+                                includeSoundCue = fieldIncludeSoundCue
+                            )
+                        )
+                        fieldResult = result
+                        if (result.isAllowed) {
+                            status = "FIELD REPORT READY"
+                            statusDetail = "Narration generated locally. Send it to the Voice Lab text box when ready."
+                        } else {
+                            status = "ERROR"
+                            statusDetail = result.safetyNote ?: "Use a harmless fictional setup."
+                        }
+                    }) { Text("Generate Narration") }
+                    fieldResult?.let { result ->
+                        Column(
+                            Modifier.fillMaxWidth()
+                                .background(BackgroundDark.copy(alpha = 0.42f), RoundedCornerShape(10.dp))
+                                .border(1.dp, if (result.isAllowed) LimeAccent.copy(alpha = 0.55f) else OrangeAccent, RoundedCornerShape(10.dp))
+                                .padding(10.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Text(result.title, color = if (result.isAllowed) LimeAccent else OrangeAccent)
+                            Text(result.narration, color = Color.White, style = MaterialTheme.typography.bodyMedium)
+                            result.safetyNote?.let { Text(it, color = OrangeAccent, style = MaterialTheme.typography.bodySmall) }
+                            if (result.isAllowed) {
+                                Button(onClick = {
+                                    text = result.narration.take(300)
+                                    outputName = result.title
+                                    allPresets.firstOrNull { it.id == result.suggestedVoicePresetId }?.let { applyPreset(it) }
+                                    status = "FIELD REPORT LOADED"
+                                    statusDetail = "Tweakographic text loaded. Review it, then use Generate Voice Clip."
+                                }) { Text("Send to Voice Lab") }
+                            }
+                        }
                     }
                 }
             }

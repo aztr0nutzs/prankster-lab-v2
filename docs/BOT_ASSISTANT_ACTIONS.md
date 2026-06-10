@@ -1,6 +1,6 @@
 # Bot Assistant Actions
 
-Last updated: 2026-06-07
+Last updated: 2026-06-10
 
 ## Supported intents
 
@@ -8,6 +8,7 @@ Last updated: 2026-06-07
 - `RecommendSounds(vibe)`
 - `PlayRecommended(vibe)`
 - `GenerateJoke(prompt)`
+- `GenerateTweakerGeographic(action, setting?, tone)`
 - `BuildPrankPlan(prompt)`
 - `ChooseVoice(prompt)`
 - `PlayRandom`
@@ -44,6 +45,8 @@ Last updated: 2026-06-07
 - `show animal sounds`: searches category/tags/name/pack metadata for animal sounds.
 - `play something funny`: recommends funny sounds and plays the first real result.
 - `make a joke about being late`: generates local text and exposes Voice Lab handoff.
+- `make a tweakographic field report about looking for a lighter`: generates original local mock-documentary narration and exposes Voice Lab handoff.
+- `make a chaotic field report about hunting for a charger near the couch`: generates narration with parsed `CHAOTIC` tone and `near the couch` as setting.
 - `create a robot announcement`: generates a robot-style local line.
 - `open stash`: navigates to `library`.
 - `open jokes`: navigates to `voice_lab`.
@@ -55,6 +58,7 @@ Last updated: 2026-06-07
 
 - Sound cards are backed by repository sounds; no fake recommendation rows are created.
 - Generate/Preview/Save in Voice Lab remains user-controlled.
+- Tweakographic narration is local template generation. It does not scrape, call cloud APIs, copy creators, impersonate real people, or auto-generate audio.
 - Prank plans are informational and not auto-run.
 - Navigation is returned as an action and executed by the Composable host.
 - The bot does not send messages automatically.
