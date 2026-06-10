@@ -781,6 +781,15 @@ button,.dtab,.rsel,.mode-btn,.joke-btn,.forge-item,.stash-item,.zone-btn,.sb,.bo
   .rsel-lbl{font-size:8px !important;letter-spacing:.35px !important}
   .mode-btn,.joke-btn,.ctrl-card{font-size:9px !important}
 }
+
+/* Canonical reactor registry layer */
+.rsel.disabled{opacity:.42;filter:grayscale(.55);cursor:not-allowed;border-style:dashed}
+.rsel.disabled:active{transform:none}
+.rsel .rsel-sub{font-size:4.8px;line-height:1.05;color:rgba(180,255,255,.72);letter-spacing:.25px;margin-top:1px}
+.rsel.disabled .rsel-sub{color:rgba(255,170,120,.78)}
+.reactor-slot.registry-slot .zone-label{max-width:84%;text-align:center;white-space:normal;line-height:1.05;text-shadow:0 0 8px currentColor}
+.reactor-slot.registry-slot.missing-asset{display:none!important}
+
 </style>
 </head>
 <body>
@@ -1429,7 +1438,7 @@ function switchR(rid,el,cls){
   ensurePlay(rid);
   var cfg=rConfig[rid]||{name:rid.toUpperCase(),color:'var(--g)'};
   var nm=document.getElementById('tb-rname');nm.textContent=cfg.name;nm.style.color=cfg.color;nm.style.textShadow='0 0 8px '+cfg.color;
-  document.querySelectorAll('.rsel').forEach(function(b){b.className='rsel';});
+  document.querySelectorAll('.rsel').forEach(function(b){var ent=window.reactorRegistryByRid&&window.reactorRegistryByRid[b.dataset.rid];b.className='rsel '+(ent&&!ent.enabled?'disabled':'');});
   el.className='rsel '+cls;
   showAlert('◈ REACTOR: '+cfg.name+' ◈',false);
 }
@@ -1684,6 +1693,165 @@ window.addEventListener('load',function(){
 document.addEventListener('touchstart',function(){
   ['r1','r2','r3','r4','r5','r6','r7'].forEach(function(rid){ensurePlay(rid);});
 },{once:true,passive:true});
+
+
+
+
+/* ===== CANONICAL REACTOR REGISTRY RUNTIME LAYER ===== */
+(function(){
+  var registryUrl='reactor_registry.json';
+  var selectorId='reactor-sel';
+  var wrapId='reactor-video-wrap';
+  var classCycle=['on-g','on-pk','on-r','on-o','on-b','on-y','on-teal'];
+  var colorCycle=['var(--g)','var(--pk)','var(--r)','var(--o)','var(--b)','var(--y)','var(--teal)'];
+
+  function deactivateLegacyReactorDom(){
+    var selector=document.getElementById(selectorId),wrap=document.getElementById(wrapId);
+    if(selector)selector.innerHTML='';
+    if(wrap)wrap.querySelectorAll('.reactor-slot').forEach(function(slot){slot.remove();});
+  }
+  deactivateLegacyReactorDom();
+  function slotRid(entry){return 'r'+entry.slot;}
+  function labelFor(entry){return String(entry.title||entry.id||'REACTOR').toUpperCase();}
+  function subFor(entry){return String(entry.subtitle||entry.mode||'').toUpperCase();}
+  function actionLabel(action){return String(action||'DEPLOY').replace(/_/g,' ');}
+  function currentEntry(rid){return (window.reactorRegistryByRid&&window.reactorRegistryByRid[rid])||null;}
+  function registryColor(entry,index){return colorCycle[index%colorCycle.length];}
+  function registryClass(index){return classCycle[index%classCycle.length];}
+  function setHeader(entry){
+    var name=document.getElementById('tb-rname');
+    if(!name||!entry)return;
+    name.textContent=labelFor(entry);
+    name.style.color=entry.color||'var(--g)';
+    name.style.textShadow='0 0 8px '+(entry.color||'var(--g)');
+  }
+  function feedback(entry,action){
+    var rid=slotRid(entry);
+    if(typeof doRipple==='function')doRipple(rid);
+    if(typeof vidFlash==='function')vidFlash(rid);
+    charge=Math.min(100,charge+(action==='hold'?32:22));
+    prankCnt++;updatePrankCnt();
+    showAlert('◈ '+labelFor(entry)+' / '+actionLabel(action)+' ◈',false);
+    updateLog('REACTOR '+entry.slot+': '+labelFor(entry)+' ['+entry.mode+'] '+actionLabel(action));
+    callAndroid('setReactorMode',entry.mode||rid);
+  }
+  function runAction(entry,action){
+    if(!entry)return;
+    var actionName=String(action||entry.primaryAction||'DEPLOY_RANDOM');
+    feedback(entry,actionName);
+    switch(actionName){
+      case 'DEPLOY_CHAIN': return callAndroid('deployChain',3)||callAndroid('playRandomSound');
+      case 'ARM_RANDOM_CHAIN': return callAndroid('deployChain',2)||callAndroid('playRandomSound');
+      case 'DELAYED_DEPLOY': return setTimeout(function(){callAndroid('deployRandom')||callAndroid('playRandomSound');},650);
+      case 'STOP_ALL': return callAndroid('stopAll');
+      case 'OPEN_TIMER': return callAndroid('openTimer');
+      case 'OPEN_RANDOMIZER': return callAndroid('openRandomizer');
+      case 'OPEN_FORGE': return callAndroid('openForge');
+      case 'OPEN_SYSTEM': return callAndroid('openSystem');
+      case 'OPEN_JOKES': return callAndroid('openJokes');
+      case 'OPEN_STASH': return callAndroid('openStash');
+      case 'OPEN_PACKS': return callAndroid('openPacks');
+      case 'OPEN_VOICE_LAB': return callAndroid('openJokes');
+      case 'OPEN_MESSAGES': return callAndroid('openMessages');
+      case 'PLAY_JOKE': return callAndroid('playRandomJoke');
+      case 'PLAY_GLITCH_EFFECTS': return callAndroid('playReactorCategory','effects')||callAndroid('playSoundByCategory','effects');
+      case 'PLAY_SONIC_OVERDRIVE': return callAndroid('playReactorCategory','audio')||callAndroid('playSoundByCategory','audio');
+      case 'BOOST_INTENSITY': intensity=Math.min(100,intensity+12);showAlert('🔊 INTENSITY '+Math.round(intensity)+'%',false);return callAndroid('playReactorCategory','audio')||callAndroid('playSoundByCategory','audio');
+      case 'PLAY_MISCHIEF_SOUND': return callAndroid('playReactorCategory','funny')||callAndroid('playSoundByCategory','funny');
+      case 'PLAY_LOUD_MISCHIEF': return callAndroid('playReactorCategory','cartoon')||callAndroid('playSoundByCategory','cartoon');
+      case 'PLAY_VOICE_SOUND': return callAndroid('playReactorCategory','voice')||callAndroid('playSoundByCategory','voice');
+      case 'SAFE_RANDOM': return callAndroid('deployRandom')||callAndroid('playRandomSound');
+      case 'DEPLOY_RANDOM':
+      default: return callAndroid('deployRandom')||callAndroid('playRandomSound');
+    }
+  }
+  function disabledClick(entry){
+    showAlert('⚠ '+labelFor(entry)+' ASSET MISSING: '+entry.assetPath,true);
+    updateLog('REACTOR '+entry.slot+' DISABLED: MISSING '+entry.assetPath);
+    callAndroid('logEvent','Missing reactor asset '+entry.assetPath);
+  }
+  function createSelector(entry,index,activeRid){
+    var rid=slotRid(entry),el=document.createElement('div');
+    el.className='rsel '+(entry.enabled?registryClass(index):'disabled')+(rid===activeRid?' '+registryClass(index):'');
+    el.id='rsel-'+rid;el.dataset.rid=rid;el.dataset.registryId=entry.id;el.setAttribute('role','button');
+    el.setAttribute('aria-label',labelFor(entry)+' '+subFor(entry));
+    el.innerHTML='<div class="rsel-icon">'+(entry.enabled?'◈':'⚠')+'</div><div class="rsel-lbl">'+labelFor(entry)+'</div><div class="rsel-sub">'+(entry.enabled?subFor(entry):'ASSET MISSING')+'</div>';
+    el.onclick=function(){
+      if(!entry.enabled)return disabledClick(entry);
+      switchR(rid,el,registryClass(index));
+    };
+    return el;
+  }
+  function createSlot(entry,index,activeRid){
+    var rid=slotRid(entry),slot=document.createElement('div');
+    slot.className='reactor-slot registry-slot'+(rid===activeRid?' active-slot':'');
+    slot.id='slot-'+rid;slot.dataset.rid=rid;slot.dataset.registryId=entry.id;slot.style.color=registryColor(entry,index);
+    var actionButtons='<button type="button" class="zone-btn" style="left:34%;top:30%;width:32%;height:30%;" aria-label="'+actionLabel(entry.primaryAction)+'" onclick="reactorAction(\''+rid+'\',\'primary\')"><div class="zone-inner" style="border-color:currentColor">◈</div></button>'+
+      '<button type="button" class="zone-btn" style="left:6%;top:28%;width:18%;height:18%;" aria-label="'+actionLabel(entry.holdAction)+'" onclick="reactorAction(\''+rid+'\',\'hold\')"><div class="zone-inner" style="border-color:currentColor">◆</div></button>'+
+      '<button type="button" class="zone-btn" style="right:6%;top:28%;width:18%;height:18%;" aria-label="'+actionLabel(entry.doubleTapAction)+'" onclick="reactorAction(\''+rid+'\',\'double\')"><div class="zone-inner" style="border-color:currentColor">◇</div></button>';
+    slot.innerHTML='<video id="vid-'+rid+'" autoplay loop muted playsinline preload="metadata"><source src="'+entry.assetPath+'" type="video/mp4"></video>'+
+      '<div class="ctrl-overlay interactive" id="ovl-'+rid+'">'+
+      '<div class="rpl-ring" id="rpl-'+rid+'-1" style="width:0;height:0;border-color:currentColor"></div>'+
+      '<div class="rpl-ring" id="rpl-'+rid+'-2" style="width:0;height:0;border-color:currentColor;border-width:2.5px"></div>'+
+      '<div class="rpl-ring" id="rpl-'+rid+'-3" style="width:0;height:0;border-color:currentColor;border-width:2px"></div>'+
+      '<div class="touch-flash" id="tf-'+rid+'"></div>'+actionButtons+
+      '<div class="zone-label visible" style="top:10%;left:50%;transform:translateX(-50%);color:currentColor">'+labelFor(entry)+'</div>'+
+      '<div class="zone-label visible" style="bottom:10%;left:50%;transform:translateX(-50%);color:currentColor">'+subFor(entry)+'</div>'+
+      '</div>';
+    return slot;
+  }
+  function normalizeRegistry(entries){
+    return entries.map(function(entry,index){
+      var e=Object.assign({},entry);e.color=registryColor(e,index);e.rsel=registryClass(index);e.name=e.title;return e;
+    }).sort(function(a,b){return a.slot-b.slot;});
+  }
+  function renderRegistry(entries){
+    entries=normalizeRegistry(entries);
+    window.reactorRegistry=entries;window.reactorRegistryByRid={};
+    var enabled=entries.filter(function(entry){return entry.enabled;});
+    var first=enabled[0]||entries[0];if(!first)return;
+    var activeRid=slotRid(first);curR=activeRid;
+    rConfig={};window.rConfig=rConfig;
+    entries.forEach(function(entry,index){var rid=slotRid(entry);window.reactorRegistryByRid[rid]=entry;rConfig[rid]={name:entry.title,color:entry.color,rsel:entry.rsel,mode:entry.mode,subtitle:entry.subtitle,group:entry.group};});
+    var selector=document.getElementById(selectorId),wrap=document.getElementById(wrapId);
+    if(selector){selector.innerHTML='';entries.forEach(function(entry,index){selector.appendChild(createSelector(entry,index,activeRid));});}
+    if(wrap){wrap.querySelectorAll('.reactor-slot').forEach(function(slot){slot.remove();});enabled.forEach(function(entry,index){wrap.appendChild(createSlot(entry,index,activeRid));});}
+    setHeader(first);ensurePlay(activeRid);updateLog('CANONICAL REACTOR REGISTRY LOADED: '+entries.length+' ENTRIES / '+enabled.length+' ACTIVE ASSETS');
+  }
+  window.reactorAction=function(rid,kind){
+    var entry=currentEntry(rid);if(!entry)return;
+    var action=kind==='hold'?entry.holdAction:(kind==='double'?entry.doubleTapAction:entry.primaryAction);
+    runAction(entry,action);
+  };
+  function loadRegistryWithXhr(){
+    var xhr=new XMLHttpRequest();
+    xhr.overrideMimeType('application/json');
+    xhr.onreadystatechange=function(){
+      if(xhr.readyState!==4)return;
+      try{
+        if(xhr.status===0||xhr.status===200){renderRegistry(JSON.parse(xhr.responseText));}
+        else{throw new Error('registry status '+xhr.status);}
+      }catch(xhrErr){
+        console.error('[PrankStar] canonical reactor registry failed',xhrErr);
+        showAlert('⚠ REACTOR REGISTRY LOAD FAILED',true);
+        updateLog('CANONICAL REACTOR REGISTRY LOAD FAILED');
+      }
+    };
+    xhr.open('GET',registryUrl,true);xhr.send(null);
+  }
+  window.loadCanonicalReactors=function(){
+    fetch(registryUrl,{cache:'no-store'}).then(function(response){return response.json();}).then(renderRegistry).catch(function(err){
+      console.warn('[PrankStar] fetch registry failed; trying XHR',err);
+      try{loadRegistryWithXhr();}
+      catch(xhrErr){
+        console.error('[PrankStar] canonical reactor registry failed',xhrErr);
+        showAlert('⚠ REACTOR REGISTRY LOAD FAILED',true);
+        updateLog('CANONICAL REACTOR REGISTRY LOAD FAILED');
+      }
+    });
+  };
+  window.addEventListener('load',window.loadCanonicalReactors);
+})();
 
 
 /* ===== REACTOR RESPONSIVENESS + EXTRA TOUCH CONTROL PATCH ===== */

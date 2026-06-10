@@ -9,6 +9,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -57,6 +58,40 @@ class PrankstarWebBridge(
 
     @JavascriptInterface
     fun openSystem() = navigate("system")
+
+    @JavascriptInterface
+    fun openTimer() = navigate("timer")
+
+    @JavascriptInterface
+    fun openRandomizer() = navigate("randomizer")
+
+    @JavascriptInterface
+    fun openPacks() = navigate("lab")
+
+    @JavascriptInterface
+    fun openMessages() = navigate("messages")
+
+    @JavascriptInterface
+    fun deployChain(count: Int) {
+        val cappedCount = count.coerceIn(1, 3)
+        scope.launch {
+            repeat(cappedCount) { index ->
+                val sound = selectRandomCatalogSound(preferSafe = true)
+                if (sound == null) {
+                    Log.w(TAG, "deployChain: no playable catalog sound found")
+                    return@launch
+                }
+                val started = audioPlayerController.playPrankSound(sound)
+                Log.i(TAG, "deployChain index=$index soundId=${sound.id} started=$started mode=$currentReactorMode")
+                if (index < cappedCount - 1) delay(650L)
+            }
+        }
+    }
+
+    @JavascriptInterface
+    fun playReactorCategory(category: String) {
+        playSoundByCategory(category)
+    }
 
     @JavascriptInterface
     fun setReactorMode(mode: String) {
