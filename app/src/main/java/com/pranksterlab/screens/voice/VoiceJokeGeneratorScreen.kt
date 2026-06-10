@@ -157,7 +157,8 @@ private enum class VoiceSourceMode { LOCAL_ANDROID_TTS, TWEAKER_GEOGRAPHIC_BRITI
 fun VoiceJokeGeneratorScreen(
     soundRepository: SoundRepository,
     audioPlayerController: AudioPlayerController,
-    onNavigate: (String) -> Unit
+    onNavigate: (String) -> Unit,
+    featureGate: FeatureGate = FeatureGate.unconfiguredFree()
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -177,7 +178,6 @@ fun VoiceJokeGeneratorScreen(
     }
     val narrationOutputDir = remember(context) { File(context.filesDir, "generated/elevenlabs") }
     val voiceGenerationMode = remember { VoiceGenerationMode.fromBuildConfig(BuildConfig.VOICE_GENERATION_MODE) }
-    val featureGate = remember { FeatureGate.unconfiguredFree() }
     val generatedRepo = remember { GeneratedVoiceRepository(soundRepository) }
     val allPresets = VoicePresetLibrary.presets
     val ttsReadiness by tts.readiness.collectAsState()

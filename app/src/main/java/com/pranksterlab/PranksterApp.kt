@@ -3,6 +3,7 @@ package com.pranksterlab
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -20,6 +21,8 @@ import com.pranksterlab.core.repository.CustomSoundManager
 
 import androidx.compose.runtime.DisposableEffect
 import com.pranksterlab.core.audio.AudioPlayerController
+import com.pranksterlab.core.billing.FeatureGate
+import com.pranksterlab.core.billing.UnconfiguredEntitlementRepository
 import com.pranksterlab.core.repository.SoundRepository
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.graphics.Color
@@ -38,6 +41,8 @@ fun PranksterApp() {
     val customSoundManager = remember { CustomSoundManager(context, soundRepository) }
     val soundGeneratorEngine = remember { SoundGeneratorEngine(context) }
     val soundForgeViewModel = remember { SoundForgeViewModel(soundGeneratorEngine, customSoundManager) }
+    val entitlementRepository = remember { UnconfiguredEntitlementRepository() }
+    val featureGate by entitlementRepository.featureGate.collectAsState(initial = FeatureGate.unconfiguredFree())
     
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -100,12 +105,19 @@ fun PranksterApp() {
             composable("timer") { TimerPrankScreen(soundRepository, audioPlayerController) }
             composable("forge") { SoundForgeScreen(soundForgeViewModel, audioPlayerController) }
             composable("lab") { SoundPacksScreen(soundRepository, audioPlayerController, onOpenLibrary = { navController.navigate("library") }) }
-            composable("system") { SettingsScreen(soundRepository, audioPlayerController) }
+            composable("system") {
+                SettingsScreen(
+                    soundRepository = soundRepository,
+                    audioPlayerController = audioPlayerController,
+                    featureGate = featureGate
+                )
+            }
             composable("voice_lab") {
                 VoiceJokeGeneratorScreen(
                     soundRepository = soundRepository,
                     audioPlayerController = audioPlayerController,
-                    onNavigate = { navController.navigate(it) }
+                    onNavigate = { navController.navigate(it) },
+                    featureGate = featureGate
                 )
             }
             composable("randomizer") { RandomizerScreen(soundRepository, audioPlayerController) }

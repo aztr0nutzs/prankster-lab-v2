@@ -175,8 +175,10 @@ Before production rollout:
 ## Current Android Prep Status
 
 - `BillingProductIds` defines planned product IDs.
+- `BillingProducts` defines dependency-free product metadata for subscriptions, lifetime Pro, and credit packs.
 - `UserEntitlement` represents Free, Pro Monthly, Pro Yearly, and Lifetime Pro.
 - `VoiceCreditBalance` represents configured or missing credit state.
 - `FeatureGate` centralizes premium narration, generated saves, advanced Twak tones, premium bot actions, and remaining credits.
+- `EntitlementRepository` is the injection point for backend-verified entitlement and credit state. The current Android app wires `UnconfiguredEntitlementRepository`, which only exposes Free / not configured state until real billing and backend verification are accepted.
 - Voice Lab and System settings show non-fake "not configured" states.
 - No Google Play Billing dependency or fake purchase flow has been added.

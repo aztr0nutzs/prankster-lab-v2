@@ -69,7 +69,11 @@ import kotlinx.coroutines.withContext
 import java.io.File
 
 @Composable
-fun SettingsScreen(soundRepository: SoundRepository, audioPlayerController: AudioPlayerController) {
+fun SettingsScreen(
+    soundRepository: SoundRepository,
+    audioPlayerController: AudioPlayerController,
+    featureGate: FeatureGate = FeatureGate.unconfiguredFree()
+) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
@@ -84,8 +88,6 @@ fun SettingsScreen(soundRepository: SoundRepository, audioPlayerController: Audi
     val playbackState by audioPlayerController.playbackState.collectAsState()
     val elevenLabsApiKeyStatus = if (BuildConfig.ELEVENLABS_API_KEY.isBlank()) "Missing" else "Configured"
     val elevenLabsApiKeySuffix = BuildConfig.ELEVENLABS_API_KEY.takeLast(4)
-    val featureGate = remember { FeatureGate.unconfiguredFree() }
-
     var diagnostics by remember { mutableStateOf<AudioDiagnostics?>(null) }
     var confirmAction by remember { mutableStateOf<String?>(null) }
     var actionResult by remember { mutableStateOf<String?>(null) }
