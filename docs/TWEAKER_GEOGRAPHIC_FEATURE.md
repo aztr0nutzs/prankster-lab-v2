@@ -124,3 +124,7 @@ The bot controller generates locally, returns a visible message, and fills Voice
 - Try a blocked real-person or emergency prompt and confirm refusal text appears without filling Voice Lab.
 - Ask the bot: `make a tweakographic field report about hunting for a charger near the couch`.
 - Confirm the bot fills Voice Lab but does not auto-generate or auto-play.
+
+## ElevenLabs British Narrator Addendum
+
+Tweaker Geographic now has a dedicated ElevenLabs narration path using voice ID `wV67xHKrIHTU0gtChZiQ`. The generated narration text remains local until the user explicitly taps **Generate British Narration**. MP3 output is written to `filesDir/generated/elevenlabs/` and saved to Stash through generated voice metadata; it is not added to bundled `sound_catalog.json`.

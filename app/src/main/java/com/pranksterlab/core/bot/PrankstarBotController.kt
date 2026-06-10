@@ -108,15 +108,16 @@ class PrankstarBotController(
                 suggestedChips = listOf("Tweakographic", "Make Joke", "Find Funny", "Help")
             )
         }
-        val message = "Tweakographic narration ready. I placed it in Voice Lab for review; Generate stays manual: \"${result.narration}\""
+        val message = "Tweakographic narration ready. I placed it in Voice Lab for review; tap Generate with British Narrator when you approve spending ElevenLabs credits: \"${result.narration}\""
         return PrankstarBotResult(
             message = message,
             actions = listOf(
                 PrankstarBotAction.ShowMessage(result.narration),
-                PrankstarBotAction.FillVoiceLabText(result.narration.take(300), result.suggestedVoicePresetId)
+                PrankstarBotAction.FillVoiceLabText(result.narration.take(300), result.suggestedVoicePresetId, preferBritishNarrator = true),
+                PrankstarBotAction.Navigate("voice_lab")
             ),
             mood = PrankstarBotMood.RELAXED,
-            suggestedChips = listOf("Open Jokes", "Robot Voice", "Make Joke", "Find Documentary"),
+            suggestedChips = listOf("Generate with British Narrator", "Open Jokes", "Make Joke", "Find Documentary"),
             generatedText = result.narration,
             suggestedVoicePresetId = result.suggestedVoicePresetId
         )

@@ -38,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.pranksterlab.BuildConfig
 import com.pranksterlab.R
 import com.pranksterlab.components.PrankstarHeader
 import com.pranksterlab.components.ScanlineOverlay
@@ -45,6 +46,9 @@ import com.pranksterlab.components.bot.PrankstarBotMood
 import com.pranksterlab.components.bot.PrankstarBotVideo
 import com.pranksterlab.core.bot.PrankstarBotJokeGenerator
 import com.pranksterlab.core.bot.PrankstarBotVoiceLabBridge
+import com.pranksterlab.core.elevenlabs.ElevenLabsTtsResult
+import com.pranksterlab.core.elevenlabs.ElevenLabsTtsService
+import com.pranksterlab.core.elevenlabs.TWEAKER_GEOGRAPHIC_VOICE_ID
 import com.pranksterlab.core.narration.TweakerGeographicNarrator
 import com.pranksterlab.core.narration.TweakerGeographicRequest
 import com.pranksterlab.core.narration.TweakerGeographicResult
@@ -67,7 +71,9 @@ import com.pranksterlab.theme.OrangeAccent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.OkHttpClient
 import java.io.File
+import java.util.concurrent.TimeUnit
 
 private class ManagedPreviewPlayer {
     private var mediaPlayer: MediaPlayer? = null
@@ -128,11 +134,23 @@ private class ManagedPreviewPlayer {
     }
 }
 
+private enum class VoiceSourceMode { LOCAL_ANDROID_TTS, TWEAKER_GEOGRAPHIC_BRITISH_NARRATOR }
+
 @Composable
 fun VoiceJokeGeneratorScreen(soundRepository: SoundRepository) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val tts = remember { AndroidTextToSpeechEngine(context) }
+    val elevenLabsTtsService = remember {
+        ElevenLabsTtsService(
+            client = OkHttpClient.Builder()
+                .connectTimeout(20, TimeUnit.SECONDS)
+                .readTimeout(60, TimeUnit.SECONDS)
+                .writeTimeout(30, TimeUnit.SECONDS)
+                .build(),
+            apiKeyProvider = { BuildConfig.ELEVENLABS_API_KEY }
+        )
+    }
     val generatedRepo = remember { GeneratedVoiceRepository(soundRepository) }
     val allPresets = VoicePresetLibrary.presets
     val ttsReadiness by tts.readiness.collectAsState()
@@ -161,6 +179,9 @@ fun VoiceJokeGeneratorScreen(soundRepository: SoundRepository) {
     var fieldTone by remember { mutableStateOf(TweakerGeographicTone.BALANCED) }
     var fieldIncludeSoundCue by remember { mutableStateOf(false) }
     var fieldResult by remember { mutableStateOf<TweakerGeographicResult?>(null) }
+    var voiceSourceMode by remember { mutableStateOf(VoiceSourceMode.LOCAL_ANDROID_TTS) }
+    var generatedTweakerNarrationTitle by remember { mutableStateOf<String?>(null) }
+    var generatedTweakerNarrationText by remember { mutableStateOf<String?>(null) }
 
     fun applyPreset(selected: VoicePreset) {
         preset = selected
@@ -191,8 +212,24 @@ fun VoiceJokeGeneratorScreen(soundRepository: SoundRepository) {
         draft.suggestedVoicePresetId?.let { presetId ->
             allPresets.firstOrNull { it.id == presetId }?.let { applyPreset(it) }
         }
-        status = "BOT DRAFT LOADED"
-        statusDetail = "Prankstar Bot filled the line. Review it, then tap Generate when ready."
+        if (draft.preferBritishNarrator) {
+            fieldAction = draft.text.take(120)
+            fieldResult = TweakerGeographicResult(
+                title = "Tweaker Geographic",
+                narration = draft.text,
+                tone = TweakerGeographicTone.BALANCED,
+                suggestedVoicePresetId = draft.suggestedVoicePresetId ?: "overly_serious_narrator",
+                suggestedSoundQuery = null,
+                safetyNote = null
+            )
+            outputName = "Tweaker Geographic"
+            voiceSourceMode = VoiceSourceMode.TWEAKER_GEOGRAPHIC_BRITISH_NARRATOR
+            status = "BOT FIELD REPORT LOADED"
+            statusDetail = "Bot filled Tweaker Geographic narration. Review it, then tap Generate British Narration."
+        } else {
+            status = "BOT DRAFT LOADED"
+            statusDetail = "Prankstar Bot filled the line. Review it, then tap Generate when ready."
+        }
         PrankstarBotVoiceLabBridge.consume()
     }
 
@@ -220,10 +257,11 @@ fun VoiceJokeGeneratorScreen(soundRepository: SoundRepository) {
     }
 
     val canGenerate = ttsReadiness is VoiceEngineReadiness.READY && text.isNotBlank() && status != "GENERATING"
+    val canGenerateBritishNarration = fieldResult?.isAllowed == true && status != "GENERATING"
     val canUseGeneratedFile = isValidGeneratedFile(generatedFile) && generatedResult?.success == true
     val botMood = when (status) {
         "INITIALIZING VOICE ENGINE" -> PrankstarBotMood.THINKING
-        "GENERATING" -> PrankstarBotMood.GENERATING
+        "GENERATING", "RECORDING FIELD NARRATION" -> PrankstarBotMood.GENERATING
         "SAVING" -> PrankstarBotMood.PROCESSING
         "SAVED" -> PrankstarBotMood.SAVED
         "GENERATED" -> PrankstarBotMood.CELEBRATING
@@ -294,6 +332,28 @@ fun VoiceJokeGeneratorScreen(soundRepository: SoundRepository) {
                             status = "BOT ROBOT LINE READY"
                             statusDetail = "Robot-style line filled. Generate remains manual."
                         }) { Text("Robot") }
+                        Button(onClick = {
+                            fieldAction = botPrompt.ifBlank { "looking for a lighter" }.take(120)
+                            val result = tweakographicNarrator.generate(
+                                TweakerGeographicRequest(
+                                    action = fieldAction,
+                                    setting = null,
+                                    tone = fieldTone,
+                                    includeSoundCue = fieldIncludeSoundCue
+                                )
+                            )
+                            fieldResult = result
+                            if (result.isAllowed) {
+                                text = result.narration.take(300)
+                                outputName = result.title
+                                voiceSourceMode = VoiceSourceMode.TWEAKER_GEOGRAPHIC_BRITISH_NARRATOR
+                                status = "BOT FIELD REPORT READY"
+                                statusDetail = "Bot routed a Tweaker Geographic draft. Review it, then tap Generate British Narration."
+                            } else {
+                                status = "ERROR"
+                                statusDetail = result.safetyNote ?: "Use a harmless fictional setup."
+                            }
+                        }) { Text("Tweakographic") }
                     }
                 }
             }
@@ -336,6 +396,20 @@ fun VoiceJokeGeneratorScreen(soundRepository: SoundRepository) {
                         Checkbox(fieldIncludeSoundCue, { fieldIncludeSoundCue = it })
                         Text("Suggest matching stash sound search", color = Color.White)
                     }
+                    Text("Voice Source", color = CyanAccent, style = MaterialTheme.typography.bodySmall)
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                        FilterChip(
+                            selected = voiceSourceMode == VoiceSourceMode.LOCAL_ANDROID_TTS,
+                            onClick = { voiceSourceMode = VoiceSourceMode.LOCAL_ANDROID_TTS },
+                            label = { Text("Local Android TTS") }
+                        )
+                        FilterChip(
+                            selected = voiceSourceMode == VoiceSourceMode.TWEAKER_GEOGRAPHIC_BRITISH_NARRATOR,
+                            onClick = { voiceSourceMode = VoiceSourceMode.TWEAKER_GEOGRAPHIC_BRITISH_NARRATOR },
+                            label = { Text("Tweaker Geographic British Narrator") }
+                        )
+                    }
+                    Text("Dedicated ElevenLabs voice configured for this feature only: ${TWEAKER_GEOGRAPHIC_VOICE_ID.take(6)}…", color = Color.Gray, style = MaterialTheme.typography.bodySmall)
                     listOf("looking for a lighter", "protecting the last slice", "hunting for a charger").forEach { example ->
                         Button(
                             onClick = {
@@ -356,8 +430,9 @@ fun VoiceJokeGeneratorScreen(soundRepository: SoundRepository) {
                         )
                         fieldResult = result
                         if (result.isAllowed) {
+                            voiceSourceMode = VoiceSourceMode.TWEAKER_GEOGRAPHIC_BRITISH_NARRATOR
                             status = "FIELD REPORT READY"
-                            statusDetail = "Narration generated locally. Send it to the Voice Lab text box when ready."
+                            statusDetail = "Narration generated locally. Use British Narrator or send it to local Voice Lab."
                         } else {
                             status = "ERROR"
                             statusDetail = result.safetyNote ?: "Use a harmless fictional setup."
@@ -379,9 +454,51 @@ fun VoiceJokeGeneratorScreen(soundRepository: SoundRepository) {
                                     text = result.narration.take(300)
                                     outputName = result.title
                                     allPresets.firstOrNull { it.id == result.suggestedVoicePresetId }?.let { applyPreset(it) }
+                                    voiceSourceMode = VoiceSourceMode.LOCAL_ANDROID_TTS
                                     status = "FIELD REPORT LOADED"
                                     statusDetail = "Tweakographic text loaded. Review it, then use Generate Voice Clip."
                                 }) { Text("Send to Voice Lab") }
+                                Button(onClick = {
+                                    voiceSourceMode = VoiceSourceMode.TWEAKER_GEOGRAPHIC_BRITISH_NARRATOR
+                                    text = result.narration.take(300)
+                                    outputName = result.title
+                                    scope.launch {
+                                        status = "GENERATING"
+                                        statusDetail = "Recording field narration…"
+                                        generatedFile = null
+                                        generatedResult = null
+                                        savedGeneratedFilePath = null
+                                        generatedTweakerNarrationTitle = result.title
+                                        generatedTweakerNarrationText = result.narration
+                                        val dir = File(context.filesDir, "generated/elevenlabs")
+                                        val file = File(dir, "tweaker_geo_${System.currentTimeMillis()}.mp3")
+                                        when (val ttsResult = elevenLabsTtsService.generateTweakerGeographicNarration(result.narration, file)) {
+                                            is ElevenLabsTtsResult.Success -> {
+                                                generatedFile = ttsResult.outputFile
+                                                generatedResult = VoiceSynthesisResult(
+                                                    outputFile = ttsResult.outputFile,
+                                                    formatLabel = "MP3/ElevenLabs",
+                                                    durationMs = ttsResult.durationMs,
+                                                    success = true
+                                                )
+                                                status = "GENERATED"
+                                                statusDetail = "Narration generated."
+                                            }
+                                            is ElevenLabsTtsResult.Failure -> {
+                                                generatedFile = null
+                                                generatedResult = VoiceSynthesisResult(
+                                                    outputFile = file,
+                                                    formatLabel = "MP3/ElevenLabs",
+                                                    durationMs = null,
+                                                    success = false,
+                                                    errorMessage = ttsResult.error.userMessage
+                                                )
+                                                status = "ERROR"
+                                                statusDetail = ttsResult.error.userMessage
+                                            }
+                                        }
+                                    }
+                                }, enabled = canGenerateBritishNarration) { Text("Generate British Narration") }
                             }
                         }
                     }
@@ -561,7 +678,16 @@ fun VoiceJokeGeneratorScreen(soundRepository: SoundRepository) {
                         status = "SAVING"
                         statusDetail = "Saving generated voice clip to Sound Stash."
                         runCatching {
-                            generatedRepo.saveGeneratedVoice(file, settings(), generatedResult?.durationMs)
+                            if (voiceSourceMode == VoiceSourceMode.TWEAKER_GEOGRAPHIC_BRITISH_NARRATOR && file.extension.equals("mp3", ignoreCase = true)) {
+                                generatedRepo.saveTweakerGeographicElevenLabsVoice(
+                                    file = file,
+                                    title = generatedTweakerNarrationTitle ?: outputName,
+                                    narrationText = generatedTweakerNarrationText ?: text,
+                                    durationMs = generatedResult?.durationMs
+                                )
+                            } else {
+                                generatedRepo.saveGeneratedVoice(file, settings(), generatedResult?.durationMs)
+                            }
                         }.onSuccess {
                             savedGeneratedFilePath = file.absolutePath
                             status = "SAVED"
@@ -576,7 +702,7 @@ fun VoiceJokeGeneratorScreen(soundRepository: SoundRepository) {
             item {
                 Text(
                     if (ttsReadiness is VoiceEngineReadiness.READY) {
-                        "Output: WAV/PCM generated locally on device."
+                        "Output: WAV/PCM generated locally on device, or MP3 for confirmed Tweaker Geographic British Narrator requests."
                     } else {
                         "TTS unavailable: install or enable an Android text-to-speech engine."
                     },
