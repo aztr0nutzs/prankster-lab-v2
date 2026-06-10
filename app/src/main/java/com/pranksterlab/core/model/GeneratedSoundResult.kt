@@ -13,6 +13,10 @@ data class GeneratedSoundMetadata(
     val volume: Float? = null,
     val toneStyle: String? = null,
     val effectStyle: String? = null,
+    val source: String? = null,
+    val voiceId: String? = null,
+    val format: String? = null,
+    val feature: String? = null,
     val createdAt: Long? = null,
     val durationMs: Long? = null
 )

@@ -67,6 +67,7 @@ fun PrankstarBotPanel(
     onFavoriteSound: ((PrankSound) -> Unit)? = null,
     onOpenStash: () -> Unit,
     onSendToVoiceLab: (String, String?) -> Unit,
+    onInputChanged: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var input by remember { mutableStateOf("") }
@@ -115,7 +116,10 @@ fun PrankstarBotPanel(
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
             OutlinedTextField(
                 value = input,
-                onValueChange = { input = it.take(220) },
+                onValueChange = {
+                    input = it.take(220)
+                    onInputChanged(input)
+                },
                 modifier = Modifier.weight(1f).semantics { contentDescription = "Ask Prankstar Bot Agent" },
                 placeholder = { Text("find creepy sounds") },
                 label = { Text("Ask the bot") },

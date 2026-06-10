@@ -11,9 +11,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,27 +19,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.media3.ui.AspectRatioFrameLayout
 import com.pranksterlab.R
-import com.pranksterlab.core.repository.dataStore
-import kotlinx.coroutines.flow.map
 
 @Composable
 fun PrankstarHeaderVideo(
     modifier: Modifier = Modifier,
-    rawResId: Int = R.raw.prankstar_header,
     height: Dp = 88.dp,
 ) {
-    val context = LocalContext.current
-    val animationIntensity by remember {
-        context.dataStore.data.map { preferences ->
-            preferences[androidx.datastore.preferences.core.stringPreferencesKey("animation_intensity")] ?: "FULL"
-        }
-    }.collectAsState(initial = "FULL")
-    val showVideo = animationIntensity != "MINIMAL"
     val shape = RoundedCornerShape(14.dp)
 
     Box(
@@ -61,35 +46,12 @@ fun PrankstarHeaderVideo(
             ),
         contentAlignment = Alignment.Center
     ) {
-        if (showVideo) {
-            MutedLoopingRawVideo(
-                rawResId = rawResId,
-                modifier = Modifier.matchParentSize(),
-                resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM,
-            )
-        } else {
-            Image(
-                painter = painterResource(R.drawable.prankstar_sn1),
-                contentDescription = "Prankstar",
-                modifier = Modifier.matchParentSize(),
-                contentScale = ContentScale.Crop,
-                alpha = 0.82f,
-            )
-        }
-        Box(
-            Modifier
-                .matchParentSize()
-                .background(
-                    Brush.verticalGradient(
-                        listOf(Color.Black.copy(alpha = 0.18f), Color.Black.copy(alpha = 0.46f))
-                    )
-                )
-        )
-        Text(
-            text = "PRANKSTAR CORE",
-            color = Color.White,
-            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Black),
-            modifier = Modifier.align(Alignment.BottomStart).padding(start = 14.dp, bottom = 10.dp)
+        Image(
+            painter = painterResource(R.drawable.prankstar_header),
+            contentDescription = "Prankstar",
+            modifier = Modifier.matchParentSize(),
+            contentScale = ContentScale.Fit,
+            alpha = 0.96f,
         )
     }
 }

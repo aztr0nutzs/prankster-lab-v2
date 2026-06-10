@@ -1,7 +1,21 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
 }
+
+
+val localProperties = Properties().apply {
+    val file = rootProject.file("local.properties")
+    if (file.exists()) {
+        file.inputStream().use(::load)
+    }
+}
+val elevenLabsApiKey = providers.gradleProperty("ELEVENLABS_API_KEY")
+    .orElse(providers.environmentVariable("ELEVENLABS_API_KEY"))
+    .orElse(localProperties.getProperty("ELEVENLABS_API_KEY", ""))
+
 
 android {
     namespace = "com.pranksterlab"
@@ -13,6 +27,7 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
+        buildConfigField("String", "ELEVENLABS_API_KEY", "\"${elevenLabsApiKey.get().replace("\\", "\\\\").replace("\"", "\\\"")}\"")
     }
 
     compileOptions {
@@ -50,4 +65,8 @@ dependencies {
     implementation("androidx.media3:media3-exoplayer:1.3.1")
     implementation("androidx.media3:media3-ui:1.3.1")
     implementation("com.google.code.gson:gson:2.10.1")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
 }

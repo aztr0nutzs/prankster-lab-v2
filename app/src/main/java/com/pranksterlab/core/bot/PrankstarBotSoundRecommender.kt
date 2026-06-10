@@ -11,7 +11,8 @@ class PrankstarBotSoundRecommender {
         "voice" to listOf("voice", "robot", "speech", "talking", "announcement"),
         "chaos" to listOf("explosion", "alarm", "siren", "glitch", "zap", "chaos"),
         "office" to listOf("office", "phone", "bell", "announcement", "meeting"),
-        "robot" to listOf("robot", "sci-fi", "scifi", "glitch", "machine", "bot")
+        "robot" to listOf("robot", "sci-fi", "scifi", "glitch", "machine", "bot"),
+        "prank" to listOf("prank", "funny", "cartoon", "voice", "misc", "surprise")
     )
 
     fun recommend(query: String, sounds: List<PrankSound>, limit: Int = 6): List<PrankSound> {

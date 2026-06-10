@@ -87,7 +87,7 @@ fun PrankMessagesScreen() {
             PrankstarHeader(
                 title = "Prank Messages",
                 subtitle = "Transparent Prank Text Console",
-                imageRes = R.drawable.header_joke_gen,
+                imageRes = R.drawable.prankstar_header,
                 statusLabel = selectedCategory,
                 showTextOverlay = false,
                 modifier = Modifier.padding(horizontal = 0.dp)

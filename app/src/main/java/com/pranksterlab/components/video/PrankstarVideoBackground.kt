@@ -1,6 +1,7 @@
 package com.pranksterlab.components.video
 
 import android.net.Uri
+import androidx.annotation.OptIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,6 +24,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
@@ -31,6 +33,7 @@ import com.pranksterlab.core.repository.dataStore
 import kotlinx.coroutines.flow.map
 
 @Composable
+@OptIn(UnstableApi::class)
 fun PrankstarVideoBackground(
     modifier: Modifier = Modifier,
     rawResId: Int = R.raw.prankstar_bg,
@@ -63,6 +66,7 @@ fun PrankstarVideoBackground(
 }
 
 @Composable
+@OptIn(UnstableApi::class)
 internal fun MutedLoopingRawVideo(
     rawResId: Int,
     modifier: Modifier = Modifier,

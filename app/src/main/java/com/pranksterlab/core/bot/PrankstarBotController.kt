@@ -2,6 +2,8 @@ package com.pranksterlab.core.bot
 
 import com.pranksterlab.components.bot.PrankstarBotMood
 import com.pranksterlab.core.model.PrankSound
+import com.pranksterlab.core.narration.TweakerGeographicNarrator
+import com.pranksterlab.core.narration.TweakerGeographicRequest
 import com.pranksterlab.core.voice.VoicePresetLibrary
 
 class PrankstarBotController(
@@ -9,6 +11,7 @@ class PrankstarBotController(
     private val safety: PrankstarBotSafety = PrankstarBotSafety(),
     private val soundRecommender: PrankstarBotSoundRecommender = PrankstarBotSoundRecommender(),
     private val jokeGenerator: PrankstarBotJokeGenerator = PrankstarBotJokeGenerator(safety),
+    private val tweakerGeographicNarrator: TweakerGeographicNarrator = TweakerGeographicNarrator(),
     private val responseBuilder: PrankstarBotResponseBuilder = PrankstarBotResponseBuilder()
 ) {
     fun handle(input: String, sounds: List<PrankSound>): PrankstarBotResult {
@@ -24,10 +27,12 @@ class PrankstarBotController(
         }
 
         return when (val intent = commandParser.parse(input)) {
-            is PrankstarBotIntent.SearchSounds -> recommend(intent.query, sounds, PrankstarBotMood.THINKING)
-            is PrankstarBotIntent.RecommendSounds -> recommend(intent.vibe, sounds, PrankstarBotMood.PLAYING)
+            is PrankstarBotIntent.SearchSounds -> recommend(intent.query, sounds, PrankstarBotMood.SEARCHING)
+            is PrankstarBotIntent.RecommendSounds -> recommend(intent.vibe, sounds, PrankstarBotMood.SEARCHING)
+            is PrankstarBotIntent.PlayRecommended -> recommend(intent.vibe, sounds, PrankstarBotMood.PLAYING, autoPlayFirst = true)
             is PrankstarBotIntent.GenerateJoke -> generateJoke(intent.prompt)
             is PrankstarBotIntent.GenerateTwakAttack -> generateTwakAttack(intent.prompt)
+            is PrankstarBotIntent.GenerateTweakerGeographic -> generateTweakerGeographic(intent)
             is PrankstarBotIntent.BuildPrankPlan -> buildPlan(intent.prompt, sounds)
             is PrankstarBotIntent.ChooseVoice -> chooseVoice(intent.prompt)
             PrankstarBotIntent.PlayRandom -> playRandom(sounds)
@@ -40,6 +45,7 @@ class PrankstarBotController(
             PrankstarBotIntent.OpenStash -> navigate("library", "Opening Sound Stash. I’ll keep the neon warm.")
             PrankstarBotIntent.OpenJokes -> navigate("voice_lab", "Opening Voice Lab / Joke Gen. Bring the line, you tap Generate.")
             PrankstarBotIntent.OpenForge -> navigate("forge", "Opening Sound Forge for handcrafted chaos.")
+            PrankstarBotIntent.OpenSystem -> navigate("system", "Opening System controls.")
             PrankstarBotIntent.Help -> PrankstarBotResult(
                 message = responseBuilder.help(),
                 actions = listOf(PrankstarBotAction.ShowMessage(responseBuilder.help())),
@@ -54,17 +60,20 @@ class PrankstarBotController(
         }
     }
 
-    private fun recommend(query: String, sounds: List<PrankSound>, mood: PrankstarBotMood): PrankstarBotResult {
+    private fun recommend(query: String, sounds: List<PrankSound>, mood: PrankstarBotMood, autoPlayFirst: Boolean = false): PrankstarBotResult {
         val recommended = soundRecommender.recommend(query, sounds.filter { it.assetPath.isNotBlank() || it.localUri != null })
         val message = responseBuilder.recommendations(query, recommended)
         val actions = mutableListOf<PrankstarBotAction>(PrankstarBotAction.ShowMessage(message))
         if (recommended.isNotEmpty()) {
             actions += PrankstarBotAction.ShowSoundRecommendations(recommended, "Matched name, category, tags, pack, and vibe keywords for '$query'.")
+            if (autoPlayFirst) {
+                actions += PrankstarBotAction.PlaySound(recommended.first())
+            }
         }
         return PrankstarBotResult(
             message = message,
             actions = actions,
-            mood = if (recommended.isEmpty()) PrankstarBotMood.CONFUSED else mood,
+            mood = if (recommended.isEmpty()) PrankstarBotMood.SAD else mood,
             suggestedChips = listOf("Play Random", "Make Joke", "Open Stash", "Stop All")
         )
     }
@@ -97,6 +106,37 @@ class PrankstarBotController(
             suggestedChips = listOf("Send to Voice Lab", "Find Funny", "Open Stash", "Stop All"),
             generatedText = text,
             suggestedVoicePresetId = "overly_serious_narrator"
+        )
+    }
+
+    private fun generateTweakerGeographic(intent: PrankstarBotIntent.GenerateTweakerGeographic): PrankstarBotResult {
+        val result = tweakerGeographicNarrator.generate(
+            TweakerGeographicRequest(
+                action = intent.action,
+                setting = intent.setting,
+                tone = intent.tone
+            )
+        )
+        if (!result.isAllowed) {
+            return PrankstarBotResult(
+                message = result.narration,
+                actions = listOf(PrankstarBotAction.Refuse(result.narration), PrankstarBotAction.ShowMessage(result.narration)),
+                mood = PrankstarBotMood.WARNING,
+                suggestedChips = listOf("Tweakographic", "Make Joke", "Find Funny", "Help")
+            )
+        }
+        val message = "Tweakographic narration ready. I placed it in Voice Lab for review; tap Generate with British Narrator when you approve spending ElevenLabs credits: \"${result.narration}\""
+        return PrankstarBotResult(
+            message = message,
+            actions = listOf(
+                PrankstarBotAction.ShowMessage(result.narration),
+                PrankstarBotAction.FillVoiceLabText(result.narration.take(300), result.suggestedVoicePresetId, preferBritishNarrator = true),
+                PrankstarBotAction.Navigate("voice_lab")
+            ),
+            mood = PrankstarBotMood.RELAXED,
+            suggestedChips = listOf("Generate with British Narrator", "Open Jokes", "Make Joke", "Find Documentary"),
+            generatedText = result.narration,
+            suggestedVoicePresetId = result.suggestedVoicePresetId
         )
     }
 

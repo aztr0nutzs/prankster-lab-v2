@@ -81,7 +81,7 @@ fun SoundPacksScreen(soundRepository: SoundRepository, audioPlayerController: Au
             PrankstarHeader(
                 title = "Sound Packs",
                 subtitle = "Featured Data Pack Catalogue",
-                imageRes = R.drawable.header_sound_stash,
+                imageRes = R.drawable.prankstar_header,
                 statusLabel = "${packSummaries.size} PACKS",
                 showTextOverlay = false,
                 modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp)

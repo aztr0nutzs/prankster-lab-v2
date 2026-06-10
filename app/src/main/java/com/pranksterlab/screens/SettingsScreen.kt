@@ -53,6 +53,7 @@ import com.pranksterlab.components.LabelCaps
 import com.pranksterlab.components.PrankstarHeader
 import com.pranksterlab.components.ScanlineOverlay
 import com.pranksterlab.core.audio.AudioPlayerController
+import com.pranksterlab.core.elevenlabs.TWEAKER_GEOGRAPHIC_VOICE_ID
 import com.pranksterlab.core.repository.AudioDiagnostics
 import com.pranksterlab.core.repository.SoundRepository
 import com.pranksterlab.theme.BackgroundDark
@@ -79,6 +80,8 @@ fun SettingsScreen(soundRepository: SoundRepository, audioPlayerController: Audi
     val botSuggestionsEnabled by soundRepository.getBotSuggestionsEnabledFlow().collectAsState(initial = true)
     val safetyAck by soundRepository.getSafetyAckFlow().collectAsState(initial = false)
     val playbackState by audioPlayerController.playbackState.collectAsState()
+    val elevenLabsApiKeyStatus = if (BuildConfig.ELEVENLABS_API_KEY.isBlank()) "Missing" else "Configured"
+    val elevenLabsApiKeySuffix = BuildConfig.ELEVENLABS_API_KEY.takeLast(4)
 
     var diagnostics by remember { mutableStateOf<AudioDiagnostics?>(null) }
     var confirmAction by remember { mutableStateOf<String?>(null) }
@@ -108,7 +111,7 @@ fun SettingsScreen(soundRepository: SoundRepository, audioPlayerController: Audi
                 PrankstarHeader(
                     title = "System Setup",
                     subtitle = "Diagnostics / Safety / App Control",
-                    imageRes = R.drawable.header_settings,
+                    imageRes = R.drawable.prankstar_header,
                     statusLabel = if ((diagnostics?.invalidCatalogSounds ?: 0) > 0) "ALERT" else "STABLE",
                     showTextOverlay = false
                 )
@@ -156,6 +159,21 @@ fun SettingsScreen(soundRepository: SoundRepository, audioPlayerController: Audi
                             )
                         }
                     }
+                }
+            }
+        }
+
+        item {
+            HUDCard(modifier = Modifier.fillMaxWidth(), accentColor = CyanAccent) {
+                Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    LabelCaps("ELEVENLABS", color = CyanAccent)
+                    Text("API Key Status: $elevenLabsApiKeyStatus", color = if (elevenLabsApiKeyStatus == "Configured") LimeAccent else OrangeAccent)
+                    if (elevenLabsApiKeyStatus == "Configured") {
+                        Text("Key ending: ••••$elevenLabsApiKeySuffix", color = Color.Gray, style = MaterialTheme.typography.bodySmall)
+                    } else {
+                        Text("Add ELEVENLABS_API_KEY to local.properties or environment variables, then rebuild.", color = Color.LightGray, style = MaterialTheme.typography.bodySmall)
+                    }
+                    Text("Preferred Tweaker Geographic Voice: British Narrator (${TWEAKER_GEOGRAPHIC_VOICE_ID.take(6)}…)", color = Color.LightGray, style = MaterialTheme.typography.bodySmall)
                 }
             }
         }

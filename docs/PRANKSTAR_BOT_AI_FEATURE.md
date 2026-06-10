@@ -1,52 +1,96 @@
-# Prankstar Bot Agent AI-Style Feature
+# Prankstar Bot AI Feature
+
+Last updated: 2026-06-07
 
 ## Summary
 
-Prankstar Bot Agent is a local deterministic assistant layer for Prankster Lab. It keeps the existing Prankstar / NEO MP4 mascot mood system and adds useful actions on top of it.
+Prankstar Bot is a local deterministic assistant layer. It does not call a cloud model and does not auto-send messages. It parses simple commands, searches real `PrankSound` objects from `SoundRepository`, generates safe template-based joke text, and returns explicit UI actions for playback, navigation, Voice Lab handoff, and stop-all.
 
-This phase does not use cloud APIs, WebView assistant logic, payment flows, or external LLM calls.
+## Supported commands
 
-## What the bot can do
+Examples now supported:
 
-- Parse simple natural-language requests locally.
-- Search and recommend real sounds loaded from `SoundRepository`.
-- Generate harmless joke/comment lines from safe local templates.
-- Suggest voice preset IDs for Voice Lab.
-- Send generated text to Voice Lab through a shared in-app draft bridge.
-- Build harmless prank plans with explicit safety notes.
-- Trigger safe app actions: play a real sound, stop audio, navigate to Stash/Jokes/Forge.
-- Explain what it did in the bot message bubble.
-- Update the existing robot mood video state.
+- `find creepy sounds`
+- `show animal sounds`
+- `play something funny`
+- `make a joke about being late`
+- `create a robot announcement`
+- `open stash`
+- `open jokes`
+- `open forge`
+- `open system`
+- `stop all`
 
-## Local parser behavior
+The parser also recognizes `recommend`, `random`, `surprise me`, `voice`, `say`, `plan`, `prank`, and vibe words including `creepy`, `funny`, `animal`, `voice`, `chaos`, `office`, `robot`, `scary`, and `prank`.
 
-The parser supports keywords such as:
+## Sound recommendations
 
-- `find`, `search`, `show`
-- `play`, `random`, `recommend`
-- `joke`, `roast`
-- `voice`, `say`
-- `plan`, `prank`
-- `creepy`, `funny`, `animal`, `scary`, `robot`
-- `stop`
-- `stash`, `library`, `jokes`, `voice lab`, `forge`
+`PrankstarBotSoundRecommender` scores real sounds only. It searches:
 
-Example mappings:
+- name
+- category
+- tags
+- pack ID
+- description
+- preview label
+- prank style
 
-- `find creepy sounds` -> `SearchSounds("creepy")`
-- `show animal pranks` -> `SearchSounds("animal")`
-- `play something funny` -> `RecommendSounds("funny")`
-- `make a joke about my friend being late` -> `GenerateJoke("my friend being late")`
-- `create a creepy prank plan` -> `BuildPrankPlan("creepy")`
-- `stop all` -> `StopAll`
-- `open stash` -> `OpenStash`
+The recommender expands vibe keywords. For example, `creepy` expands to horror/ghost/scary-style tokens, while `robot` expands to sci-fi/glitch/machine/bot tokens. Results are de-duplicated by sound ID and shown as playable cards.
 
-## Safety limits
+## Joke and comment generation
 
-The bot refuses requests involving threats, self-harm, harassment, stalking, emergency/government impersonation, real-person voice impersonation, phone-number spoofing, automatic message sending, illegal activity, bypassing consent, or dangerous pranks.
+`PrankstarBotJokeGenerator` uses local templates only. It sanitizes mild insults and generates harmless lines such as robot announcements, office announcements, dramatic narrator bits, creepy whispers, and light roasts.
 
-Refusals are friendly and keep the prank tone: the bot redirects users toward harmless sound pranks, goofy voice clips, or consent-friendly jokes.
+Generated text is never auto-spoken or auto-sent. Voice Lab generation remains user-controlled.
 
-## Future cloud LLM interface
+## Voice Lab handoff
 
-The current controller is intentionally dependency-free and deterministic. A future cloud/LLM implementation can be added behind the controller/parser/recommender interfaces while preserving the same action model and safety gate.
+The handoff uses `PrankstarBotVoiceLabBridge`, a shared in-process pending draft store:
+
+1. Bot action `FillVoiceLabText(text, suggestedVoicePresetId)` stores a pending draft.
+2. `VoiceJokeGeneratorScreen` collects `pendingDraft`.
+3. When a draft appears, the screen fills the input text and applies the suggested preset if present.
+4. The screen consumes the draft.
+5. The user must still tap Generate.
+
+The Home bot panel also exposes a `Voice Lab` button for generated text, and command-driven `ChooseVoice` actions can navigate to Voice Lab with the draft already queued.
+
+## Safe actions
+
+Supported safe actions:
+
+- play a real recommended sound through `AudioPlayerController`
+- stop all audio through `AudioPlayerController.stopAll()`
+- navigate to Stash/Library
+- navigate to Jokes/Voice Lab
+- navigate to Forge
+- navigate to System
+- show generated text
+- show a harmless prank plan
+
+## Safety behavior
+
+The bot refuses threats, harassment, emergency or government impersonation, real-person voice impersonation, phone-number spoofing, automatic or secret message sending, illegal activity, non-consensual recording, and dangerous pranks. Refusals use `PrankstarBotMood.WARNING` and redirect toward safe sound or joke requests.
+
+## UI integration
+
+The native Home/Core screen shows `PrankstarBotPanel` with:
+
+- input box
+- send button
+- quick chips
+- real sound recommendation cards with Play buttons
+- generated joke card with Voice Lab handoff
+- stop-all behavior
+
+Voice Lab exposes a compact bot helper for local line generation. Stable V9 WebView Home was preserved and not covered by a giant native overlay.
+
+## Validation
+
+- `.\gradlew.bat assembleDebug --stacktrace --console=plain`: passed.
+- `python tools\validate_sound_catalog.py`: passed, 369 entries.
+- `node tools\advanced_validate.cjs`: passed, 369 files checked.
+
+## Runtime QA
+
+No device was attached through ADB, so runtime bot interaction screenshots were not captured.

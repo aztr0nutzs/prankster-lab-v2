@@ -8,7 +8,7 @@ sealed class PrankstarBotAction {
     data class PlaySound(val sound: PrankSound) : PrankstarBotAction()
     object StopAllSounds : PrankstarBotAction()
     data class Navigate(val route: String) : PrankstarBotAction()
-    data class FillVoiceLabText(val text: String, val suggestedVoicePresetId: String? = null) : PrankstarBotAction()
+    data class FillVoiceLabText(val text: String, val suggestedVoicePresetId: String? = null, val preferBritishNarrator: Boolean = false) : PrankstarBotAction()
     data class ShowPrankPlan(val plan: PrankstarPrankPlan) : PrankstarBotAction()
     data class Refuse(val reason: String) : PrankstarBotAction()
 }

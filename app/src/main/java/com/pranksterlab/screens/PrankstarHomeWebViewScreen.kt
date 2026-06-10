@@ -32,7 +32,7 @@ const val PRANKSTAR_HOME_WEBVIEW_URL = "file:///android_asset/prankstar/pranksta
 private const val PRANKSTAR_BRIDGE_NAME = "PrankstarAndroid"
 private const val PRANKSTAR_BRIDGE_TAG = "PrankstarBridge"
 
-@SuppressLint("SetJavaScriptEnabled")
+@SuppressLint("SetJavaScriptEnabled", "JavascriptInterface")
 @Composable
 fun PrankstarHomeWebViewScreen(
     audioPlayerController: AudioPlayerController,
