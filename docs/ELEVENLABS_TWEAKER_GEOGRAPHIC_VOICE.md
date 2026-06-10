@@ -97,3 +97,7 @@ Unit tests use a fake OkHttp interceptor and do not make real ElevenLabs calls. 
 ## Runtime QA Result
 
 Manual device QA was not executed in this container because no ADB/device session was available during implementation. Generation cannot be marked runtime-passed without a configured API key and device/emulator test.
+
+## Twak-Attacks Visual State
+
+The Twak-Attacks visual pass preserves the dedicated voice ID `wV67xHKrIHTU0gtChZiQ`. The Twak Bot switches to `GENERATING` while ElevenLabs is called, `EXCITED` after a successful MP3, `PREVIEWING` during playback, `SAVED` after Sound Stash save, and `ERROR` for missing API key, network, or generation failures.

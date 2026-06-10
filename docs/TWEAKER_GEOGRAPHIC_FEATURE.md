@@ -128,3 +128,11 @@ The bot controller generates locally, returns a visible message, and fills Voice
 ## ElevenLabs British Narrator Addendum
 
 Tweaker Geographic now has a dedicated ElevenLabs narration path using voice ID `wV67xHKrIHTU0gtChZiQ`. The generated narration text remains local until the user explicitly taps **Generate British Narration**. MP3 output is written to `filesDir/generated/elevenlabs/` and saved to Stash through generated voice metadata; it is not added to bundled `sound_catalog.json`.
+
+## Twak-Attacks Visual Addendum
+
+The Tweaker Geographic / Tweakographic Narrator card now includes a dedicated Twak-Attacks header and feature-specific Twak Bot video avatar. The code resolves the expected asset names dynamically (`twak_attack_header`, `twakbot_idle`, `twakbot_searching`, `twakbot_generating`, `twakbot_excited`, and `twakbot_error`) and shows neon fallback UI until those binary resources are added by a separate asset-only PR.
+
+The visual integration is scoped to Voice Lab / Joke Gen only. It does not replace the global Prankstar header, Prankstar Bot, existing robot videos, Sound Stash, Forge, Settings, boot sequence, or bundled audio catalog.
+
+Twak Bot mood changes are driven by the existing user-controlled flow: prompt editing, local narration generation, ElevenLabs generation, preview, save, errors, and safety refusals.

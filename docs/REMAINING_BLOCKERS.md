@@ -52,3 +52,7 @@ C:\Users\Aztr0nutZs\Desktop\prankster-lab\app\build\intermediates\compile_and_ru
 ## ElevenLabs Tweaker Geographic Runtime QA Blocker
 
 Manual ElevenLabs runtime QA still requires an Android device/emulator and a locally configured `ELEVENLABS_API_KEY`. Without those, the implementation can be unit-tested and built, but real audio generation, preview, Save to Stash playback, screenshots, and logcat capture remain device QA tasks.
+
+## Twak-Attacks Runtime QA Blocker
+
+Twak-Attacks visual runtime QA requires an Android device/emulator. ElevenLabs end-to-end MP3 generation additionally requires a locally configured `ELEVENLABS_API_KEY`. If either is unavailable in the agent environment, screenshots, logcat, real ElevenLabs generation, preview playback, and Sound Stash verification must be completed locally rather than faked.

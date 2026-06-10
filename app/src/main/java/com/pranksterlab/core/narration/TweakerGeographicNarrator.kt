@@ -60,7 +60,7 @@ class TweakerGeographicNarrator {
 
     private fun refusal(tone: TweakerGeographicTone) = TweakerGeographicResult(
         title = "Try a safer field report",
-        narration = "I can generate an original mock-documentary line about harmless fictional behavior, but not targeted real-person, emergency, impersonation, violent, or non-consensual prompts.",
+        narration = "I can make it ridiculous without targeting or endangering a real person. Describe the action generically.",
         tone = tone,
         suggestedVoicePresetId = "overly_serious_narrator",
         suggestedSoundQuery = null,
