@@ -37,7 +37,7 @@ class CustomSoundManager(
             // Create the domain model for the new custom sound
             val newSound = PrankSound(
                 id = uniqueId,
-                name = name,
+                name = name.sanitizedDisplayName("Custom Sound"),
                 category = PrankCategory.CUSTOM.name,
                 packId = "user_custom",
                 assetPath = internalFile.absolutePath, // Use absolute path or custom scheme for playback
@@ -72,7 +72,7 @@ class CustomSoundManager(
         
         val trimmedSound = originalSound.copy(
             id = trimmedId,
-            name = "${originalSound.name} (Trimmed)",
+            name = "${originalSound.name} (Trimmed)".sanitizedDisplayName("Trimmed Sound"),
             durationMs = endTimeMs - startTimeMs,
             createdAt = System.currentTimeMillis()
             // Physical file trimming logic would happen here, saving to a new file.
@@ -83,6 +83,15 @@ class CustomSoundManager(
     }
 
     suspend fun addCustomSound(sound: PrankSound) {
-        repository.saveCustomSound(sound)
+        repository.saveCustomSound(sound.copy(name = sound.name.sanitizedDisplayName("Generated Sound")))
     }
+}
+
+private fun String.sanitizedDisplayName(fallback: String): String {
+    val normalized = trim()
+        .replace(Regex("\\s+"), " ")
+        .filter { it.isLetterOrDigit() || it.isWhitespace() || it in "._-'():&" }
+        .take(80)
+        .trim()
+    return normalized.ifBlank { fallback }
 }

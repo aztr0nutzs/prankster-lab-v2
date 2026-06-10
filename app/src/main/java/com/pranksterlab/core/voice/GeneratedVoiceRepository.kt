@@ -30,7 +30,7 @@ class GeneratedVoiceRepository(private val soundRepository: SoundRepository) {
 
         val sound = PrankSound(
             id = id,
-            name = settings.outputName.ifBlank { "Voice Clip" },
+            name = settings.outputName.sanitizedDisplayName("Voice Clip"),
             category = "VOICE_GENERATED",
             packId = "voice_lab",
             assetPath = file.absolutePath,
@@ -75,7 +75,7 @@ class GeneratedVoiceRepository(private val soundRepository: SoundRepository) {
 
         val createdAt = System.currentTimeMillis()
         val id = "tweaker_geo_${file.nameWithoutExtension.removePrefix("tweaker_geo_").take(24)}"
-        val safeTitle = title.ifBlank { "Tweaker Geographic Narration" }
+        val safeTitle = title.sanitizedDisplayName("Tweaker Geographic Narration")
         val parametersJson = JSONObject()
             .put("title", safeTitle)
             .put("source", ELEVENLABS_SOURCE)
@@ -123,4 +123,13 @@ class GeneratedVoiceRepository(private val soundRepository: SoundRepository) {
         return sound
     }
 
+}
+
+private fun String.sanitizedDisplayName(fallback: String): String {
+    val normalized = trim()
+        .replace(Regex("\\s+"), " ")
+        .filter { it.isLetterOrDigit() || it.isWhitespace() || it in "._-'():&" }
+        .take(80)
+        .trim()
+    return normalized.ifBlank { fallback }
 }

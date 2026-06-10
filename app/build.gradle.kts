@@ -16,6 +16,10 @@ val elevenLabsApiKey = providers.gradleProperty("ELEVENLABS_API_KEY")
     .orElse(providers.environmentVariable("ELEVENLABS_API_KEY"))
     .orElse(localProperties.getProperty("ELEVENLABS_API_KEY", ""))
 
+fun String.asBuildConfigString(): String {
+    return "\"${replace("\\", "\\\\").replace("\"", "\\\"")}\""
+}
+
 
 android {
     namespace = "com.pranksterlab"
@@ -27,7 +31,21 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
-        buildConfigField("String", "ELEVENLABS_API_KEY", "\"${elevenLabsApiKey.get().replace("\\", "\\\\").replace("\"", "\\\"")}\"")
+    }
+
+    buildTypes {
+        debug {
+            buildConfigField("String", "ELEVENLABS_API_KEY", elevenLabsApiKey.get().asBuildConfigString())
+        }
+        release {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+            buildConfigField("String", "ELEVENLABS_API_KEY", "\"\"")
+        }
     }
 
     compileOptions {
