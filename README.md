@@ -1,10 +1,10 @@
 <div align="center">
-  <img src="./prankstar_ad1.png" alt="Prankster Lab v2 banner" width="100%" />
+  <img src="./prankstar_ad1.png" alt="Prankst⭐️r Lab" width="100%" />
 </div>
 
 <div align="center">
 
-# Prankst⭐️r Lab v2 
+# Prankst⭐️r Lab 
 
 <p>
   <strong>Premium prank soundboard • Audio lab • Reactive sound experience</strong>
@@ -23,16 +23,16 @@
 
 ## Overview
 
-**Prankster Lab v2** is a premium prank soundboard and audio utility built for fast, fun, and highly organized sound triggering. The project blends a polished user interface with a growing audio catalog, advanced sound-management workflows, and a strong foundation for reactive, prank-oriented interactions.
+**Prankst⭐️r Lab** is a premium prank soundboard and audio utility built for fast, fun, and highly organized sound triggering. The project blends a polished user interface with a growing audio catalog, advanced sound-management workflows, and a strong foundation for reactive, prank-oriented interactions.
 
 <div align="center">
-  <img src="./prankstar_ad2.png" alt="Prankster Lab v2 visual showcase 1" width="92%" />
+  <img src="./prankstar_ad2.png" alt="Prankst⭐️r Lab Visual Showcase" width="92%" />
 </div>
 
 It is designed to feel less like a basic button board and more like a **stylized audio playground**: a place where users can browse categories, trigger sounds instantly, explore curated packs, and use randomizer, timer, Sound Forge, and Voice Lab workflows.
 
 <div align="center">
-  <img src="./prankstar_ad4.png" alt="Prankster Lab v2" width="92%" />
+  <img src="./prankstar_ad4.png" alt="Prankst⭐️r Lab" width="92%" />
 </div>
 
 ---
@@ -52,7 +52,7 @@ It is designed to feel less like a basic button board and more like a **stylized
 
 ## Core experience
 
-Prankster Lab v2 is built around a few major pillars:
+Prankst⭐️r Lab is built around a few major pillars:
 
 ### 1) Instant sound triggering
 - Fast access to prank audio
@@ -140,7 +140,7 @@ The repository’s sound data and planning docs show a broad, curated prank libr
 This structure makes the app easy to browse while keeping the content playful and varied.
 
 <div align="center">
-  <img src="./twak_attack_header.png" alt="Prankster Lab v2 banner" width="100%" />
+  <img src="./twak_attack_header.png" alt=r width="100%" />
 </div>
 
 ---
@@ -218,7 +218,7 @@ Build details and phone-controlled Codex/devcontainer setup are documented in `d
 
 ## Audio sourcing philosophy
 
-Prankster Lab v2 takes audio quality and safety seriously.
+Prankst⭐️r Lab takes audio quality and safety seriously.
 
 ### Recommended sourcing principles
 - use royalty-free or fully owned audio
