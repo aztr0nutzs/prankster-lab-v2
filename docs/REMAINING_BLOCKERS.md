@@ -10,34 +10,13 @@ Severity: Critical
 
 Affected areas: whole app, WebView home, Library, Voice Lab, Sound Forge, Bot AI, Twak-Attacks, Settings.
 
-Evidence: `adb version` succeeds, but `adb devices -l` returned no attached devices during the final audit. No fresh screenshots or logcat could be captured.
+Evidence: `adb devices -l` returned no attached devices during the final audit. Captured output: `qa/blockerfix_device_status.txt`. No fresh screenshots or logcat could be captured.
 
 Fix required: connect an unlocked Android device or emulator, install `app/build/outputs/apk/debug/app-debug.apk`, launch `com.pranksterlab`, complete the runtime checklist, and save screenshots plus logcat.
 
 Test to close: fresh screenshots for Home, Library, Voice Lab, Twak-Attacks, Sound Forge, Bot, and Settings; logcat with no launch/playback/generation crashes; verified install and relaunch.
 
-### 2. Twak-Attacks visual assets are not packaged under app resource names
-
-Severity: Critical
-
-Affected areas: `TwakAttackHeader`, `TwakBotVideo`, `TwakBotMood`, Voice Lab Twak-Attacks section.
-
-Evidence: these expected resources are missing:
-
-- `app/src/main/res/drawable/twak_attack_header.png`
-- `app/src/main/res/raw/twakbot_idle.mp4`
-- `app/src/main/res/raw/twakbot_searching.mp4`
-- `app/src/main/res/raw/twakbot_generating.mp4`
-- `app/src/main/res/raw/twakbot_excited.mp4`
-- `app/src/main/res/raw/twakbot_error.mp4`
-
-Root-level source files exist (`twak_attack_header.png`, `twakbot1.mp4` through `twakbot5.mp4`), but they are not imported into Android resources under the names the app resolves.
-
-Fix required: map the root Twak assets into the expected Android resource paths, rebuild, and verify the Twak UI renders each mood video instead of fallback content.
-
-Test to close: exact path check passes, `TwakBotMoodTest` resolves nonzero raw resource IDs, and device screenshots show the Twak header plus idle/searching/generating/excited/error states.
-
-### 3. Release signing is not configured/proven
+### 2. Release signing is not configured/proven
 
 Severity: Critical
 
@@ -49,7 +28,7 @@ Fix required: configure release signing or Play App Signing upload key flow, pro
 
 Test to close: signed release AAB is generated and accepted by Play Console internal testing.
 
-### 4. Production ElevenLabs backend/auth/credits are not configured
+### 3. Production ElevenLabs backend/auth/credits are not configured
 
 Severity: Critical
 
@@ -61,7 +40,7 @@ Fix required: deploy the backend proxy, configure `VOICE_BACKEND_BASE_URL`, wire
 
 Test to close: backend integration tests and device QA prove authorized success, unauthenticated refusal, not-entitled refusal, out-of-credits refusal, rate limiting, and no Android-embedded provider key.
 
-### 5. Google Play Billing and server purchase verification are not implemented
+### 4. Google Play Billing and server purchase verification are not implemented
 
 Severity: Critical
 
@@ -75,45 +54,33 @@ Test to close: sandbox purchase, restore, refund/revocation, credit spend, and e
 
 ## High Blockers
 
-### 6. Release artifact size is high
+### 5. Release artifact size is high
 
 Severity: High
 
 Affected areas: Play delivery, install reliability, startup, media decoding, device storage.
 
-Evidence: debug APK is about 238.4 MiB, release unsigned APK is about 196.3 MiB, and release AAB is about 190.7 MiB.
+Evidence: after packaging Twak assets, debug APK is 268,866,295 bytes, release unsigned APK is 224,211,386 bytes, and release AAB is 217,569,217 bytes.
 
 Fix required: optimize/transcode media, remove duplicate bundled media where safe, and consider Play Asset Delivery or dynamic delivery for large optional media.
 
 Test to close: Play Console upload/pre-launch report accepts artifact size and internal testers can install/update on target devices.
 
-### 7. `reactor4.mp4` is missing from the exact packaged asset path
-
-Severity: High
-
-Affected areas: Stable V9 reactor auditability and media packaging.
-
-Evidence: `app/src/main/assets/prankstar/assets/reactor4.mp4` is missing. The HTML embeds reactor 4 as base64 video, but the exact asset requested for packaging is absent.
-
-Fix required: either package `reactor4.mp4` at the expected path and reference it normally, or document and test the intentional base64 exception.
-
-Test to close: path check passes or explicit exception is approved, and device QA proves reactor 4 playback.
-
-### 8. npm dependency vulnerabilities remain
+### 6. npm dependency vulnerabilities remain
 
 Severity: High
 
 Affected areas: JavaScript tooling/backend-adjacent dependency graph.
 
-Evidence: `npm audit --omit=dev --audit-level=moderate` reports 7 vulnerabilities: 3 high and 4 moderate. High findings include `google-tts-api -> axios` and `protobufjs`.
+Evidence: initial `npm audit` reported 7 vulnerabilities: 3 high and 4 moderate. Non-force `npm audit fix` reduced this to 2 high vulnerabilities through `google-tts-api -> axios`. The remaining remediation requires `npm audit fix --force`, which would install `google-tts-api@0.0.6` and is a breaking change.
 
-Fix required: run a dependency compatibility pass. The `google-tts-api` remediation path may be semver-major and should be tested carefully.
+Fix required: replace/remove `google-tts-api` or run a dedicated dependency compatibility pass for the forced breaking remediation.
 
 Test to close: `npm audit --omit=dev --audit-level=moderate` exits cleanly or remaining findings are documented as non-runtime/non-shipped risk.
 
 ## Medium Blockers
 
-### 9. Store/legal checklist is not production-final
+### 7. Store/legal checklist is not production-final
 
 Severity: Medium
 
@@ -125,7 +92,7 @@ Fix required: publish reviewed privacy policy, complete Data Safety and content 
 
 Test to close: Play Console internal test artifact has completed Data Safety, content rating, privacy URL, and pre-launch report review.
 
-### 10. Bot AI unit and runtime coverage are incomplete
+### 8. Bot AI unit and runtime coverage are incomplete
 
 Severity: Medium
 
@@ -137,7 +104,7 @@ Fix required: add focused unit tests and run a device checklist for the represen
 
 Test to close: unit tests cover safe commands and refusals, and device QA proves playback, stop-all, navigation, recommendations, joke generation, and Twak handoff.
 
-### 11. Requested historic audit reports are absent
+### 9. Requested historic audit reports are absent
 
 Severity: Medium
 
@@ -150,7 +117,7 @@ Evidence: the following requested files were not present:
 - `docs/STABLE_V9_WEBVIEW_BRIDGE_REPORT.md`
 - `docs/LOCAL_WINDOWS_BUILD_RUNTIME_QA.md`
 
-Fix required: recreate them or mark them as intentionally superseded by `docs/FINAL_PRODUCTION_READINESS_AUDIT.md`.
+Fix required: recreate the remaining absent reports or mark them as intentionally superseded by `docs/FINAL_PRODUCTION_READINESS_AUDIT.md`. `docs/STABLE_V9_WEBVIEW_BRIDGE_REPORT.md` has been recreated.
 
 Test to close: documentation index or audit packet clearly points to current replacements.
 
@@ -175,8 +142,30 @@ Test to close: documentation index or audit packet clearly points to current rep
 - `node tools\advanced_validate.cjs` passed with 369 files.
 - `gradlew.bat assembleRelease --stacktrace --console=plain` passed.
 - `gradlew.bat bundleRelease --stacktrace --console=plain` passed.
+- Twak-Attacks header and bot videos are packaged under expected Android resource names.
+- `app/src/main/assets/prankstar/assets/reactor4.mp4` exists at the exact requested path.
 - Targeted secret scan found no real committed provider key.
 - `npm ci` passed.
 - `npm run lint` passed after dependency install.
 - `npm run build` passed after dependency install.
+- Non-force `npm audit fix` removed the moderate npm findings.
 - `git diff --check` passed with CRLF warnings only in existing `.omx` files.
+
+## Blockers Closed In Latest Pass
+
+### Twak-Attacks visual assets are now packaged
+
+The following resources now exist:
+
+- `app/src/main/res/drawable/twak_attack_header.png`
+- `app/src/main/res/raw/twakbot_idle.mp4`
+- `app/src/main/res/raw/twakbot_searching.mp4`
+- `app/src/main/res/raw/twakbot_generating.mp4`
+- `app/src/main/res/raw/twakbot_excited.mp4`
+- `app/src/main/res/raw/twakbot_error.mp4`
+
+Generated debug `R.txt` includes the corresponding `drawable` and `raw` symbols. Device screenshot proof remains part of the runtime QA blocker.
+
+### `reactor4.mp4` exact packaged path is now fixed
+
+`app/src/main/assets/prankstar/assets/reactor4.mp4` exists and was copied from the real root `reactor4.mp4`. Device playback proof remains part of the runtime QA blocker.

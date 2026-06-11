@@ -2,9 +2,9 @@
 
 ## Asset handling
 
-This PR intentionally does **not** include binary Twak-Attacks assets. The feature code resolves the expected Android resource names dynamically and falls back to neon static UI when the resources are not packaged. This keeps the code PR reviewable and lets the binary files ship in a separate asset-only PR.
+The Twak-Attacks binary assets are now packaged under the Android resource names resolved by the feature code. The root originals remain in place for source traceability and were not deleted.
 
-Expected asset-only PR mapping:
+Packaged mapping:
 
 | Source asset | Final Android resource |
 | --- | --- |
@@ -19,7 +19,7 @@ The default mapping is retained in code by resource name because the supplied fi
 
 ## Header sizing decision
 
-When `twak_attack_header` is packaged by the asset PR, `TwakAttackHeader` renders it in a 104dp high, full-width rounded neon frame using `ContentScale.Fit`. Until then, the component shows a neon text fallback so the code-only PR remains buildable without binary resources.
+`TwakAttackHeader` renders `twak_attack_header` in a 104dp high, full-width rounded neon frame using `ContentScale.Fit`. The fallback UI remains in code as a defensive path, but the packaged resource is now present.
 
 ## UI location
 
@@ -59,14 +59,16 @@ Targeted unit tests cover:
 
 ## Build result
 
-Static checks completed in this environment:
+Static and build checks completed on 2026-06-11:
 
-- `git diff --check`: passed.
-- `python tools/validate_sound_catalog.py`: passed.
-- `node tools/advanced_validate.cjs`: passed.
-
-Gradle unit tests and `assembleDebug` were blocked by the container Android SDK environment. `scripts/android-env-check.sh` reported no SDK from `ANDROID_HOME`, `ANDROID_SDK_ROOT`, or common Linux paths, while `local.properties` points to a Windows SDK path not present in the container.
+- `app/build/intermediates/runtime_symbol_list/debug/processDebugResources/R.txt` contains `drawable twak_attack_header`.
+- `app/build/intermediates/runtime_symbol_list/debug/processDebugResources/R.txt` contains `raw twakbot_idle`, `twakbot_searching`, `twakbot_generating`, `twakbot_excited`, and `twakbot_error`.
+- `git diff --check`: passed with only pre-existing `.omx` CRLF warnings.
+- `.\gradlew.bat clean assembleDebug --stacktrace --console=plain`: passed.
+- `.\gradlew.bat testDebugUnitTest --stacktrace --console=plain`: passed.
+- `python tools\validate_sound_catalog.py`: passed.
+- `node tools\advanced_validate.cjs`: passed.
 
 ## Runtime QA result
 
-Runtime device QA was blocked because `adb` is not installed in the container. ElevenLabs end-to-end runtime QA still requires a device/emulator plus a locally configured `ELEVENLABS_API_KEY`. No screenshots or logcat captures were faked.
+Runtime device QA remains blocked because `adb devices -l` returned no attached devices on 2026-06-11. ElevenLabs end-to-end runtime QA still requires a device/emulator plus backend/API configuration. No screenshots or logcat captures were faked.

@@ -4,17 +4,17 @@ Last updated: 2026-06-11
 
 ## 1. Executive Summary
 
-PranksterLab builds cleanly and the core packaged sound catalog is in good shape. The Android SDK environment is valid, `clean assembleDebug`, `testDebugUnitTest`, `assembleRelease`, and `bundleRelease` all passed. The 369-entry sound catalog passed both validators with no missing, corrupt, unsupported, uncataloged, orphaned, or duplicate-path failures.
+PranksterLab builds cleanly and the core packaged sound catalog is in good shape. The Android SDK environment is valid, `clean assembleDebug`, `testDebugUnitTest`, `assembleRelease`, and `bundleRelease` all passed after the Twak-Attacks and `reactor4.mp4` asset imports. The 369-entry sound catalog passed both validators with no missing, corrupt, unsupported, uncataloged, orphaned, or duplicate-path failures.
 
-The app is not production-shippable yet. The main blockers are missing current device runtime QA, missing packaged Twak-Attacks visual assets, unsigned release output, unimplemented production billing/entitlement/credit enforcement, unconfigured production ElevenLabs backend authentication, high media artifact size, and unresolved npm dependency vulnerabilities.
+The app is not production-shippable yet. The Twak-Attacks packaging blocker and exact `reactor4.mp4` packaging blocker are statically closed, but the main remaining blockers are missing current device runtime QA, unsigned release output, unimplemented production billing/entitlement/credit enforcement, unconfigured production ElevenLabs backend authentication, high media artifact size, and the remaining high-risk `google-tts-api -> axios` npm dependency chain.
 
-No feature removals, redesigns, or source-code fixes were made during this audit. `npm ci` was run to install lockfile dependencies so JavaScript lint/build could be verified.
+No feature removals, redesigns, sound catalog edits, API keys, or fake runtime results were introduced. `npm audit fix` was run without `--force` to apply safe non-breaking dependency updates, followed by `npm ci`, `npm run lint`, and `npm run build`.
 
 ## 2. Final Readiness Score
 
-Score: 62/100.
+Score: 69/100.
 
-Release decision: Not shippable for production. The current state is suitable for continued internal engineering validation only after accepting the missing runtime proof as a known audit gap. It should not move to closed testing, open testing, or production until the critical blockers in this report are closed.
+Release decision: Not shippable for production. The asset packaging blockers are improved, but the build should not move to closed testing, open testing, or production until current device QA, release signing, production backend/billing scope, and the remaining high dependency risk are resolved or explicitly removed from scope.
 
 ## 3. Build/Test Status
 
@@ -25,14 +25,16 @@ Release decision: Not shippable for production. The current state is suitable fo
 | Android SDK env vars | PASS | `ANDROID_HOME` and `ANDROID_SDK_ROOT` point to `C:\Users\Aztr0nutZs\AppData\Local\Android\Sdk`. |
 | Required SDK folders | PASS | Environment check confirmed SDK folder validity before Gradle. |
 | Gradle daemon stop | PASS | `gradlew.bat --stop` stopped existing daemons. |
-| Debug build | PASS | `gradlew.bat clean assembleDebug --stacktrace --console=plain`. |
-| Unit tests | PASS | `gradlew.bat testDebugUnitTest --stacktrace --console=plain`. |
+| Debug build | PASS | `gradlew.bat clean assembleDebug --stacktrace --console=plain` after asset imports. |
+| Unit tests | PASS | `gradlew.bat testDebugUnitTest --stacktrace --console=plain` after asset imports. |
 | Sound catalog validator | PASS | `python tools\validate_sound_catalog.py`: 369 entries, 0 failures. |
 | Advanced sound validator | PASS | `node tools\advanced_validate.cjs`: 369 files checked. |
 | JavaScript dependency install | PASS | `npm ci` completed from lockfile. |
-| JavaScript TypeScript check | PASS | `npm run lint` after `npm ci`. |
-| JavaScript production build | PASS | `npm run build` after `npm ci`. |
+| JavaScript TypeScript check | PASS | `npm run lint` after safe audit fix and `npm ci`. |
+| JavaScript production build | PASS | `npm run build` after safe audit fix and `npm ci`. |
 | `git diff --check` | PASS | CRLF warnings only in existing `.omx` files. |
+| Release APK build | PASS | `gradlew.bat assembleRelease --stacktrace --console=plain` after asset imports. |
+| Release AAB build | PASS | `gradlew.bat bundleRelease --stacktrace --console=plain` after asset imports. |
 
 Warnings seen during Android compilation are not immediate blockers but should be cleaned up before a hardened release: deprecated Material icons, deprecated WebView file URL access APIs, a few unused parameters, one unnecessary `!!`, and Java 8 source/target warnings under JDK 21.
 
@@ -40,11 +42,11 @@ Warnings seen during Android compilation are not immediate blockers but should b
 
 | Artifact | Result | Size |
 | --- | --- | --- |
-| `app/build/outputs/apk/debug/app-debug.apk` | PASS | 250,005,155 bytes, about 238.4 MiB. |
-| `app/build/outputs/apk/release/app-release-unsigned.apk` | PASS, unsigned | 205,843,592 bytes, about 196.3 MiB. |
-| `app/build/outputs/bundle/release/app-release.aab` | PASS, signing not proven | 200,000,413 bytes, about 190.7 MiB. |
+| `app/build/outputs/apk/debug/app-debug.apk` | PASS | 268,866,295 bytes, about 256.4 MiB. |
+| `app/build/outputs/apk/release/app-release-unsigned.apk` | PASS, unsigned | 224,211,386 bytes, about 213.8 MiB. |
+| `app/build/outputs/bundle/release/app-release.aab` | PASS, signing not proven | 217,569,217 bytes, about 207.5 MiB. |
 
-Release minification and resource shrinking are enabled. Release signing is not configured/proven, so the generated release artifact is not Play-ready.
+Release minification and resource shrinking are enabled. Release signing is not configured/proven, `app-release-unsigned.apk` is explicitly unsigned, and `keytool -printcert -jarfile app/build/outputs/bundle/release/app-release.aab` reported `Not a signed jar file`; the generated release output is not Play-ready.
 
 ## 5. Secret Scan Status
 
@@ -64,15 +66,15 @@ Core Prankstar identity assets are present and wired:
 | `app/src/main/assets/prankstar/prankstar_new_home_bot_screen.html` | Present. |
 | Stable home videos including `prankstar_header.mp4`, `reactor1.mp4`, `reactor2.mp4`, `reactor3.mp4`, `reactor5.mp4`, `reactor6.mp4`, `reactor7.mp4` | Present. |
 | Raw Prankstar bot videos | Present. |
-| Packaged `reactor4.mp4` at exact requested path | Missing. The HTML embeds reactor 4 as base64 video instead. |
-| `app/src/main/res/drawable/twak_attack_header.png` | Missing. |
-| `app/src/main/res/raw/twakbot_idle.mp4` | Missing. |
-| `app/src/main/res/raw/twakbot_searching.mp4` | Missing. |
-| `app/src/main/res/raw/twakbot_generating.mp4` | Missing. |
-| `app/src/main/res/raw/twakbot_excited.mp4` | Missing. |
-| `app/src/main/res/raw/twakbot_error.mp4` | Missing. |
+| Packaged `reactor4.mp4` at exact requested path | Present: `app/src/main/assets/prankstar/assets/reactor4.mp4`, 2,423,891 bytes. |
+| `app/src/main/res/drawable/twak_attack_header.png` | Present, 3,119,986 bytes. |
+| `app/src/main/res/raw/twakbot_idle.mp4` | Present, 2,515,624 bytes. |
+| `app/src/main/res/raw/twakbot_searching.mp4` | Present, 2,710,872 bytes. |
+| `app/src/main/res/raw/twakbot_generating.mp4` | Present, 2,648,920 bytes. |
+| `app/src/main/res/raw/twakbot_excited.mp4` | Present, 3,204,039 bytes. |
+| `app/src/main/res/raw/twakbot_error.mp4` | Present, 2,236,248 bytes. |
 
-The repo root contains `twak_attack_header.png` and `twakbot1.mp4` through `twakbot5.mp4`, but they are not packaged under the resource names used by `TwakAttackHeader`, `TwakBotVideo`, and `TwakBotMood`.
+The repo root still contains the original Twak assets. They were copied into Android resources under the names used by `TwakAttackHeader`, `TwakBotVideo`, and `TwakBotMood`; existing Prankstar Bot clips were not replaced.
 
 Large bundled media drives high APK/AAB size. Store delivery, install reliability, and device decoding should be tested before closed testing.
 
@@ -106,7 +108,7 @@ Static status: wired. Runtime status: not proven in this audit because no device
 
 ## 9. Reactor Status
 
-Reactor videos 1, 2, 3, 5, 6, and 7 are packaged as assets. Reactor 4 is embedded in the HTML as base64 data but is missing from the exact file path `app/src/main/assets/prankstar/assets/reactor4.mp4`.
+Reactor videos are packaged as assets, and the exact requested reactor 4 path now exists at `app/src/main/assets/prankstar/assets/reactor4.mp4`. The HTML still contains an embedded base64 reactor 4 path, so device QA must prove runtime playback.
 
 Reactor UI and bridge calls are present statically. Runtime playback, sizing, and repeated navigation behavior still need device QA.
 
@@ -162,7 +164,7 @@ Test coverage is incomplete. Current tests cover parts of Twak parsing and entit
 
 Twak-Attacks/Tweaker Geographic text generation exists inside Voice Lab. The local narrator validates action/setting text, refuses unsafe prompts, supports tones, and has tests for harmless generation, empty input refusal, unsafe impersonation refusal, and the dedicated ElevenLabs voice ID.
 
-Visual integration is blocked. The app looks up `twak_attack_header` and raw videos named `twakbot_idle`, `twakbot_searching`, `twakbot_generating`, `twakbot_excited`, and `twakbot_error`; none of those packaged resources exist. The UI will fall back instead of rendering the requested final Twak visual states.
+Visual integration is statically packaged. The app looks up `twak_attack_header` and raw videos named `twakbot_idle`, `twakbot_searching`, `twakbot_generating`, `twakbot_excited`, and `twakbot_error`; all of those packaged resources now exist and appear in the generated debug `R.txt`. Device screenshots are still required to prove final visual rendering on hardware.
 
 ## 15. ElevenLabs Voice Status
 
@@ -203,7 +205,7 @@ Remaining policy blockers:
 
 ## 18. Runtime QA Status
 
-Runtime QA is blocked in this audit. `adb version` succeeded, but `adb devices -l` returned no attached devices.
+Runtime QA is blocked in this audit. `adb devices -l` returned no attached devices on 2026-06-11; the captured output is `qa/blockerfix_device_status.txt`.
 
 Not verified in this audit:
 
@@ -226,15 +228,19 @@ No fresh screenshots or logcat files were produced in this audit because no Andr
 ## 20. Production Blockers
 
 1. No connected-device runtime regression QA.
-2. Missing packaged Twak-Attacks header and bot video resources.
-3. Release artifact is unsigned/not Play-ready.
-4. Production ElevenLabs backend URL/auth/entitlement/credit enforcement is not configured.
-5. Google Play Billing implementation and backend purchase verification are not implemented.
-6. High release artifact size from bundled media.
-7. `reactor4.mp4` is missing from the exact packaged asset path.
-8. npm audit reports 7 vulnerabilities: 3 high and 4 moderate.
-9. Privacy policy URL, Data Safety, content rating, and Play pre-launch review are not complete.
-10. Bot AI runtime QA and deeper bot unit coverage are incomplete.
+2. Release artifact is unsigned/not Play-ready.
+3. Production ElevenLabs backend URL/auth/entitlement/credit enforcement is not configured.
+4. Google Play Billing implementation and backend purchase verification are not implemented.
+5. High release artifact size from bundled media.
+6. npm audit still reports 2 high vulnerabilities through `google-tts-api -> axios`; the remaining fix is breaking.
+7. Privacy policy URL, Data Safety, content rating, and Play pre-launch review are not complete.
+8. Bot AI runtime QA and deeper bot unit coverage are incomplete.
+
+Closed in this pass:
+
+- Missing packaged Twak-Attacks header and bot video resources.
+- Missing exact packaged `app/src/main/assets/prankstar/assets/reactor4.mp4` path.
+- Moderate npm audit findings remediated with non-force `npm audit fix`.
 
 ## 21. Non-Blocking Polish Items
 
@@ -249,7 +255,6 @@ No fresh screenshots or logcat files were produced in this audit because no Andr
 
 Do not submit to production.
 
-Before any closed test, close the Twak asset packaging blocker, sign the release artifact, run current device runtime QA with screenshots/logcat, and resolve or explicitly risk-accept the npm audit findings and media size risk.
+Before any closed test, sign the release artifact, run current device runtime QA with screenshots/logcat, and resolve or explicitly risk-accept the remaining npm audit finding and media size risk.
 
 Before production, complete Play Billing, backend entitlement/credit enforcement, production ElevenLabs backend auth, privacy policy hosting, Play Data Safety, content rating, pre-launch report review, and Android vitals monitoring.
-
